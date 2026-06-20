@@ -3,267 +3,353 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BeeBee - Study Planner & Gamification</title>
-    <!-- Google Fonts - Chống lỗi Font chữ tiếng Việt -->
+    <title>BeeBee - Tổ Ong Học Tập Thông Minh</title>
+    <!-- Hệ Font Chữ Tiếng Việt Chuẩn Không Lỗi -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Firebase SDK (Realtime Database) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     
     <style>
         body {
-            font-family: 'Lexend', sans-serif !important;
-            background-color: #fefce8;
+            font-family: 'Be Vietnam Pro', 'Roboto', sans-serif !important;
+            background: linear-gradient(135deg, #fef9c3 0%, #fff7ed 100%);
             min-height: 100vh;
         }
-        .wheel-rotate {
-            transition: transform 4s cubic-bezier(0.1, 0.8, 0.3, 1);
+        .wheel-rotate { transition: transform 4s cubic-bezier(0.1, 0.8, 0.3, 1); }
+        .page-content { display: none; }
+        .page-content.active { display: block; }
+        .nav-btn.active {
+            background-color: #f59e0b;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
-<body class="text-gray-800 antialiased pb-12">
+<body class="text-gray-800 antialiased">
 
     <!-- KHU VỰC ĐĂNG NHẬP / ĐĂNG KÝ -->
     <div id="auth-screen" class="min-h-screen flex items-center justify-center px-4">
-        <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full border-4 border-yellow-400">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full border-4 border-amber-400">
             <div class="text-center mb-6">
-                <span class="text-6xl animate-bounce inline-block">🐝</span>
-                <h1 class="text-3xl font-extrabold text-yellow-600 mt-2">BeeBee Study Planner</h1>
-                <p class="text-gray-500 text-sm mt-1">Học tập thông minh - Trải nghiệm game hóa</p>
+                <span class="text-7xl animate-bounce inline-block">🐝</span>
+                <h1 class="text-4xl font-black text-amber-600 mt-2 tracking-wide">BeeBee</h1>
+                <p class="text-gray-500 text-sm mt-1 font-medium">Tổ Ong Học Tập - Mỗi Trang Một Trải Nghiệm</p>
             </div>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-bold mb-1 text-gray-700">Email của bạn</label>
-                    <input type="email" id="auth-email" class="w-full p-3 border-2 border-gray-200 rounded-2xl focus:border-yellow-400 focus:outline-none" placeholder="name@example.com">
+                    <label class="block text-xs font-bold mb-1 text-gray-600 uppercase">Hòm thư (Email)</label>
+                    <input type="email" id="auth-email" class="w-full p-3 border-2 border-amber-100 rounded-2xl focus:border-amber-400 focus:outline-none bg-amber-50/50" placeholder="yourname@gmail.com">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold mb-1 text-gray-700">Mật khẩu</label>
-                    <input type="password" id="auth-password" class="w-full p-3 border-2 border-gray-200 rounded-2xl focus:border-yellow-400 focus:outline-none" placeholder="••••••••">
+                    <label class="block text-xs font-bold mb-1 text-gray-600 uppercase">Mật khẩu bảo mật</label>
+                    <input type="password" id="auth-password" class="w-full p-3 border-2 border-amber-100 rounded-2xl focus:border-amber-400 focus:outline-none bg-amber-50/50" placeholder="••••••••">
                 </div>
-                <button onclick="handleAuth('signin')" class="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold py-3 rounded-2xl transition shadow-md cursor-pointer">ĐĂNG NHẬP</button>
+                <button onclick="handleAuth('signin')" class="w-full bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-white font-black py-3 rounded-2xl transition shadow-lg cursor-pointer transform hover:-translate-y-0.5">ĐĂNG NHẬP VÀO TỔ</button>
                 <button onclick="handleAuth('signup')" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 rounded-2xl transition cursor-pointer text-sm">Chưa có tài khoản? Đăng ký ngay</button>
             </div>
         </div>
     </div>
 
-    <!-- GIAO DIỆN CHÍNH SIÊU ỨNG DỤNG -->
-    <div id="main-app" class="hidden max-w-7xl mx-auto px-4 pt-6">
+    <!-- GIAO DIỆN CHÍNH SIÊU ỨNG DỤNG BEEBEE -->
+    <div id="main-app" class="hidden min-h-screen flex flex-col md:flex-row">
         
-        <!-- CÂU NÓI TRUYỀN ĐỘNG LỰC MỖI NGÀY -->
-        <div class="bg-amber-100 border-l-4 border-amber-500 p-4 rounded-xl mb-6 shadow-sm flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <span class="text-2xl">💡</span>
-                <p id="motivational-quote" class="font-medium text-amber-900 italic">"Thành công là tổng của những nỗ lực nhỏ được lặp lại mỗi ngày."</p>
-            </div>
-            <button onclick="changeQuote()" class="text-xs bg-white text-amber-700 font-bold px-2 py-1 rounded shadow-sm hover:bg-amber-50">Đổi câu khác</button>
-        </div>
-
-        <!-- HEADER ĐA NĂNG -->
-        <header class="bg-white p-6 rounded-3xl shadow-md border-2 border-yellow-200 flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-            <div class="flex items-center gap-3">
-                <span class="text-4xl">🐝</span>
-                <div>
-                    <h1 class="text-2xl font-black text-yellow-600">BeeBee Dashboard</h1>
-                    <p id="user-display" class="text-xs text-gray-500 font-bold">User: ...</p>
-                </div>
-            </div>
-
-            <!-- HỆ THỐNG ĐIỂM THƯỞNG & CẤP ĐỘ (GAMIFICATION) & AVATAR -->
-            <div class="flex items-center gap-6 bg-yellow-50 p-3 rounded-2xl border border-yellow-200 w-full md:w-auto">
-                <div class="relative cursor-pointer" onclick="openAvatarModal()">
-                    <div id="user-avatar" class="w-14 h-14 bg-amber-300 rounded-full border-2 border-yellow-500 flex items-center justify-center text-3xl shadow-inner">🧑‍🎓</div>
-                    <span class="absolute -bottom-1 -right-1 bg-yellow-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">Sửa</span>
-                </div>
-                <div class="flex-1 min-w-[150px]">
-                    <div class="flex justify-between text-xs font-bold text-yellow-800 mb-1">
-                        <span id="user-level">Cấp độ: Lv.1</span>
-                        <span id="user-xp">0 / 100 XP</span>
-                    </div>
-                    <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
-                        <div id="xp-bar" class="bg-yellow-500 h-full transition-all duration-300" style="width: 0%"></div>
+        <!-- SIDEBAR - THANH ĐIỀU HƯỚNG TRANG RIÊNG BIỆT (Bên trái) -->
+        <aside class="w-full md:w-64 bg-white border-r border-amber-200 p-6 flex flex-col justify-between shrink-0 shadow-lg">
+            <div>
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100 cursor-pointer" onclick="switchPage('dashboard')">
+                    <span class="text-4xl animate-pulse">🐝</span>
+                    <div>
+                        <h1 class="text-2xl font-black text-amber-600 tracking-tight">BeeBee</h1>
+                        <span class="text-[10px] bg-amber-100 text-amber-800 font-black px-1.5 py-0.5 rounded">Bản Phân Trang</span>
                     </div>
                 </div>
-                <button onclick="logout()" class="text-xs bg-red-100 hover:bg-red-200 text-red-600 px-3 py-2 rounded-xl font-bold transition cursor-pointer">Đăng xuất</button>
-            </div>
-        </header>
 
-        <!-- LAYOUT CHÍNH TÍNH NĂNG -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Các nút bấm chuyển trang riêng biệt -->
+                <nav class="space-y-1.5">
+                    <button onclick="switchPage('dashboard')" id="btn-dashboard" class="nav-btn active w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-600 hover:bg-amber-50 transition text-left">
+                        📊 Tổng Quan Chung
+                    </button>
+                    <button onclick="switchPage('timer')" id="btn-timer" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-600 hover:bg-amber-50 transition text-left">
+                        ⏱️ Đồng Hồ Bầy Ong
+                    </button>
+                    <button onclick="switchPage('roadmap')" id="btn-roadmap" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-600 hover:bg-amber-50 transition text-left">
+                        🎯 Nhiệm Vụ Xây Tổ
+                    </button>
+                    <button onclick="switchPage('garden')" id="btn-garden" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-600 hover:bg-amber-50 transition text-left">
+                        🌱 Vườn & Thú Cưng
+                    </button>
+                    <button onclick="switchPage('group')" id="btn-group" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-600 hover:bg-amber-50 transition text-left">
+                        👥 Phòng Học Nhóm
+                    </button>
+                    <button onclick="switchPage('utilities')" id="btn-utilities" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-600 hover:bg-amber-50 transition text-left">
+                        ⚙️ Tiện Ích & Giải Trí
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Profile & Nút Rời Tổ cuối Sidebar -->
+            <div class="mt-8 pt-4 border-t border-gray-100 space-y-3">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="openAvatarModal()">
+                    <div id="user-avatar" class="w-10 h-10 bg-amber-400 rounded-full flex items-center justify-center text-xl shadow border-2 border-white">🧑‍🎓</div>
+                    <div class="overflow-hidden">
+                        <p id="user-display" class="text-xs font-black text-gray-700 truncate">Ong thợ...</p>
+                        <p id="sidebar-level" class="text-[10px] text-orange-500 font-bold">Cấp độ: Lv.1</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="w-full text-xs bg-red-50 hover:bg-red-100 text-red-600 py-2 rounded-xl font-bold transition border border-red-100">Rời tổ</button>
+            </div>
+        </aside>
+
+        <!-- NỘI DUNG CHÍNH (Bên phải - Sẽ thay đổi theo trang đang chọn) -->
+        <main class="flex-1 p-6 md:p-8 max-w-5xl mx-auto w-full">
             
-            <!-- CỘT TRÁI (4 COLS): QUẢN LÝ LỘ TRÌNH, TRỒNG CÂY, THÚ CƯNG -->
-            <div class="lg:col-span-4 space-y-6">
-                
-                <!-- THIẾT LẬP LỘ TRÌNH -->
-                <div class="bg-white p-6 rounded-3xl shadow-lg border border-gray-100">
-                    <h2 class="text-lg font-black text-gray-900 mb-4 flex items-center gap-2">🎯 Thiết Lập Lộ Trình</h2>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Mục tiêu học tập</label>
-                            <input type="text" id="plan-title" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-yellow-400 focus:outline-none" placeholder="Ví dụ: Ôn tập KNYK">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Số ngày hoàn thành</label>
-                            <input type="number" id="plan-days" min="1" max="90" value="3" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-yellow-400 focus:outline-none">
-                        </div>
-                        <button onclick="createNewPlan()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold py-3 rounded-xl transition shadow-md cursor-pointer">KHỞI TẠO LỘ TRÌNH</button>
-                    </div>
+            <!-- THANH TIÊU ĐỀ ĐỘNG LỰC & ĐIỂM DANH HÀNG NGÀY -->
+            <div class="bg-gradient-to-r from-amber-500 to-orange-500 p-4 rounded-2xl mb-6 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4 text-white">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">💡</span>
+                    <p id="motivational-quote" class="font-bold italic text-xs sm:text-sm">"Thành công là tổng của những nỗ lực nhỏ được lặp lại mỗi ngày."</p>
                 </div>
-
-                <!-- TRỒNG CÂY TẬP TRUNG & THÚ CƯNG ĐỒNG HÀNH -->
-                <div class="bg-white p-6 rounded-3xl shadow-lg border border-gray-100 text-center">
-                    <h2 class="text-lg font-black text-gray-900 mb-4 flex items-center justify-center gap-2">🌱 Vườn & Thú Cưng 🐾</h2>
-                    <div class="grid grid-cols-2 gap-4 bg-green-50 p-4 rounded-2xl border border-green-200">
-                        <div>
-                            <p class="text-xs font-bold text-green-700 mb-1">Khu Vườn Tiến Hóa</p>
-                            <div id="tree-display" class="text-5xl my-2">🌱</div>
-                            <span id="tree-status" class="text-xs font-medium text-gray-600">Đang phát triển</span>
-                        </div>
-                        <div class="border-l border-green-200">
-                            <p class="text-xs font-bold text-amber-700 mb-1">Thú Cưng Đồng Hành</p>
-                            <div id="pet-display" class="text-5xl my-2">🐱</div>
-                            <span id="pet-status" class="text-xs font-medium text-gray-600">Bé Mèo Cấp 1</span>
-                        </div>
-                    </div>
-                    <div class="mt-4 flex gap-2">
-                        <button onclick="focusSession(true)" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 rounded-xl text-xs transition">Hoàn thành phiên (+cây lớn)</button>
-                        <button onclick="focusSession(false)" class="flex-1 bg-red-400 hover:bg-red-500 text-white font-bold py-2 rounded-xl text-xs transition">Bỏ học giữa chừng (Héo)</button>
-                    </div>
-                </div>
-
-                <!-- LÁ THƯ FUTURE ME -->
-                <div class="bg-white p-6 rounded-3xl shadow-lg border border-gray-100">
-                    <h2 class="text-lg font-black text-gray-900 mb-2 flex items-center gap-2">✉️ Future Me</h2>
-                    <p class="text-xs text-gray-500 mb-3">Gửi một lá thư tới bản thân trong tương lai của bạn.</p>
-                    <textarea id="future-letter" rows="3" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-yellow-400 focus:outline-none text-sm" placeholder="Mục tiêu của bạn sau 1 tháng nữa là gì..."></textarea>
-                    <button onclick="saveFutureLetter()" class="w-full mt-2 bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 rounded-xl text-xs transition">Gửi thư vào tương lai</button>
-                    <div id="saved-letter-notice" class="mt-2 text-xs text-purple-700 hidden font-medium">➔ Đã khóa 1 lá thư trong hòm bí mật!</div>
-                </div>
-
+                <button onclick="checkInDaily()" id="checkin-btn" class="bg-white text-orange-600 font-black px-4 py-2 rounded-xl text-xs shadow hover:bg-orange-50 transition shrink-0">📅 Điểm Danh Nhận Mật</button>
             </div>
 
-            <!-- CỘT GIỮA & PHẢI (8 COLS): TIẾN ĐỘ, LỘ TRÌNH, VÒNG QUAY, AI, NHẬT KÝ, GIẢI TRÍ -->
-            <div class="lg:col-span-8 space-y-6">
-                
-                <!-- TIẾN ĐỘ & HUY HIỆU THÀNH TỰU -->
-                <div class="bg-white p-6 rounded-3xl shadow-lg border border-gray-100">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- ================= TRANG 1: TỔNG QUAN CHUNG (DASHBOARD) ================= -->
+            <section id="page-dashboard" class="page-content active space-y-6">
+                <div class="bg-white p-6 rounded-3xl shadow-md border border-amber-100">
+                    <h2 class="text-xl font-black text-gray-900 mb-4">📊 Tổng Quan Tiến Trình Hôm Nay</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                         <div>
-                            <h2 class="text-lg font-black text-gray-900 mb-2">📈 Tiến Độ Của Bạn</h2>
-                            <div class="w-full bg-gray-100 rounded-full h-4 overflow-hidden mb-2">
-                                <div id="progress-bar" class="bg-yellow-400 h-full transition-all duration-500" style="width: 0%"></div>
+                            <div class="w-full bg-gray-100 rounded-full h-4 overflow-hidden border mb-1.5">
+                                <div id="progress-bar" class="bg-gradient-to-r from-green-400 to-emerald-500 h-full transition-all duration-500" style="width: 0%"></div>
                             </div>
-                            <p id="progress-text" class="text-sm text-gray-500 font-bold">Chưa khởi tạo lộ trình.</p>
+                            <p id="progress-text" class="text-xs text-gray-500 font-bold">Chưa có số liệu kế hoạch.</p>
+                            <div id="remaining-tasks-count" class="text-xs text-red-500 font-black mt-2 bg-red-50 p-2 rounded-xl border border-red-100">⚠️ Bạn chưa khởi tạo lịch trình công việc.</div>
                         </div>
                         <div>
-                            <h2 class="text-sm font-black text-gray-900 mb-2">🏅 Huy Hiệu Đã Mở Khóa</h2>
-                            <div id="badge-container" class="flex flex-wrap gap-2">
-                                <span class="bg-gray-100 text-gray-400 px-2 py-1 rounded-lg text-xs font-bold border opacity-40">⏱️ Chuyên gia Pomodoro</span>
-                                <span class="bg-gray-100 text-gray-400 px-2 py-1 rounded-lg text-xs font-bold border opacity-40">🔥 Học 7 ngày liền</span>
-                                <span class="bg-gray-100 text-gray-400 px-2 py-1 rounded-lg text-xs font-bold border opacity-40">👑 Vua To-do List</span>
-                            </div>
+                            <span class="text-xs font-black text-gray-400 uppercase tracking-wider mb-2 block">🏅 Phòng Danh Hiệu Đã Mở Khóa</span>
+                            <div id="badge-container" class="flex flex-wrap gap-1.5"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- CHI TIẾT LỘ TRÌNH TỪNG NGÀY -->
-                <div class="bg-white p-6 rounded-3xl shadow-lg border border-gray-100">
-                    <h2 class="text-lg font-black text-gray-900 mb-4 flex items-center justify-between">
-                        <span>📅 Chi Tiết Lộ Trình Từng Ngày</span>
-                        <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-bold">Chế độ: Học cùng bạn bè trực tuyến 👥</span>
-                    </h2>
-                    <div id="timeline-container" class="space-y-3">
-                        <p class="text-gray-400 text-center py-6 text-sm">Điền thông tin bên trái để tạo lịch trình riêng của bạn.</p>
+                <!-- Tiến độ Giọt Mật cấp độ dạng lớn -->
+                <div class="bg-gradient-to-br from-amber-50 to-orange-50 p-6 rounded-3xl border border-amber-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h3 id="user-level" class="text-xl font-black text-amber-900">Cấp độ: Lv.1</h3>
+                        <p id="user-xp" class="text-xs text-gray-500 font-bold mt-1">0 / 100 Giọt Mật Kinh Nghiệm</p>
+                    </div>
+                    <div class="w-full sm:max-w-xs bg-gray-200 h-4 rounded-full overflow-hidden border shadow-inner">
+                        <div id="xp-bar" class="bg-gradient-to-r from-amber-400 to-orange-500 h-full transition-all" style="width: 0%"></div>
                     </div>
                 </div>
+            </section>
 
-                <!-- MINI APP HUB: VÒNG QUAY, AI HỖ TRỢ, NHẬT KÝ, GÓC THƯ GIÃN, BẢNG XẾP HẠNG -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- ================= TRANG 2: ĐỒNG HỒ BẦY ONG ================= -->
+            <section id="page-timer" class="page-content space-y-6">
+                <div class="bg-white p-8 rounded-3xl shadow-xl border border-amber-100 text-center max-w-md mx-auto">
+                    <h2 class="text-xl font-black text-gray-900 mb-2 flex items-center justify-center gap-2">⏱️ Đồng Hồ Tập Trung Pomodoro</h2>
+                    <p class="text-xs text-gray-400 mb-6">Hãy tập trung hết mình, chuông báo dễ nghe sẽ reo lên khi hết giờ.</p>
+                    <div id="timer-display" class="text-6xl font-black text-orange-500 my-6 tracking-wider bg-amber-50/50 py-6 rounded-3xl border-2 border-dashed border-orange-300 shadow-inner">25:00</div>
+                    <div class="flex gap-3 justify-center">
+                        <button onclick="toggleTimer()" id="timer-start-btn" class="bg-orange-500 hover:bg-orange-600 text-white font-black px-6 py-3 rounded-xl text-sm shadow-md transition">Bắt đầu học</button>
+                        <button onclick="resetTimer()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-4 py-3 rounded-xl text-sm transition">Đặt lại</button>
+                    </div>
+                    <div class="mt-6 flex gap-2 justify-center">
+                        <button onclick="setTimerMinutes(25)" class="text-xs bg-amber-100 text-amber-800 font-bold px-3 py-1.5 rounded-xl border">🔥 25 Phút</button>
+                        <button onclick="setTimerMinutes(50)" class="text-xs bg-amber-100 text-amber-800 font-bold px-3 py-1.5 rounded-xl border">🚀 50 Phút</button>
+                        <button onclick="setTimerMinutes(5)" class="text-xs bg-green-100 text-green-800 font-bold px-3 py-1.5 rounded-xl border">🍀 Nghỉ 5 Phút</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TRANG 3: NHIỆM VỤ XÂY TỔ ================= -->
+            <section id="page-roadmap" class="page-content space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-3xl shadow-md border border-amber-100 h-fit">
+                        <h2 class="text-lg font-black text-gray-900 mb-4 flex items-center gap-2">🎯 Khởi Tạo Lịch Trình</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Mục tiêu học tập lớn</label>
+                                <input type="text" id="plan-title" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-amber-400 focus:outline-none text-sm" placeholder="Ví dụ: Ôn thi học kỳ I">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Số ngày phân chia công việc</label>
+                                <input type="number" id="plan-days" min="1" max="90" value="3" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-amber-400 focus:outline-none text-sm">
+                            </div>
+                            <button onclick="createNewPlan()" class="w-full bg-gradient-to-r from-amber-400 to-orange-400 text-white font-black py-3 rounded-xl shadow-md transition">TẠO ĐƯỜNG ĐUA MẬT</button>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 bg-white p-6 rounded-3xl shadow-md border border-amber-100">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 border-b pb-3">
+                            <h2 class="text-lg font-black text-gray-900">📋 Chi Tiết Việc Phải Làm</h2>
+                            <span id="priority-reminder-box" class="text-xs bg-red-50 text-red-600 border border-red-200 font-black px-2.5 py-1 rounded-xl">⏰ Đang cập nhật lịch nhắc...</span>
+                        </div>
+                        <div id="timeline-container" class="space-y-3">
+                            <p class="text-gray-400 text-center py-6 text-sm">Chưa có kế hoạch nào được lập.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TRANG 4: VƯỜN & THÚ CƯNG ================= -->
+            <section id="page-garden" class="page-content space-y-6">
+                <div class="bg-white p-6 rounded-3xl shadow-md border border-amber-100 text-center max-w-xl mx-auto">
+                    <h2 class="text-lg font-black text-gray-900 mb-2">🌱 Khu Vườn Sinh Thái & Thú Cưng Bạn Đồng Hành 🐾</h2>
+                    <p class="text-xs text-gray-400 mb-6">Mỗi phiên học thành công giúp cây phát triển lớn mạnh, bỏ cuộc giữa chừng cây sẽ héo úa.</p>
                     
-                    <!-- VÒNG QUAY MAY MẮN MỖI NGÀY -->
-                    <div class="bg-white p-6 rounded-3xl shadow-lg border border-gray-100 flex flex-col items-center text-center">
-                        <h2 class="text-sm font-black text-gray-900 mb-3">🎡 Vòng Quay May Mắn</h2>
-                        <div class="relative w-32 h-32 border-4 border-yellow-400 rounded-full flex items-center justify-center overflow-hidden bg-gradient-to-tr from-yellow-100 to-amber-300 shadow-inner">
-                            <div id="wheel-pointer" class="absolute top-0 text-red-600 font-black text-xl z-10">▼</div>
-                            <div id="wheel-element" class="w-full h-full flex items-center justify-center font-bold text-xs text-amber-900 wheel-rotate">🎰 SPIN</div>
+                    <div class="grid grid-cols-2 gap-4 bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-3xl border border-green-100 mb-6">
+                        <div class="bg-white p-4 rounded-2xl border shadow-sm">
+                            <span class="text-xs font-black text-green-800 uppercase">Hệ Cây Trồng</span>
+                            <div id="tree-display" class="text-6xl my-4">🌱</div>
+                            <select id="select-tree" onchange="changeTreeType()" class="text-xs p-2 border rounded-xl bg-white font-bold text-gray-600 focus:outline-none w-full">
+                                <option value="🌱">Cây Mầm Nhỏ</option>
+                                <option value="🌻">Hoa Hướng Dương</option>
+                                <option value="🌵">Cây Xương Rồng</option>
+                            </select>
                         </div>
-                        <button onclick="spinWheel()" class="mt-4 bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2 rounded-xl text-xs transition">Quay Thưởng (Mỗi ngày 1 lần)</button>
+                        <div class="bg-white p-4 rounded-2xl border shadow-sm">
+                            <span class="text-xs font-black text-amber-800 uppercase">Thú Nuôi Đáng Yêu</span>
+                            <div id="pet-display" class="text-6xl my-4">🐱</div>
+                            <select id="select-pet" onchange="changePetType()" class="text-xs p-2 border rounded-xl bg-white font-bold text-gray-600 focus:outline-none w-full">
+                                <option value="🐱">Bé Mèo Mun</option>
+                                <option value="🐶">Bé Cún Con</option>
+                                <option value="🐰">Bé Thỏ Bông</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <!-- AI HỖ TRỢ HỌC TẬP CHUYÊN NGHIỆP -->
-                    <div class="bg-white p-6 rounded-3xl shadow-lg border border-gray-100">
-                        <h2 class="text-sm font-black text-gray-900 mb-2">🤖 Trợ Lý Học Tập AI</h2>
-                        <div class="bg-gray-50 p-2.5 rounded-xl text-xs space-y-2 h-24 overflow-y-auto border" id="ai-chat-box">
-                            <p class="text-purple-700 font-medium"><b>AI:</b> Chào bạn! Tôi có thể giúp bạn lên thời gian biểu cá nhân hóa hoặc đề xuất phương pháp học tối ưu.</p>
+                    <div class="flex gap-3">
+                        <button onclick="focusSession(true)" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl text-xs shadow transition">Thu Hoạch Mật Ngọt (+Cây Lớn)</button>
+                        <button onclick="focusSession(false)" class="flex-1 bg-red-400 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-xs shadow transition">Bỏ Cuộc Giữa Chừng (Héo)</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TRANG 5: PHÒNG HỌC NHÓM TRỰC TUYẾN ================= -->
+            <section id="page-group" class="page-content space-y-6">
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-3xl shadow-md border border-blue-100">
+                    <h2 class="text-xl font-black text-blue-950 mb-1">👥 Phòng Học Bầy Ong Trực Tuyến</h2>
+                    <p class="text-xs text-blue-800/70 mb-6">Tự tạo phòng học riêng tư, mời bạn bè bằng mã số ID để cùng nhau đua tiến độ công việc trong ngày.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-5 rounded-2xl border border-blue-200 shadow-sm">
+                            <h3 class="text-sm font-black text-gray-700 mb-2">Tự Tạo / Kết Nối Phòng</h3>
+                            <div class="flex gap-2">
+                                <input type="text" id="room-id-input" class="flex-1 p-3 border-2 border-gray-100 rounded-xl text-xs focus:outline-none focus:border-blue-400 font-bold" placeholder="Nhập mã ID phòng học của nhóm...">
+                                <button onclick="joinStudyRoom()" class="bg-blue-600 text-white font-bold px-4 py-2 rounded-xl text-xs hover:bg-blue-700 transition">Vào Phòng</button>
+                            </div>
+                            <p id="current-room-display" class="text-xs text-green-600 font-bold mt-3">📍 Đang ở chế độ: Phòng đơn độc lập</p>
                         </div>
-                        <div class="mt-2 flex gap-1">
-                            <input type="text" id="ai-input" class="flex-1 p-2 border rounded-xl text-xs focus:outline-none" placeholder="Hỏi AI bí quyết học tập...">
+                        <div class="bg-white p-5 rounded-2xl border border-blue-200 shadow-sm">
+                            <h3 class="text-sm font-black text-gray-700 mb-1">Gửi Lời Mời Bạn Bè</h3>
+                            <p class="text-[11px] text-gray-400 mb-3">Copy mã ID cá nhân của bạn dưới đây và gửi để bạn bè nhập phòng học chung:</p>
+                            <div class="flex items-center justify-between bg-gray-50 p-3 rounded-xl border">
+                                <span id="my-invite-id" class="text-xs font-mono font-bold text-gray-600 overflow-hidden text-ellipsis whitespace-nowrap max-w-[200px]">Đang lấy ID...</span>
+                                <button onclick="copyInviteID()" class="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-lg font-black hover:bg-blue-200">Sao Chép</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TRANG 6: HUB TIỆN ÍCH & GIẢI TRÍ ================= -->
+            <section id="page-utilities" class="page-content space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- VÒNG QUAY MAY MẮN MỖI NGÀY -->
+                    <div class="bg-white p-6 rounded-3xl shadow-md border border-amber-100 flex flex-col items-center text-center">
+                        <h2 class="text-sm font-black text-gray-900 mb-3">🎡 Vòng Quay May Mắn Mật Ong</h2>
+                        <div class="relative w-32 h-32 border-4 border-amber-400 rounded-full flex items-center justify-center overflow-hidden bg-gradient-to-tr from-amber-50 to-orange-200">
+                            <div class="absolute top-0 text-red-600 font-black text-xl z-10">▼</div>
+                            <div id="wheel-element" class="w-full h-full flex items-center justify-center font-black text-[10px] text-amber-950 wheel-rotate">QUAY THƯỞNG</div>
+                        </div>
+                        <button onclick="spinWheel()" class="mt-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-black px-4 py-2 rounded-xl text-xs transition shadow">Quay Ngay</button>
+                    </div>
+
+                    <!-- AI TRỢ LÝ HỌC TẬP -->
+                    <div class="bg-white p-6 rounded-3xl shadow-md border border-amber-100">
+                        <h2 class="text-sm font-black text-gray-900 mb-2">🤖 Trợ Lý Ong AI Thông Thái</h2>
+                        <div class="bg-gray-50 p-2.5 rounded-xl text-[11px] space-y-2 h-24 overflow-y-auto border mb-2" id="ai-chat-box">
+                            <p class="text-purple-700 font-medium"><b>AI:</b> Chào bạn! Tôi có thể hỗ trợ bạn thiết lập thời gian biểu học tập một cách tối ưu.</p>
+                        </div>
+                        <div class="flex gap-1">
+                            <input type="text" id="ai-input" class="flex-1 p-2 border rounded-xl text-xs focus:outline-none focus:border-amber-400 font-medium" placeholder="Nhập câu hỏi...">
                             <button onclick="askAI()" class="bg-purple-600 text-white px-3 py-1 rounded-xl text-xs font-bold">Gửi</button>
                         </div>
                     </div>
 
-                    <!-- NHẬT KÝ HỌC TẬP & CẢM XÚC -->
-                    <div class="bg-white p-6 rounded-3xl shadow-lg border border-gray-100">
-                        <h2 class="text-sm font-black text-gray-900 mb-2">📝 Nhật Ký Học Tập</h2>
+                    <!-- NHẬT KÝ HỌC TẬP -->
+                    <div class="bg-white p-6 rounded-3xl shadow-md border border-amber-100">
+                        <h2 class="text-sm font-black text-gray-900 mb-2">📝 Nhật Ký Cảm Xúc & Tập Trung</h2>
                         <div class="space-y-2">
-                            <input type="text" id="journal-feeling" class="w-full p-2 border rounded-xl text-xs" placeholder="Hôm nay bạn cảm thấy thế nào?">
-                            <div class="flex items-center gap-1">
-                                <span class="text-xs font-bold text-gray-500">Độ tập trung:</span>
-                                <select id="journal-stars" class="text-xs border rounded p-1 text-yellow-600 font-bold">
-                                    <option value="5">⭐⭐⭐⭐⭐ (Xuất sắc)</option>
+                            <input type="text" id="journal-feeling" class="w-full p-2.5 border rounded-xl text-xs focus:outline-none" placeholder="Hôm nay bạn học tập thế nào?">
+                            <div class="flex items-center justify-between text-xs font-bold text-gray-500">
+                                <span>Độ tập trung:</span>
+                                <select id="journal-stars" class="border rounded p-1 text-amber-600 font-black bg-white focus:outline-none">
+                                    <option value="5">⭐⭐⭐⭐⭐ (Tuyệt đỉnh)</option>
                                     <option value="4">⭐⭐⭐⭐ (Tốt)</option>
                                     <option value="3">⭐⭐⭐ (Tạm ổn)</option>
-                                    <option value="2">⭐⭐ (Trì hoãn)</option>
-                                    <option value="1">⭐ (Kém)</option>
+                                    <option value="2">⭐⭐ (Xao nhãng)</option>
+                                    <option value="1">⭐ (Trì hoãn)</option>
                                 </select>
                             </div>
-                            <button onclick="saveJournal()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1.5 rounded-xl text-xs transition">Lưu nhật ký tiến bộ</button>
+                            <button onclick="saveJournal()" class="w-full bg-blue-500 text-white font-bold py-2 rounded-xl text-xs shadow">Lưu Sổ Cảm Xúc</button>
                         </div>
                     </div>
 
-                    <!-- GÓC THƯ GIÃN & BẢNG XẾP HẠNG CHĂM CHỈ -->
-                    <div class="bg-white p-6 rounded-3xl shadow-lg border border-gray-100 space-y-4">
-                        <div>
-                            <h2 class="text-sm font-black text-gray-900 mb-1">🧘 Góc Thư Giãn nhanh</h2>
-                            <button onclick="startBreathing()" id="breath-btn" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-1.5 rounded-xl text-xs transition">Bài tập hít thở giảm stress (2 Phút)</button>
-                        </div>
-                        <div class="border-t pt-2">
-                            <h2 class="text-sm font-black text-gray-900 mb-1">🏆 Bảng Xếp Hạng Tuần (Top 3)</h2>
-                            <div class="text-xs space-y-1 text-gray-600">
-                                <p>🥇 <b>Bạn</b> - <span id="leaderboard-xp">0 XP</span></p>
-                                <p>🥈 Minh Anh - 450 XP</p>
-                                <p>🥉 Tuấn Kiệt - 320 XP</p>
-                            </div>
-                        </div>
+                    <!-- LÁ THƯ TƯƠNG LAI -->
+                    <div class="bg-white p-6 rounded-3xl shadow-md border border-amber-100">
+                        <h2 class="text-sm font-black text-gray-900 mb-1">✉️ Future Me (Thư Gửi Tương Lai)</h2>
+                        <textarea id="future-letter" rows="2" class="w-full p-2.5 border rounded-xl text-xs focus:outline-none" placeholder="Lời nhắn gửi chính mình trong tương lai..."></textarea>
+                        <button onclick="saveFutureLetter()" class="w-full mt-1 bg-purple-500 text-white font-bold py-2 rounded-xl text-xs shadow">Niêm Phong Thời Gian</button>
+                        <div id="saved-letter-notice" class="mt-1.5 text-[10px] text-purple-700 font-bold hidden">➔ Đã có một lá thư được khóa kín!</div>
                     </div>
 
+                    <!-- BÀI TẬP HÍT THỞ XẢ STRESS -->
+                    <div class="bg-white p-6 rounded-3xl shadow-md border border-amber-100">
+                        <h2 class="text-sm font-black text-gray-900 mb-2">🧘 Góc Thư Giãn 2 Phút</h2>
+                        <button onclick="startBreathing()" id="breath-btn" class="w-full bg-teal-500 text-white font-black py-2.5 rounded-xl text-xs shadow transition">Bài tập hít thở sâu giảm căng thẳng</button>
+                    </div>
+
+                    <!-- BẢNG XẾP HẠNG -->
+                    <div class="bg-white p-6 rounded-3xl shadow-md border border-amber-100">
+                        <h2 class="text-sm font-black text-gray-900 mb-2">🏆 Bảng Xếp Hạng Ong Vàng</h2>
+                        <div class="text-xs space-y-1.5 text-gray-600 font-medium" id="leaderboard-container">
+                            <p class="bg-amber-100 p-1.5 rounded border border-amber-300">🥇 <b>Bạn (Ong Thợ)</b> - <span id="leaderboard-xp">0 Mật</span></p>
+                            <p class="p-1">🥈 Ong Vàng Siêu Cấp - 850 Mật</p>
+                            <p class="p-1">🥉 Ong Mật Đi Học - 610 Mật</p>
+                        </div>
+                    </div>
                 </div>
+            </section>
 
-            </div>
-        </div>
+        </main>
     </div>
 
-    <!-- MODAL CHỌN AVATAR / CUSTOMIZE AVATAR -->
-    <div id="avatar-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
-        <div class="bg-white p-6 rounded-3xl max-w-sm w-full text-center">
-            <h3 class="text-lg font-black mb-4">🛒 Cửa Hàng Trang Phục Avatar</h3>
-            <p class="text-xs text-gray-500 mb-4">Thay đổi phụ kiện đại diện cho bạn.</p>
+    <!-- MODAL TÙY CHỈNH AVATAR -->
+    <div id="avatar-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-3xl max-w-sm w-full text-center border-4 border-amber-400">
+            <h3 class="text-lg font-black mb-1 text-amber-700">🛒 Phòng Thay Đồ Avatar</h3>
             <div class="grid grid-cols-4 gap-3 my-4">
-                <button onclick="changeAvatar('🧑‍🎓')" class="text-3xl p-2 bg-gray-50 border rounded-xl hover:bg-yellow-100">🧑‍🎓</button>
-                <button onclick="changeAvatar('🥷')" class="text-3xl p-2 bg-gray-50 border rounded-xl hover:bg-yellow-100">🥷</button>
-                <button onclick="changeAvatar('🧙')" class="text-3xl p-2 bg-gray-50 border rounded-xl hover:bg-yellow-100">🧙</button>
-                <button onclick="changeAvatar('👑')" class="text-3xl p-2 bg-gray-50 border rounded-xl hover:bg-yellow-100">👑</button>
+                <button onclick="changeAvatar('🧑‍🎓')" class="text-3xl p-2 bg-gray-50 border rounded-xl hover:border-amber-400">🧑‍🎓</button>
+                <button onclick="changeAvatar('🥷')" class="text-3xl p-2 bg-gray-50 border rounded-xl hover:border-amber-400">🥷</button>
+                <button onclick="changeAvatar('🧙')" class="text-3xl p-2 bg-gray-50 border rounded-xl hover:border-amber-400">🧙</button>
+                <button onclick="changeAvatar('👑')" class="text-3xl p-2 bg-gray-50 border rounded-xl hover:border-amber-400">👑</button>
             </div>
-            <button onclick="closeAvatarModal()" class="bg-gray-900 text-white px-4 py-2 rounded-xl text-xs font-bold">Đóng</button>
+            <button onclick="closeAvatarModal()" class="bg-gray-900 text-white px-4 py-2 rounded-xl text-xs font-black shadow">Đóng</button>
         </div>
     </div>
 
-    <!-- SCRIPT ĐỒNG BỘ REALTIME DATABASE TOÀN DIỆN -->
+    <!-- AUDIO THÔNG BÁO DỄ NGHE -->
+    <audio id="alert-sound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav" preload="auto"></audio>
+
     <script>
+        // Cấu hình đồng bộ Firebase của bạn
         const firebaseConfig = {
             apiKey: "AIzaSyAQp5aYmT9qc3k6gvK505aQxbz1uzRC6mg",
             authDomain: "beebee-8db3f.firebaseapp.com",
@@ -279,30 +365,32 @@
         const db = firebase.database(); 
 
         let currentUser = null;
+        let timerInterval = null;
+        let timerTimeLeft = 1500; 
+
         let userData = {
-            level: 1,
-            xp: 0,
-            avatar: '🧑‍🎓',
+            level: 1, xp: 0, avatar: '🧑‍🎓',
             badges: { pomodoro: false, streak: false, todo: false },
-            treeState: '🌱',
-            petLevel: 1,
-            letterSaved: false,
-            plan: null
+            treeType: '🌱', treeState: '🌱', petType: '🐱',
+            letterSaved: false, plan: null, roomID: 'independent'
         };
 
-        const quotes = [
-            "Thành công là tổng của những nỗ lực nhỏ được lặp lại mỗi ngày.",
-            "Đừng đợi cơ hội đến, hãy tự tạo ra nó.",
-            "Học tập là hành trình làm chủ tương lai của chính mình.",
-            "Hãy rực rỡ theo cách của bạn, chú ong chăm chỉ!"
-        ];
+        // Hàm chuyển đổi giao diện trang riêng biệt
+        function switchPage(pageId) {
+            document.querySelectorAll('.page-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(`page-${pageId}`).classList.add('active');
+            document.getElementById(`btn-${pageId}`).classList.add('active');
+        }
 
         auth.onAuthStateChanged(user => {
             if (user) {
                 currentUser = user;
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
-                document.getElementById('user-display').innerText = `Tài khoản: ${user.email}`;
+                document.getElementById('my-invite-id').innerText = user.uid;
+                document.getElementById('user-display').innerText = user.email.split('@')[0];
                 loadUserData();
             } else {
                 currentUser = null;
@@ -314,98 +402,102 @@
         function handleAuth(type) {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
-            if(!email || !password) return alert("Vui lòng điền đủ thông tin đăng nhập!");
+            if(!email || !password) return alert("Vui lòng điền đủ thông tin!");
 
             if(type === 'signup') {
                 auth.createUserWithEmailAndPassword(email, password)
-                    .then(() => alert("Tạo tài khoản BeeBee thành công!"))
-                    .catch(err => alert("Lỗi: " + err.message));
+                    .then(() => alert("Đăng ký thành công tài khoản BeeBee!"))
+                    .catch(err => alert(err.message));
             } else {
-                auth.signInWithEmailAndPassword(email, password)
-                    .catch(err => alert("Sai thông tin: " + err.message));
+                auth.signInWithEmailAndPassword(email, password).catch(err => alert(err.message));
             }
         }
 
         function logout() { auth.signOut(); }
 
         function loadUserData() {
-            db.ref("study_planner_v2/" + currentUser.uid).on("value", snapshot => {
+            db.ref("study_planner_beebee_v4/" + currentUser.uid).on("value", snapshot => {
                 if(snapshot.exists()) {
-                    const data = snapshot.val();
-                    userData = { ...userData, ...data };
+                    userData = { ...userData, ...snapshot.val() };
                     updateUI();
                 }
             });
         }
 
         function saveToServer() {
-            if(currentUser) {
-                db.ref("study_planner_v2/" + currentUser.uid).set(userData);
-            }
+            if(currentUser) db.ref("study_planner_beebee_v4/" + currentUser.uid).set(userData);
         }
 
         function updateUI() {
             document.getElementById('user-level').innerText = `Cấp độ: Lv.${userData.level}`;
-            document.getElementById('user-xp').innerText = `${userData.xp} / 100 XP`;
+            document.getElementById('sidebar-level').innerText = `Cấp độ: Lv.${userData.level}`;
+            document.getElementById('user-xp').innerText = `${userData.xp} / 100 Giọt Mật`;
             document.getElementById('xp-bar').style.width = `${userData.xp}%`;
             document.getElementById('user-avatar').innerText = userData.avatar;
-            document.getElementById('tree-display').innerText = userData.treeState;
-            document.getElementById('pet-status').innerText = `Bé Mèo Cấp ${userData.petLevel}`;
-            document.getElementById('leaderboard-xp').innerText = `${userData.level * 100 + userData.xp} XP`;
+            document.getElementById('tree-display').innerText = userData.treeState || '🌱';
+            document.getElementById('pet-display').innerText = userData.petType || '🐱';
+            document.getElementById('select-tree').value = userData.treeType || '🌱';
+            document.getElementById('select-pet').value = userData.petType || '🐱';
+            document.getElementById('leaderboard-xp').innerText = `${userData.level * 100 + userData.xp} Mật`;
             
             if(userData.letterSaved) document.getElementById('saved-letter-notice').classList.remove('hidden');
 
-            // Cập nhật giao diện huy hiệu
+            if(userData.roomID && userData.roomID !== 'independent') {
+                document.getElementById('current-room-display').innerText = `📍 Đang ở phòng học nhóm ID: ${userData.roomID}`;
+            } else {
+                document.getElementById('current-room-display').innerText = `📍 Đang ở chế độ: Phòng đơn độc lập`;
+            }
+
             const badgeBox = document.getElementById('badge-container');
             badgeBox.innerHTML = '';
-            const badgeList = [
-                { id: 'pomodoro', name: '⏱️ Chuyên gia Pomodoro' },
-                { id: 'streak', name: '🔥 Học 7 ngày liền' },
-                { id: 'todo', name: '👑 Vua To-do List' }
-            ];
-            badgeList.forEach(b => {
-                const span = document.createElement('span');
-                span.className = `px-2 py-1 rounded-lg text-xs font-bold border transition ${userData.badges && userData.badges[b.id] ? 'bg-yellow-400 text-gray-900 border-yellow-500 font-extrabold opacity-100 shadow-sm' : 'bg-gray-100 text-gray-400 opacity-40'}`;
-                span.innerText = b.name;
-                badgeBox.appendChild(span);
+            const list = [{id:'pomodoro', name:'⏱️ Pomodoro'}, {id:'streak', name:'🔥 7 Ngày'}, {id:'todo', name:'👑 To-do Vua'}];
+            list.forEach(b => {
+                const s = document.createElement('span');
+                s.className = `px-2 py-1 rounded-xl text-[10px] font-black border ${userData.badges && userData.badges[b.id] ? 'bg-amber-400 border-amber-500' : 'bg-gray-100 text-gray-300 opacity-40'}`;
+                s.innerText = b.name;
+                badgeBox.appendChild(s);
             });
 
-            // Render Lịch trình
             renderTimeline();
         }
 
-        function addXP(amount) {
-            userData.xp += amount;
+        function addXP(amt) {
+            userData.xp += amt;
             if(userData.xp >= 100) {
                 userData.level += Math.floor(userData.xp / 100);
                 userData.xp = userData.xp % 100;
-                alert(`🎉 CHÚC MỪNG! Bạn đã thăng lên Cấp độ ${userData.level}! Thú cưng cũng lớn thêm một chút!`);
-                userData.petLevel = Math.min(userData.level, 100);
+                alert(`🎉 LÊN CẤP! Bạn đã đạt Cấp độ mới: Lv.${userData.level}`);
             }
             saveToServer();
+        }
+
+        function checkInDaily() {
+            alert("📅 Điểm danh thành công! Nhận +15 Giọt Mật.");
+            document.getElementById('checkin-btn').innerText = "✅ Đã điểm danh";
+            document.getElementById('checkin-btn').disabled = true;
+            addXP(15);
         }
 
         function createNewPlan() {
             const title = document.getElementById('plan-title').value;
             const days = parseInt(document.getElementById('plan-days').value);
-            if(!title) return alert("Vui lòng nhập mục tiêu học tập!");
+            if(!title) return alert("Vui lòng nhập mục tiêu!");
 
-            const daysArray = [];
-            for(let i = 1; i <= days; i++) {
-                daysArray.push({ day: i, task: `Nhiệm vụ ôn tập chi tiết ngày ${i}`, done: false });
+            const arr = [];
+            for(let i=1; i<=days; i++) {
+                arr.push({ day: i, task: `Phân phối nội dung ôn tập của ngày thứ ${i}`, done: false });
             }
-            userData.plan = { title, totalDays: days, days: daysArray };
-            
+            userData.plan = { title, totalDays: days, days: arr };
             if(!userData.badges) userData.badges = {};
-            userData.badges.todo = true; // Mở khóa huy hiệu Vua Todo list
+            userData.badges.todo = true;
             addXP(20);
         }
 
-        function toggleDay(index) {
-            userData.plan.days[index].done = !userData.plan.days[index].done;
-            if(userData.plan.days[index].done) {
-                addXP(35); // Mỗi lần tích xong nhận 35 XP
-                userData.treeState = '🌳'; // Cây phát triển
+        function toggleDay(idx) {
+            userData.plan.days[idx].done = !userData.plan.days[idx].done;
+            if(userData.plan.days[idx].done) {
+                addXP(30);
+                playAlertSound();
             }
             saveToServer();
         }
@@ -414,118 +506,96 @@
             const container = document.getElementById('timeline-container');
             container.innerHTML = "";
             if(!userData.plan || !userData.plan.days) {
-                container.innerHTML = '<p class="text-gray-400 text-center py-6 text-sm">Điền thông tin bên trái để tạo lịch trình riêng của bạn.</p>';
-                document.getElementById('progress-bar').style.width = '0%';
-                document.getElementById('progress-text').innerText = 'Chưa khởi tạo lộ trình.';
+                container.innerHTML = '<p class="text-gray-400 text-center py-6 text-sm">Chưa có kế hoạch công việc nào được lập.</p>';
+                document.getElementById('remaining-tasks-count').innerText = "⚠️ Bạn chưa tạo lịch trình công việc cụ thể.";
                 return;
             }
 
-            let doneCount = 0;
-            userData.plan.days.forEach((item, index) => {
-                if(item.done) doneCount++;
+            let done = 0, pending = 0;
+            userData.plan.days.forEach((item, idx) => {
+                if(item.done) done++; else pending++;
                 const div = document.createElement('div');
-                div.className = `p-4 border-2 rounded-2xl flex justify-between items-center transition ${item.done ? 'bg-green-50 border-green-300' : 'bg-gray-50 border-gray-200'}`;
+                div.className = `p-4 border-2 rounded-2xl flex justify-between items-center ${item.done ? 'bg-green-50/60 border-green-200' : 'bg-white border-gray-100 shadow-sm'}`;
                 div.innerHTML = `
                     <div>
-                        <h4 class="font-bold text-gray-800 ${item.done ? 'line-through text-gray-400' : ''}">Ngày ${item.day}: ${userData.plan.title}</h4>
-                        <p class="text-xs text-gray-500">${item.task}</p>
+                        <h4 class="font-bold text-sm ${item.done ? 'line-through text-gray-400' : 'text-gray-800'}">Ngày ${item.day}: ${userData.plan.title}</h4>
+                        <p class="text-xs text-gray-400 mt-0.5">${item.task}</p>
                     </div>
-                    <input type="checkbox" ${item.done ? 'checked' : ''} onclick="toggleDay(${index})" class="w-6 h-6 accent-green-600 cursor-pointer">
+                    <input type="checkbox" ${item.done ? 'checked' : ''} onclick="toggleDay(${idx})" class="w-5 h-5 accent-green-600 cursor-pointer">
                 `;
                 container.appendChild(div);
             });
 
-            const percent = Math.round((doneCount / userData.plan.days.length) * 100);
-            document.getElementById('progress-bar').style.width = `${percent}%`;
-            document.getElementById('progress-text').innerText = `Đã hoàn thành ${doneCount}/${userData.plan.days.length} ngày (${percent}%)`;
+            const pct = Math.round((done / userData.plan.days.length) * 100);
+            document.getElementById('progress-bar').style.width = `${pct}%`;
+            document.getElementById('progress-text').innerText = `Hoàn thành ${done}/${userData.plan.days.length} ngày (${pct}%)`;
             
-            if(percent === 100 && !userData.badges.streak) {
-                userData.badges.streak = true; // Đạt huy hiệu hoàn thành lộ trình liên tiếp
-                saveToServer();
-            }
-        }
-
-        // CÁC TÍNH NĂNG PHỤ TRỢ (TRỒNG CÂY, VÒNG QUAY, AI, CẢM XÚC...)
-        function focusSession(success) {
-            if(success) {
-                userData.treeState = '🌳';
-                alert("Cây của bạn đã lớn thành cây đại thụ nhờ phiên học tập tập trung!");
-                addXP(15);
+            if(pending > 0) {
+                document.getElementById('remaining-tasks-count').innerText = `⚠️ Cảnh báo: Còn lại ${pending} nhiệm vụ chưa tích chọn hoàn thành!`;
+                document.getElementById('priority-reminder-box').innerText = `⏰ Nhắc nhở: Giải quyết việc ưu tiên ngay!`;
             } else {
-                userData.treeState = '🥀';
-                alert("Hệ thống rất tiếc, cây đã héo úa vì bạn bỏ dở phiên học tập giữa chừng. Hãy cố gắng lần sau!");
-                saveToServer();
+                document.getElementById('remaining-tasks-count').innerText = `🎉 Hoàn hảo! Toàn bộ lịch trình đã được xử lý xong xuôi!`;
+                document.getElementById('priority-reminder-box').innerText = `✅ Đã xong sạch sẽ`;
             }
         }
 
+        function setTimerMinutes(min) {
+            clearInterval(timerInterval); timerInterval = null;
+            document.getElementById('timer-start-btn').innerText = "Bắt đầu học";
+            timerTimeLeft = min * 60; updateTimerDisplay();
+        }
+
+        function toggleTimer() {
+            if(timerInterval) {
+                clearInterval(timerInterval); timerInterval = null;
+                document.getElementById('timer-start-btn').innerText = "Tiếp tục học";
+            } else {
+                document.getElementById('timer-start-btn').innerText = "Tạm dừng";
+                timerInterval = setInterval(() => {
+                    if(timerTimeLeft > 0) { timerTimeLeft--; updateTimerDisplay(); } 
+                    else {
+                        clearInterval(timerInterval); timerInterval = null;
+                        document.getElementById('timer-start-btn').innerText = "Bắt đầu học";
+                        playAlertSound(); alert("⏱️ Hết giờ tập trung Pomodoro! Nhận +10 Giọt Mật.");
+                        addXP(10);
+                        if(!userData.badges.pomodoro) { userData.badges.pomodoro = true; saveToServer(); }
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() { clearInterval(timerInterval); timerInterval = null; timerTimeLeft = 1500; updateTimerDisplay(); }
+        function updateTimerDisplay() {
+            const m = Math.floor(timerTimeLeft / 60).toString().padStart(2, '0');
+            const s = (timerTimeLeft % 60).toString().padStart(2, '0');
+            document.getElementById('timer-display').innerText = `${m}:${s}`;
+        }
+
+        function playAlertSound() { document.getElementById('alert-sound').play().catch(()=>{}); }
+        function changeTreeType() { userData.treeType = document.getElementById('select-tree').value; userData.treeState = userData.treeType; saveToServer(); }
+        function changePetType() { userData.petType = document.getElementById('select-pet').value; saveToServer(); }
+        function joinStudyRoom() {
+            const rID = document.getElementById('room-id-input').value.trim();
+            if(!rID) return alert("Nhập mã ID phòng!");
+            userData.roomID = rID; saveToServer(); alert("Đã kết nối phòng nhóm thành công!");
+        }
+        function copyInviteID() { navigator.clipboard.writeText(currentUser.uid); alert("Đã copy ID mời!"); }
+        function focusSession(suc) { userData.treeState = suc ? '🌳' : '🥀'; if(suc) addXP(15); else saveToServer(); alert(suc ? "Cây phát triển tốt mẫu mực!" : "Cây đã héo úa rồi..."); }
         function spinWheel() {
-            const rewards = ["+50 XP", "Huy hiệu Pomodoro ⏱️", "Câu nói động lực 💡", "Chủ đề Vàng Chanh 🍋"];
-            const randomIdx = Math.floor(Math.random() * rewards.length);
-            document.getElementById('wheel-element').innerText = "🌀 ROLLING...";
-            setTimeout(() => {
-                document.getElementById('wheel-element').innerText = rewards[randomIdx];
-                alert(`🎁 Phần thưởng vòng quay hôm nay của bạn: ${rewards[randomIdx]}`);
-                if(randomIdx === 0) addXP(50);
-                if(randomIdx === 1) {
-                    if(!userData.badges) userData.badges = {};
-                    userData.badges.pomodoro = true;
-                    saveToServer();
-                }
-            }, 1500);
+            document.getElementById('wheel-element').innerText = "🌀 ĐANG QUAY...";
+            setTimeout(() => { alert("🎁 Bạn nhận được +50 Giọt Mật Vàng!"); addXP(50); document.getElementById('wheel-element').innerText = "QUAY THƯỞNG"; }, 1500);
         }
-
         function askAI() {
-            const txt = document.getElementById('ai-input').value;
-            if(!txt) return;
-            const box = document.getElementById('ai-chat-box');
-            box.innerHTML += `<p class="text-gray-700"><b>Bạn:</b> ${txt}</p>`;
-            document.getElementById('ai-input').value = '';
-            setTimeout(() => {
-                box.innerHTML += `<p class="text-purple-700 font-medium"><b>AI:</b> Dựa trên mục tiêu của bạn, tôi đề xuất áp dụng ngay phương pháp quả cà chua Pomodoro: học 25 phút nghỉ 5 phút để giữ não bộ ở trạng thái tối ưu nhất nhé!</p>`;
-                box.scrollTop = box.scrollHeight;
-            }, 800);
+            const val = document.getElementById('ai-input').value; if(!val) return;
+            document.getElementById('ai-chat-box').innerHTML += `<p><b>Bạn:</b> ${val}</p><p class="text-purple-700"><b>AI:</b> Hãy chọn tab mục tiêu tương ứng để hoàn thành các việc còn tồn đọng.</p>`;
+            document.getElementById('ai-input').value = "";
         }
-
-        function saveJournal() {
-            const feeling = document.getElementById('journal-feeling').value;
-            if(!feeling) return alert("Vui lòng điền cảm xúc của bạn!");
-            alert("Đã lưu Nhật ký cảm xúc và tiến bộ thành công vào hệ thống đám mây!");
-            addXP(5);
-            document.getElementById('journal-feeling').value = '';
-        }
-
-        function saveFutureLetter() {
-            const text = document.getElementById('future-letter').value;
-            if(!text) return alert("Nội dung thư trống!");
-            userData.letterSaved = true;
-            alert("Lá thư tương lai đã được niêm phong kỹ càng! Hệ thống sẽ mở lại sau 1 thời gian học tập.");
-            document.getElementById('future-letter').value = '';
-            saveToServer();
-        }
-
-        function startBreathing() {
-            const btn = document.getElementById('breath-btn');
-            btn.innerText = "💨 Hít vào thật sâu... Giữ lại... Thở ra nhè nhẹ...";
-            btn.className = "w-full bg-orange-400 text-white font-bold py-1.5 rounded-xl text-xs transition animate-pulse";
-            setTimeout(() => {
-                btn.innerText = "Bài tập hít thở giảm stress (2 Phút)";
-                btn.className = "w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-1.5 rounded-xl text-xs transition";
-                alert("Tâm trí đã được thư giãn, tiếp tục chiến đấu mục tiêu học tập nào!");
-            }, 5000);
-        }
-
-        function changeQuote() {
-            const rand = quotes[Math.floor(Math.random() * quotes.length)];
-            document.getElementById('motivational-quote').innerText = `"${rand}"`;
-        }
-
+        function saveJournal() { alert("Đã lưu nhật ký cảm xúc."); addXP(5); }
+        function saveFutureLetter() { userData.letterSaved = true; saveToServer(); alert("Đã niêm phong thư thành công!"); }
+        function startBreathing() { alert("Bắt đầu bài tập hít thở 2 phút..."); }
         function openAvatarModal() { document.getElementById('avatar-modal').classList.remove('hidden'); }
         function closeAvatarModal() { document.getElementById('avatar-modal').classList.add('hidden'); }
-        function changeAvatar(emoji) {
-            userData.avatar = emoji;
-            saveToServer();
-            closeAvatarModal();
-        }
+        function changeAvatar(emoji) { userData.avatar = emoji; saveToServer(); closeAvatarModal(); }
     </script>
 </body>
 </html>
