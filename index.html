@@ -7,17 +7,16 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.umd.fdoc.js"></script>
     
     <style>
-        /* SỬA LỖI KHÔNG CUỘN ĐƯỢC TRÊN MÁY TÍNH */
         html, body {
             overflow-y: auto !important;
             height: auto !important;
             min-height: 100vh;
-            background-color: #f7fee7; /* lime-50 */
+            background-color: #f7fee7;
         }
     </style>
 </head>
@@ -95,7 +94,6 @@
     </div>
 
     <script>
-        // ĐÃ TÍCH HỢP THÔNG TIN FIREBASE CỦA BẠN 🐝
         const firebaseConfig = {
             apiKey: "AIzaSyAQp5aYmT9qc3k6gvK505aQxbz1uzRC6mg",
             authDomain: "beebee-8db3f.firebaseapp.com",
@@ -106,15 +104,13 @@
             measurementId: "G-JTZ0TX3SH8"
         };
         
-        // Khởi tạo Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        const db = firebase.firestore();
+        const db = firebase.database(); // Dùng Realtime Database hoàn toàn miễn phí
 
         let currentUser = null;
         let userPlanData = null;
 
-        // KIỂM TRA ĐĂNG NHẬP
         auth.onAuthStateChanged(user => {
             if (user) {
                 currentUser = user;
@@ -130,7 +126,6 @@
             }
         });
 
-        // ĐĂNG KÝ / ĐĂNG NHẬP
         function handleAuth(type) {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
@@ -151,7 +146,6 @@
             auth.signOut();
         }
 
-        // TẠO LỘ TRÌNH RIÊNG CHO MỖI TÀI KHOẢN
         function createNewPlan() {
             const title = document.getElementById('plan-title').value;
             const days = parseInt(document.getElementById('plan-days').value);
@@ -166,38 +160,37 @@
             userPlanData = {
                 title: title,
                 totalDays: days,
-                days: daysArray,
-                updatedAt: new Date()
+                days: daysArray
             };
 
-            db.collection("user_plans").doc(currentUser.uid).set(userPlanData)
+            // ĐỒNG BỘ LÊN REALTIME DATABASE ĐÃ BẬT RULES
+            db.ref("user_plans/" + currentUser.uid).set(userPlanData)
                 .then(() => {
                     renderPlan();
                 })
-                .catch(err => alert("Lỗi đồng bộ dữ liệu: Hãy chắc chắn bạn đã bật chế độ 'Test Mode' trong Firestore!"));
+                .catch(err => alert("Lỗi đồng bộ: " + err.message));
         }
 
         function loadUserPlan() {
-            db.collection("user_plans").doc(currentUser.uid).get().then(doc => {
-                if (doc.exists) {
-                    userPlanData = doc.data();
+            db.ref("user_plans/" + currentUser.uid).once("value").then(snapshot => {
+                if (snapshot.exists()) {
+                    userPlanData = snapshot.val();
                     renderPlan();
                 } else {
-                    // Hướng dẫn sử dụng cho người vào lần đầu
                     startTourGuide();
                 }
-            }).catch(err => console.log("Chờ khởi tạo database..."));
+            }).catch(err => console.log("Lỗi tải dữ liệu: ", err));
         }
 
         function toggleDay(index) {
             userPlanData.days[index].done = !userPlanData.days[index].done;
-            db.collection("user_plans").doc(currentUser.uid).update({
+            db.ref("user_plans/" + currentUser.uid).update({
                 days: userPlanData.days
             }).then(() => renderPlan());
         }
 
         function renderPlan() {
-            if(!userPlanData) return;
+            if(!userPlanData || !userPlanData.days) return;
 
             const container = document.getElementById('timeline-container');
             container.innerHTML = "";
@@ -224,13 +217,12 @@
             document.getElementById('progress-text').innerText = `Đã hoàn thành ${doneCount}/${userPlanData.days.length} ngày (${percent}%)`;
         }
 
-        // TÍNH NĂNG TOUR GUIDE
         function startTourGuide() {
             const driver = window.driver.js.driver;
             const driverObj = driver({
                 showProgress: true,
                 steps: [
-                    { element: '#tour-setup', popover: { title: '🐝 Tạo lộ trình', description: 'Chào bạn mới! Hãy bắt đầu ngày đầu tiên bằng cách điền Mục tiêu học tập và số ngày mong muốn vào đây, sau đó ấn nút khởi tạo.', side: "right", align: 'start' }},
+                    { element: '#tour-setup', popover: { title: '🐝 Tạo lộ trình', description: 'Chào bạn mới! Hãy bắt đầu bằng cách điền Mục tiêu học tập và số ngày mong muốn vào đây, sau đó ấn nút khởi tạo.', side: "right", align: 'start' }},
                     { element: '#tour-progress', popover: { title: '📈 Theo dõi tiến độ', description: 'Thanh này sẽ tự tăng lên tương ứng với phần trăm số ngày bạn hoàn thành bài học.', side: "bottom", align: 'start' }},
                     { element: '#tour-timeline', popover: { title: '📅 Nhật ký hàng ngày', description: 'Hệ thống tự lên lộ trình chia nhỏ từng ngày tại đây. Mỗi khi học xong, bạn chỉ cần tích chọn để web ghi nhớ nhé!', side: "top", align: 'start' }}
                 ]
@@ -240,4 +232,5 @@
     </script>
 </body>
 </html>
+
 
