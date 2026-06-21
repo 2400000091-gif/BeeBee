@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BeeBee - Tổ Ong Học Tập Chăm Chỉ</title>
+    <title>BeeBee - Tổ Ong Học Tập & Game Hóa Bản Nâng Cấp Tối Thượng</title>
     <!-- Font chữ Be Vietnam Pro chống lỗi tiếng Việt tuyệt đối -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,7 +46,6 @@
         .wheel-rotate {
             transition: transform 4s cubic-bezier(0.1, 0.8, 0.3, 1);
         }
-        /* Ong hóa khung lục giác mật ong */
         .honeycomb-grid {
             background-image: radial-gradient(#fbbf24 1px, transparent 1px);
             background-size: 16px 16px;
@@ -55,7 +54,7 @@
 </head>
 <body class="text-gray-800 antialiased">
 
-    <!-- SỔ ĐĂNG KÝ ONG MỚI (AUTH SCREEN) -->
+    <!-- KHU VỰC ĐĂNG NHẬP / ĐĂNG KÝ / CHẾ ĐỘ KHÁCH -->
     <div id="auth-screen" class="min-h-screen flex items-center justify-center px-4 honeycomb-grid">
         <div class="bg-white/95 backdrop-blur p-8 rounded-3xl shadow-2xl max-w-md w-full border-4 border-amber-400">
             <div class="text-center mb-6">
@@ -66,25 +65,27 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold mb-1 text-gray-600 uppercase tracking-wider">Mã Hòm Thư (Email)</label>
-                    <input type="email" id="auth-email" class="w-full p-3 border-2 border-amber-100 rounded-2xl focus:border-amber-400 focus:outline-none bg-amber-50/50 text-sm" placeholder="yourname@gmail.com">
+                    <input type="email" id="auth-email" class="w-full p-3 border-2 border-amber-100 rounded-2xl focus:border-amber-400 focus:outline-none bg-amber-50/50 text-sm text-gray-800" placeholder="yourname@gmail.com">
                 </div>
                 <div>
                     <label class="block text-xs font-bold mb-1 text-gray-600 uppercase tracking-wider">Mật Khẩu Tổ Ong</label>
-                    <input type="password" id="auth-password" class="w-full p-3 border-2 border-amber-100 rounded-2xl focus:border-amber-400 focus:outline-none bg-amber-50/50 text-sm" placeholder="••••••••">
+                    <input type="password" id="auth-password" class="w-full p-3 border-2 border-amber-100 rounded-2xl focus:border-amber-400 focus:outline-none bg-amber-50/50 text-sm text-gray-800" placeholder="••••••••">
                 </div>
                 <button onclick="handleAuth('signin')" class="w-full bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-white font-black py-3 rounded-2xl transition shadow-lg cursor-pointer transform hover:-translate-y-0.5">ĐĂNG NHẬP VÀO TỔ ONG</button>
-                <button onclick="handleAuth('signup')" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 rounded-2xl transition cursor-pointer text-sm">Chưa nhập hội bầy ong? Đăng ký ngay</button>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="handleAuth('signup')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl transition text-xs cursor-pointer">Đăng Ký Ong Mới</button>
+                    <button onclick="startGuestMode()" class="bg-amber-100 hover:bg-amber-200 text-amber-800 font-black py-2.5 rounded-xl transition text-xs cursor-pointer">Trải Nghiệm Khách 👤</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- GIAO DIỆN CHÍNH SIÊU ỨNG DỤNG BEEBEE -->
+    <!-- GIAO DIỆN CHÍNH (MAIN APP) - CHIA TAB RIÊNG BIỆT -->
     <div id="main-app" class="hidden min-h-screen flex flex-col md:flex-row">
         
         <!-- SIDEBAR ĐIỀU HƯỚNG TỔ ONG (BÊN TRÁI) -->
         <aside class="w-full md:w-64 bg-white border-r border-amber-200 p-6 flex flex-col justify-between shrink-0 shadow-xl">
             <div>
-                <!-- LOGO BEEBEE -->
                 <div class="flex items-center gap-3 mb-8 pb-4 border-b border-gray-100 cursor-pointer" onclick="switchPage('dashboard')">
                     <span class="text-5xl animate-pulse">🐝</span>
                     <div>
@@ -93,10 +94,9 @@
                     </div>
                 </div>
 
-                <!-- MENU NAVIGATION PHÂN TÁCH TRANG BIỆT LẬP -->
                 <nav class="space-y-1.5">
                     <button onclick="switchPage('dashboard')" id="btn-dashboard" class="nav-btn active w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-600 hover:bg-amber-50 transition text-left cursor-pointer">
-                        <i class="fa-solid fa-chart-pie text-amber-500"></i> Bảng Tổng Quan
+                        <i class="fa-solid fa-chart-pie text-amber-500"></i> Tổng Quan Tổ Ong
                     </button>
                     <button onclick="switchPage('roadmap')" id="btn-roadmap" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-600 hover:bg-amber-50 transition text-left cursor-pointer">
                         <i class="fa-solid fa-map text-amber-500"></i> Nhiệm Vụ Hút Mật
@@ -113,20 +113,18 @@
                     <button onclick="switchPage('groups')" id="btn-groups" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-600 hover:bg-amber-50 transition text-left cursor-pointer">
                         <i class="fa-solid fa-users text-amber-500"></i> Bầy Ong Chăm Chỉ
                     </button>
+                    <button onclick="switchPage('profile')" id="btn-profile" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-600 hover:bg-amber-50 transition text-left cursor-pointer">
+                        <i class="fa-solid fa-user text-amber-500"></i> Hồ Sơ Bầy Ong
+                    </button>
                     <button onclick="switchPage('utilities')" id="btn-utilities" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-600 hover:bg-amber-50 transition text-left cursor-pointer">
-                        <i class="fa-solid fa-dice text-amber-500"></i> Mật Ngọt May Mắn
+                        <i class="fa-solid fa-dice text-amber-500"></i> Tiện Ích Mật Ngọt
                     </button>
                 </nav>
             </div>
 
-            <!-- PROFILE & TẢI ẢNH ĐẠI DIỆN CỦA BẠN -->
             <div class="mt-8 pt-4 border-t border-gray-100 space-y-4">
-                <div class="flex items-center gap-3 p-2 rounded-2xl transition">
-                    <div class="relative group cursor-pointer">
-                        <div id="user-avatar" class="w-12 h-12 bg-gradient-to-tr from-amber-400 to-orange-300 rounded-full flex items-center justify-center text-2xl shadow border-2 border-white overflow-hidden">🧑‍🎓</div>
-                        <input type="file" id="avatar-uploader" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="uploadAvatar(event)">
-                        <span class="absolute bottom-0 right-0 bg-amber-500 text-white text-[8px] font-black p-0.5 rounded-full border border-white">UP</span>
-                    </div>
+                <div class="flex items-center gap-3 p-2 rounded-2xl transition cursor-pointer" onclick="switchPage('profile')">
+                    <div id="user-avatar" class="w-12 h-12 bg-gradient-to-tr from-amber-400 to-orange-300 rounded-full flex items-center justify-center text-2xl shadow border-2 border-white overflow-hidden shrink-0">🧑‍🎓</div>
                     <div class="overflow-hidden">
                         <p id="user-display" class="text-xs font-black text-gray-700 truncate">Ong Thợ...</p>
                         <p id="sidebar-level" class="text-[10px] text-orange-500 font-extrabold">Cấp độ: Lv.1</p>
@@ -141,25 +139,44 @@
         <!-- KHU VỰC CHỨA NỘI DUNG TỪNG TRANG -->
         <main class="flex-1 p-6 md:p-8 max-w-5xl mx-auto w-full">
             
+            <!-- BANNER CẢNH BÁO CHẾ ĐỘ KHÁCH -->
+            <div id="guest-mode-banner" class="hidden bg-red-500 text-white p-3 rounded-2xl mb-4 text-xs font-bold text-center shadow-md flex justify-between items-center animate-pulse">
+                <span>⚠️ Bạn đang sử dụng Chế độ Khách (Dữ liệu sẽ KHÔNG được lưu trữ trực tuyến lên đám mây). Hãy đăng ký tài khoản để bảo toàn tiến độ!</span>
+                <button onclick="switchPage('auth')" class="bg-white text-red-600 px-3 py-1 rounded-xl text-[10px] font-black uppercase">Đăng ký ngay</button>
+            </div>
+
             <!-- CÂU NÓI TRUYỀN ĐỘNG LỰC TỰ CHỈNH SỬA ĐƯỢC -->
             <div class="bg-gradient-to-r from-amber-500 to-orange-500 p-4 rounded-2xl mb-8 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4 text-white">
                 <div class="flex items-center gap-3 w-full sm:w-auto flex-1">
                     <span class="text-2xl shrink-0">💡</span>
-                    <input type="text" id="motivational-quote" onchange="saveCustomQuote()" class="bg-white/10 hover:bg-white/20 text-white font-bold italic text-xs sm:text-sm p-2 rounded-xl border border-white/20 focus:outline-none w-full" value="Thành công là tổng của những nỗ lực nhỏ được lặp lại mỗi ngày.">
+                    <input type="text" id="motivational-quote" onchange="saveCustomQuote()" class="bg-white/10 hover:bg-white/20 text-white font-bold italic text-xs sm:text-sm p-2 rounded-xl border border-white/20 focus:outline-none w-full animate-pulse" value="Thành công là tổng của những nỗ lực nhỏ được lặp lại mỗi ngày.">
                 </div>
-                <div class="flex gap-2 shrink-0">
+                <div class="flex gap-2 shrink-0 font-black">
                     <button onclick="checkInDaily()" id="checkin-btn" class="bg-white text-orange-600 font-black px-4 py-2 rounded-xl text-xs shadow hover:bg-orange-50 transition cursor-pointer">
-                        <i class="fa-regular fa-calendar-check"></i> Điểm Danh Hàng Ngày (24H)
+                        <i class="fa-regular fa-calendar-check"></i> Điểm Danh Hàng Ngày
                     </button>
                 </div>
             </div>
 
             <!-- ================= TRANG 1: TỔNG QUAN TỔ ONG ================= -->
             <section id="page-dashboard" class="page-content active space-y-6">
+                
+                <!-- THỬ THÁCH 21 NGÀY HÌNH THÀNH THÓI QUEN -->
+                <div class="bg-gradient-to-r from-amber-100 to-orange-100 p-6 rounded-3xl shadow-lg border border-amber-300">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-black text-amber-900 flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-days text-amber-600"></i> Thử Thách 21 Ngày Kiến Tạo Thói Quen
+                        </h2>
+                        <span id="challenge-streak" class="text-xs bg-orange-500 text-white font-black px-2.5 py-1 rounded-full">Chuỗi liên tục: 0 ngày</span>
+                    </div>
+                    <div class="grid grid-cols-7 gap-2.5 text-center" id="challenge-grid"></div>
+                    <p class="text-[11px] text-amber-800 font-bold mt-3"><i class="fa-solid fa-circle-info"></i> Hãy điểm danh đều đặn mỗi 24 giờ. Nếu bỏ lỡ một ngày, chuỗi ngày liên tục sẽ bị reset về 0!</p>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-3xl shadow-lg border border-amber-100">
                         <h2 class="text-xl font-black text-amber-900 mb-3 flex items-center gap-2">
-                            <i class="fa-solid fa-award text-amber-500"></i> Hũ Mật Cấp Độ (Gamification)
+                            <i class="fa-solid fa-award text-amber-500"></i> Hũ Mật Cấp Độ (Level XP)
                         </h2>
                         <div class="bg-gradient-to-br from-amber-50 to-orange-50 p-4 rounded-2xl border border-amber-100 mb-4">
                             <div class="flex justify-between items-center mb-2">
@@ -170,62 +187,83 @@
                                 <div id="xp-bar" class="bg-gradient-to-r from-amber-400 to-orange-500 h-full transition-all duration-300" style="width: 0%"></div>
                             </div>
                         </div>
-                        <p class="text-xs text-gray-500 font-medium">Chăm chỉ hoàn thành nhiệm vụ để thu hoạch thêm nhiều mật ong ngon ngọt!</p>
+                        <p class="text-xs text-gray-400 font-medium">Hoàn thành nhiệm vụ hút mật hàng ngày để mở khóa cấp độ tối đa Lv.100!</p>
                     </div>
 
                     <div class="bg-white p-6 rounded-3xl shadow-lg border border-amber-100">
                         <h2 class="text-xl font-black text-gray-900 mb-3 flex items-center gap-2">
-                            <i class="fa-solid fa-trophy text-amber-500"></i> Huy Hiệu Tổ Ong
+                            <i class="fa-solid fa-trophy text-amber-500"></i> Huy Hiệu Thành Tựu
                         </h2>
-                        <div id="badge-container" class="flex flex-wrap gap-2.5 min-h-[80px] p-2 bg-gray-50 rounded-2xl border border-dashed"></div>
+                        <div id="badge-container" class="flex flex-wrap gap-2 min-h-[80px] p-2 bg-gray-50 rounded-2xl border border-dashed"></div>
                     </div>
                 </div>
 
+                <!-- TIẾN ĐỘ THU HOẠCH -->
                 <div class="bg-white p-6 rounded-3xl shadow-lg border border-amber-100">
                     <h2 class="text-lg font-black text-gray-900 mb-3 flex items-center gap-2">
                         <i class="fa-solid fa-bars-progress text-amber-500"></i> Tiến Độ Thu Hoạch Hôm Nay
                     </h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center bg-amber-50/50 p-4 rounded-2xl border border-amber-200">
                         <div>
-                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Tiến trình tổ ong:</span>
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Tiến trình bầy ong:</span>
                             <div id="dashboard-progress-percentage" class="text-3xl font-black text-amber-600 my-1">0% Completed</div>
                             <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden border">
                                 <div id="dashboard-progress-bar" class="bg-gradient-to-r from-green-400 to-emerald-500 h-full transition-all duration-500" style="width: 0%"></div>
                             </div>
                         </div>
                         <div id="remaining-tasks-count" class="p-3 bg-red-50 text-red-600 border border-red-200 rounded-xl text-xs font-black">
-                            ⚠️ Tổ ong hiện chưa có nhiệm vụ nào được lập lịch.
+                            ⚠️ Tổ ong trống trải, chưa có nhiệm vụ nào.
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- ================= TRANG 2: NHIỆM VỤ HÚT MẬT (EDITABLE TO-DO LIST) ================= -->
+            <!-- ================= TRANG 2: NHIỆM VỤ HÚT MẬT (PLANS & COMPLETED & REMAINING BY DAY) ================= -->
             <section id="page-roadmap" class="page-content space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     
                     <div class="bg-white p-6 rounded-3xl shadow-lg border border-amber-100 h-fit">
                         <h2 class="text-lg font-black text-gray-900 mb-4 flex items-center gap-2">
-                            <i class="fa-solid fa-bullseye text-orange-500"></i> Khởi Tạo Nhiệm Vụ
+                            <i class="fa-solid fa-bullseye text-orange-500"></i> Khởi Tạo Việc Làm
                         </h2>
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tên nhiệm vụ hút mật</label>
-                                <input type="text" id="plan-title" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-amber-400 focus:outline-none text-sm" placeholder="Ví dụ: Ôn tập môn Toán">
+                                <input type="text" id="plan-title" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-amber-400 focus:outline-none text-sm font-bold text-gray-800" placeholder="Ví dụ: Ôn thi Học Kỳ">
                             </div>
+                            
+                            <!-- BỔ SUNG NGÀY GIỜ BẮT ĐẦU VÀ KẾT THÚC CỤ THỂ -->
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Ngày hoàn thành</label>
-                                    <input type="date" id="plan-deadline" class="w-full p-2.5 border-2 border-gray-200 rounded-xl focus:border-amber-400 focus:outline-none text-xs bg-white">
+                                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Ngày bắt đầu</label>
+                                    <input type="date" id="plan-start-date" onchange="updateStudySuggestion()" class="w-full p-2 border-2 border-amber-100 rounded-xl focus:border-amber-400 focus:outline-none text-xs bg-white font-bold text-gray-800">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Thời gian cụ thể</label>
-                                    <input type="time" id="plan-time" class="w-full p-2.5 border-2 border-gray-200 rounded-xl focus:border-amber-400 focus:outline-none text-xs bg-white">
+                                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Giờ bắt đầu</label>
+                                    <input type="time" id="plan-start-time" onchange="updateStudySuggestion()" class="w-full p-2 border-2 border-amber-100 rounded-xl focus:border-amber-400 focus:outline-none text-xs bg-white font-bold text-gray-800">
                                 </div>
                             </div>
+                            
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Ngày kết thúc (Deadline)</label>
+                                    <input type="date" id="plan-deadline" onchange="updateStudySuggestion()" class="w-full p-2 border-2 border-amber-100 rounded-xl focus:border-amber-400 focus:outline-none text-xs bg-white font-bold text-gray-800">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Giờ kết thúc</label>
+                                    <input type="time" id="plan-time" onchange="updateStudySuggestion()" class="w-full p-2 border-2 border-amber-100 rounded-xl focus:border-amber-400 focus:outline-none text-xs bg-white font-bold text-gray-800">
+                                </div>
+                            </div>
+
+                            <!-- GỢI Ý THỜI GIAN HỌC HIỆU QUẢ KỊP DEADLINE TỰ ĐỘNG -->
+                            <div id="ai-suggestion-box" class="bg-amber-50 p-3 rounded-2xl border border-amber-200 text-xs hidden shadow-inner">
+                                <p class="font-black text-amber-950"><i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> Gợi ý học hiệu quả của bầy ong:</p>
+                                <p id="ai-suggestion-text" class="text-amber-800 font-medium mt-1 leading-relaxed"></p>
+                            </div>
+
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Mức độ ưu tiên</label>
-                                <select id="plan-priority" class="w-full p-3 border-2 border-gray-200 rounded-xl bg-white text-sm focus:outline-none focus:border-amber-400">
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Mức độ ưu tiên tổ ong</label>
+                                <select id="plan-priority" class="w-full p-3 border-2 border-amber-100 rounded-xl bg-white text-sm focus:outline-none focus:border-amber-400 font-bold text-gray-800">
                                     <option value="Cao">🔴 Ưu Tiên Cao (Gấp)</option>
                                     <option value="Trung Bình">🟡 Ưu Tiên Vừa (Bình thường)</option>
                                     <option value="Thấp">🟢 Ưu Tiên Thấp (Nhẹ nhàng)</option>
@@ -235,98 +273,154 @@
                         </div>
                     </div>
 
-                    <div class="lg:col-span-2 bg-white p-6 rounded-3xl shadow-lg border border-amber-100">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 border-b pb-3">
-                            <h2 class="text-lg font-black text-gray-900 flex items-center gap-2">
-                                <i class="fa-solid fa-list-check text-green-500"></i> Nhật Ký Nhiệm Vụ Đang Chờ
-                            </h2>
-                            <span id="priority-reminder-box" class="text-xs bg-red-50 text-red-600 border border-red-200 font-black px-2.5 py-1 rounded-xl">⏰ Chưa có nhiệm vụ</span>
+                    <!-- DANH SÁCH NHIỆM VỤ CHIA THEO NGÀY RÕ RÀNG -->
+                    <div class="lg:col-span-2 space-y-4">
+                        
+                        <!-- TAB PHÂN LOẠI KẾ HOẠCH -->
+                        <div class="bg-white p-2 rounded-2xl shadow-md flex gap-2 border border-amber-100">
+                            <button onclick="switchTaskFilter('all')" id="tab-task-all" class="flex-1 py-2 text-xs font-black rounded-xl bg-amber-400 text-gray-900 transition cursor-pointer">Tất cả nhiệm vụ</button>
+                            <button onclick="switchTaskFilter('pending')" id="tab-task-pending" class="flex-1 py-2 text-xs font-black rounded-xl text-gray-600 hover:bg-amber-50 transition cursor-pointer">Chưa xong ⚠️</button>
+                            <button onclick="switchTaskFilter('completed')" id="tab-task-completed" class="flex-1 py-2 text-xs font-black rounded-xl text-gray-600 hover:bg-amber-50 transition cursor-pointer">Đã xong ✅</button>
                         </div>
-                        <div id="timeline-container" class="space-y-3"></div>
+
+                        <div class="bg-white p-6 rounded-3xl shadow-lg border border-amber-100">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b pb-3">
+                                <div class="flex items-center gap-2">
+                                    <h2 class="text-lg font-black text-gray-900">
+                                        <i class="fa-solid fa-list-check text-green-500"></i> Nhật Ký Nhiệm Vụ Hút Mật
+                                    </h2>
+                                    <!-- NÚT SẮP XẾP TỰ ĐỘNG THÔNG MINH -->
+                                    <button onclick="sortTasksAutomatically()" class="bg-amber-100 hover:bg-amber-200 text-amber-800 text-[10px] font-black px-2.5 py-1 rounded-xl shadow-sm transition border border-amber-200 cursor-pointer">
+                                        <i class="fa-solid fa-arrow-down-short-wide"></i> Sắp xếp tự động (Ưu tiên & Hạn chót)
+                                    </button>
+                                </div>
+                                <span id="priority-reminder-box" class="text-xs bg-red-50 text-red-600 border border-red-200 font-black px-2.5 py-1 rounded-xl">⏰ Đang kiểm tra...</span>
+                            </div>
+                            <div id="timeline-container" class="space-y-3"></div>
+                        </div>
+
                     </div>
 
                 </div>
             </section>
 
-            <!-- ================= TRANG 3: ĐỒNG HỒ ĐẬP CÁNH (TIMER & RELAXING SOUNDS) ================= -->
+            <!-- ================= TRANG 3: ĐỒNG HỒ ĐẬP CÁNH (TIMER & MUSIC) ================= -->
             <section id="page-timer" class="page-content space-y-6">
                 <div class="bg-white p-8 rounded-3xl shadow-xl border border-amber-100 text-center max-w-md mx-auto">
                     <h2 class="text-2xl font-black text-amber-900 mb-2 flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-hourglass-half text-orange-500"></i> Đồng Hồ Đập Cánh
+                        <i class="fa-solid fa-hourglass-half text-orange-500 animate-spin"></i> Đồng Đồng Đập Cánh Pomodoro
                     </h2>
                     
                     <div id="timer-display" class="text-6xl font-black text-orange-500 my-6 tracking-wider bg-amber-50/50 py-6 rounded-3xl border-2 border-dashed border-orange-300 shadow-inner">25:00</div>
                     
+                    <!-- BẮT BUỘC CHỌN CÂY GIEO TRƯỚC KHI HỌC -->
+                    <div class="bg-green-50 p-4 rounded-2xl border border-green-200 mb-4 text-left">
+                        <label class="block text-xs font-black text-green-800 uppercase mb-1">🌱 Chọn mầm giống gieo trước khi bắt đầu:</label>
+                        <select id="timer-select-seed" class="w-full p-2 border-2 border-green-200 rounded-xl text-xs font-black bg-white focus:outline-none focus:border-green-500 text-gray-800">
+                            <option value="🌱">🌱 Mầm giống Hoa Hạt Mầm</option>
+                            <option value="🌻">🌻 Mầm giống Hoa Hướng Dương</option>
+                            <option value="🌹">🌹 Mầm giống Hoa Hồng Đỏ</option>
+                            <option value="🌷">🌷 Mầm giống Hoa Tulip</option>
+                            <option value="🐝">🐝 Ấu Trùng Ong Vàng Siêu Chăm</option>
+                        </select>
+                        <p class="text-[10px] text-gray-400 mt-1">Cây sẽ phát triển thành công vào nông trại sau khi kết thúc phiên học tập hoàn thành!</p>
+                    </div>
+
                     <div class="grid grid-cols-2 gap-3 mb-4 text-left">
                         <div>
                             <label class="block text-[10px] font-black text-gray-400 uppercase mb-1">Thời gian học (phút)</label>
-                            <input type="number" id="input-learn-time" min="1" max="180" value="25" onchange="adjustTimerSettings()" class="w-full p-2 border rounded-xl text-xs font-bold text-center">
+                            <input type="number" id="input-learn-time" min="1" max="180" value="25" onchange="adjustTimerSettings()" class="w-full p-2 border rounded-xl text-xs font-bold text-center text-gray-800">
                         </div>
                         <div>
                             <label class="block text-[10px] font-black text-gray-400 uppercase mb-1">Thời gian nghỉ (phút)</label>
-                            <input type="number" id="input-rest-time" min="1" max="60" value="5" onchange="adjustTimerSettings()" class="w-full p-2 border rounded-xl text-xs font-bold text-center">
+                            <input type="number" id="input-rest-time" min="1" max="60" value="5" onchange="adjustTimerSettings()" class="w-full p-2 border rounded-xl text-xs font-bold text-center text-gray-800">
                         </div>
                     </div>
 
                     <div class="flex gap-3 justify-center mb-6">
-                        <button onclick="toggleTimer()" id="timer-start-btn" class="bg-orange-500 hover:bg-orange-600 text-white font-black px-6 py-3 rounded-xl text-sm shadow-md transition cursor-pointer">Bắt đầu hút mật</button>
+                        <button onclick="toggleTimer()" id="timer-start-btn" class="bg-orange-500 hover:bg-orange-600 text-white font-black px-6 py-3 rounded-xl text-sm shadow-md transition cursor-pointer">Bắt đầu học hút mật</button>
                         <button onclick="resetTimer()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-4 py-3 rounded-xl text-sm transition cursor-pointer">Đặt lại</button>
                     </div>
 
                     <div class="border-t pt-4">
-                        <p class="text-xs font-bold text-gray-500 mb-3 uppercase tracking-wider">🎵 Âm Thanh Thư Giãn (Chạy trong suốt phiên học)</p>
-                        <select id="sound-selection" onchange="switchContinuousSound()" class="w-full p-2 border rounded-xl text-xs font-bold bg-white focus:outline-none mb-3">
-                            <option value="none">🔇 Tắt âm thanh hỗ trợ</option>
-                            <option value="alpha">🧠 Sóng Alpha Tập Trung Trí Não</option>
-                            <option value="rain">🌧️ Tiếng Mưa Lâm Thâm Ngoài Tổ Ong</option>
-                            <option value="wind">🌲 Tiếng Gió Rừng Xào Xạc Thư Thái</option>
-                            <option value="lofi">🎹 Nhạc Lofi Tổ Ong Chăm Chỉ</option>
-                        </select>
-                        <p class="text-[10px] text-gray-400 font-medium">Lưu ý: Âm thanh sẽ được đồng bộ phát liên tục trong suốt quá trình đếm ngược và tự động dừng khi kết thúc!</p>
+                        <p class="text-xs font-bold text-gray-500 mb-3 uppercase tracking-wider">🎵 Phát Âm Thanh Tập Trung Thư Giãn (Loop Suốt Giờ Học)</p>
+                        
+                        <!-- LỰA CHỌN NGUỒN PHÁT ÂM THANH -->
+                        <div class="mb-3 text-left">
+                            <label class="block text-[10px] font-black text-gray-400 uppercase mb-1">Nguồn Phát Nhạc</label>
+                            <select id="audio-source-type" onchange="toggleAudioSourceType()" class="w-full p-2 border rounded-xl text-xs font-bold bg-white focus:outline-none text-gray-800">
+                                <option value="built-in">🎛️ Âm thanh có sẵn trên Web (Phát chuẩn không ngắt)</option>
+                                <option value="custom">📁 Sử dụng nhạc tải lên từ thiết bị</option>
+                            </select>
+                        </div>
+
+                        <!-- 1. ÂM THANH CÓ SẴN (WEB AUDIO SYNTH) -->
+                        <div id="box-built-in-audio" class="flex gap-2 justify-center mb-3">
+                            <button onclick="playRelaxingSound('alpha')" id="sound-btn-alpha" class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold px-3 py-1.5 rounded-xl border cursor-pointer">Sóng Alpha</button>
+                            <button onclick="playRelaxingSound('rain')" id="sound-btn-rain" class="text-xs bg-green-100 hover:bg-green-200 text-green-800 font-bold px-3 py-1.5 rounded-xl border cursor-pointer">Tiếng Mưa</button>
+                            <button onclick="playRelaxingSound('lofi')" id="sound-btn-lofi" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold px-3 py-1.5 rounded-xl border cursor-pointer">Nhạc Lo-fi</button>
+                            <button onclick="playRelaxingSound('cafe')" id="sound-btn-cafe" class="text-xs bg-pink-100 hover:bg-pink-200 text-pink-800 font-bold px-3 py-1.5 rounded-xl border cursor-pointer">Quán Cà Phê</button>
+                        </div>
+
+                        <!-- 2. TẢI FILE NHẠC TỪ THIẾT BỊ -->
+                        <div id="box-custom-audio" class="hidden text-left bg-gray-50 p-3 rounded-2xl border border-dashed border-amber-300">
+                            <label class="block text-[10px] font-bold text-amber-800 mb-1">Chọn file âm thanh (.mp3, .wav, .m4a):</label>
+                            <input type="file" id="custom-audio-file-input" accept="audio/*" onchange="uploadCustomAudio(event)" class="text-xs w-full text-gray-500">
+                            <p id="custom-audio-filename" class="text-[10px] text-green-600 font-black mt-1 hidden">✓ File nhạc cá nhân đã sẵn sàng phát.</p>
+                            <audio id="local-music-player" loop class="hidden"></audio>
+                        </div>
                     </div>
                 </div>
             </section>
 
             <!-- ================= TRANG 4: PHÒNG THÚ CƯNG BÉ ONG (PET ROOM) ================= -->
             <section id="page-pet" class="page-content space-y-6">
-                <div class="bg-white p-6 rounded-3xl shadow-lg border border-amber-100 max-w-xl mx-auto text-center">
-                    <h2 class="text-2xl font-black text-amber-900 mb-2">🐾 Phòng Thú Cưng Bé Ong</h2>
-                    <p class="text-xs text-gray-400 mb-6">Tương tác trực tiếp với thú cưng của bạn. Đừng để bé bị đói nhé!</p>
-
-                    <div class="bg-gradient-to-br from-amber-50 to-orange-100 p-8 rounded-3xl border-2 border-amber-300 shadow-inner mb-6 relative">
-                        <!-- PET INTERACTIVITY DISPLAY -->
-                        <div class="cursor-pointer transition-transform duration-200 transform hover:scale-110 inline-block" onclick="interactWithPet()">
+                <div class="bg-white p-6 rounded-3xl shadow-lg border border-amber-100 text-center max-w-xl mx-auto">
+                    <h2 class="text-xl font-black text-amber-900 mb-2 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-paw text-amber-500"></i> Phòng Thú Cưng Bé Ong Đồng Hành
+                    </h2>
+                    <p class="text-xs text-gray-400 mb-6">Nuôi dưỡng bé cưng, hoàn thành nhiệm vụ giúp bé lớn khôn và mở khóa phụ kiện mới!</p>
+                    
+                    <div class="bg-gradient-to-br from-amber-50 to-orange-100 p-6 rounded-3xl border border-amber-200 relative mb-6">
+                        <div class="absolute top-3 right-3 bg-white px-3 py-1 rounded-xl text-xs font-black shadow" id="pet-status-info">
+                            Trạng thái: No 🥩 | Thú cưng Level: 1
+                        </div>
+                        
+                        <!-- CHẠM TƯƠNG TÁC -->
+                        <div class="cursor-pointer transition-transform duration-200 transform hover:scale-110 inline-block my-6" onclick="interactWithPet()">
                             <div id="pet-display" class="text-8xl filter drop-shadow">🐱</div>
                         </div>
-                        <div class="mt-4">
-                            <input type="text" id="pet-name-input" onchange="savePetName()" class="bg-white/80 p-1.5 border text-sm font-black rounded-xl text-center shadow-sm w-44" value="Bé Mèo Mun">
-                            <p id="pet-status-info" class="text-xs text-amber-800 font-bold mt-2">Độ no: 100% 🥩 | Cấp độ thú: Cấp 1</p>
+
+                        <div class="mt-4 flex flex-col items-center gap-2">
+                            <div class="flex items-center gap-1.5 justify-center">
+                                <span class="text-xs font-bold text-gray-500">Đặt tên thú cưng:</span>
+                                <input type="text" id="pet-name-input" onchange="savePetName()" class="bg-white p-1.5 border text-sm font-black rounded-xl text-center shadow-sm w-44 text-gray-800" value="Bé Mèo Mun">
+                            </div>
+                            <p id="pet-accessory-text" class="text-xs text-amber-800 font-extrabold">Mũ trang bị: Chưa có</p>
                         </div>
 
-                        <!-- MOTIVATIONAL BUBBLE -->
+                        <!-- MOTIVATIONAL DIALOGUE BUBBLE -->
                         <div id="pet-bubble" class="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-white text-gray-700 text-xs font-bold px-4 py-2.5 rounded-2xl shadow-md border border-amber-200 transition-all duration-300 opacity-0 pointer-events-none w-64">
                             "Chào chủ nhân chăm chỉ!"
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
-                        <!-- CHỌN THÚ NUÔI -->
                         <div class="bg-gray-50 p-4 rounded-2xl border">
                             <span class="text-xs font-black text-gray-600 block mb-1">Chọn loại thú đồng hành</span>
-                            <select id="select-pet" onchange="changePetType()" class="text-xs p-2 border rounded-xl bg-white font-bold text-gray-700 w-full focus:outline-none">
+                            <select id="select-pet" onchange="changePetType()" class="text-xs p-2 border rounded-xl bg-white font-bold text-gray-800 w-full focus:outline-none">
                                 <option value="🐱">Bé Mèo Mun</option>
                                 <option value="🐶">Bé Cún Con</option>
                                 <option value="🐰">Bé Thỏ Bông</option>
                                 <option value="🐝">Chú Ong Vàng Chăm Chỉ 🐝</option>
                             </select>
                         </div>
-                        <!-- CỬA HÀNG PHỤ KIỆN -->
                         <div class="bg-gray-50 p-4 rounded-2xl border">
-                            <span class="text-xs font-black text-gray-600 block mb-1">Mua phụ kiện trang trí (Đổi bằng Giọt Mật)</span>
-                            <div class="grid grid-cols-2 gap-2 mt-1">
-                                <button onclick="buyAccessory('🎩', 30)" class="p-1.5 bg-amber-100 hover:bg-amber-200 rounded-xl text-[10px] font-black border border-amber-200">🎩 Mũ Cao (30 Giọt)</button>
-                                <button onclick="buyAccessory('👑', 50)" class="p-1.5 bg-amber-100 hover:bg-amber-200 rounded-xl text-[10px] font-black border border-amber-200">👑 Vương Miện (50 Giọt)</button>
-                                <button onclick="buyAccessory('🎀', 20)" class="p-1.5 bg-amber-100 hover:bg-amber-200 rounded-xl text-[10px] font-black border border-amber-200">🎀 Nơ Đỏ (20 Giọt)</button>
+                            <span class="text-xs font-black text-gray-600 block mb-1">Trang phục & Phụ kiện (Mở khóa bằng Giọt Mật)</span>
+                            <div class="grid grid-cols-3 gap-2 mt-1">
+                                <button onclick="buyAccessory('🎩', 30)" class="p-1.5 bg-amber-100 hover:bg-amber-200 rounded-xl text-[10px] font-black border border-amber-200 cursor-pointer">🎩 Mũ Cao (30 Giọt)</button>
+                                <button onclick="buyAccessory('👑', 50)" class="p-1.5 bg-amber-100 hover:bg-amber-200 rounded-xl text-[10px] font-black border border-amber-200 cursor-pointer">👑 Vương Miện (50 Giọt)</button>
+                                <button onclick="buyAccessory('🎀', 20)" class="p-1.5 bg-amber-100 hover:bg-amber-200 rounded-xl text-[10px] font-black border border-amber-200 cursor-pointer">🎀 Nơ Đỏ (20 Giọt)</button>
                             </div>
                         </div>
                     </div>
@@ -337,34 +431,18 @@
             <section id="page-garden" class="page-content space-y-6">
                 <div class="bg-white p-6 rounded-3xl shadow-lg border border-amber-100 max-w-xl mx-auto">
                     <h2 class="text-xl font-black text-gray-900 mb-2 text-center flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-leaf text-green-500"></i> Vườn Hoa Tổ Ong Học Tập
+                        <i class="fa-solid fa-leaf text-green-500"></i> Nông Trại Ong Thợ Đa Dạng
                     </h2>
-                    <p class="text-xs text-gray-400 text-center mb-6">Giới hạn trồng tối đa 1 cây/ngày. Nếu không hoàn thành ít nhất 1 nhiệm vụ trong tuần, cây sẽ héo úa!</p>
+                    <p class="text-xs text-gray-400 text-center mb-6">Mầm giống của bạn sẽ tự lớn sau mỗi phiên học tập đập cánh Pomodoro hoàn chỉnh!</p>
 
-                    <!-- HIỆN KHU VƯỜN TỔNG THỂ -->
+                    <!-- HIỆN KHU VƯỜN ĐỂ THẤY SỐ LƯỢNG TRỒNG -->
                     <div id="garden-container" class="bg-gradient-to-br from-green-100 to-emerald-50 p-6 rounded-3xl border-2 border-emerald-200 mb-6 shadow-inner relative">
-                        <div id="garden-grid" class="grid grid-cols-6 gap-3 bg-white/70 p-4 rounded-2xl min-h-[140px] text-4xl text-center items-center justify-center">
-                            <!-- JS Sẽ đổ cây trồng vào đây -->
-                        </div>
-                    </div>
-
-                    <div class="bg-gray-50 p-4 rounded-2xl border text-center">
-                        <span class="text-xs font-black text-gray-600 block mb-2">Chọn loại gieo trồng mới</span>
-                        <div class="flex gap-2">
-                            <select id="select-tree" class="text-xs p-2.5 border rounded-xl bg-white font-bold text-gray-700 flex-1 focus:outline-none">
-                                <option value="🌱">Cây Mầm Chăm Chỉ</option>
-                                <option value="🌻">Hoa Hướng Dương</option>
-                                <option value="🌹">Hoa Hồng Kiêu Hãnh</option>
-                                <option value="🌷">Hoa Tulip Rực Rỡ</option>
-                            </select>
-                            <button onclick="plantNewItem()" class="bg-green-600 text-white font-black px-4 py-2 rounded-xl text-xs shadow hover:bg-green-700 transition cursor-pointer">Gieo Trồng Ngay</button>
-                        </div>
-                        <p class="text-[10px] text-gray-400 mt-2">Yêu cầu: Chỉ được gieo trồng tối đa 1 cây mỗi ngày (Chu kỳ 24H).</p>
+                        <div id="garden-grid" class="grid grid-cols-6 gap-3 bg-white/70 p-4 rounded-2xl min-h-[140px] text-4xl text-center items-center justify-center"></div>
                     </div>
                 </div>
             </section>
 
-            <!-- ================= TRANG 6: BẦY ONG CHĂM CHỈ (Study Group & Leaderboard) ================= -->
+            <!-- ================= TRANG 6: BẦY ONG CHĂM CHỈ (SOCIAL & ROOM & LEADERBOARD) ================= -->
             <section id="page-groups" class="page-content space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     
@@ -373,13 +451,13 @@
                             <h2 class="text-xl font-black text-blue-950 mb-1 flex items-center gap-2">
                                 <i class="fa-solid fa-users text-blue-600"></i> Phòng Học Nhóm Bầy Ong
                             </h2>
-                            <p class="text-xs text-blue-800/70 mb-4">Nhập mã số phòng hoặc tham gia nhanh nhóm công cộng dưới đây:</p>
+                            <p class="text-xs text-blue-800/70 mb-4">Nhập mã số phòng hoặc tham gia nhanh bầy ong đang trực tuyến dưới đây:</p>
                             
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                                 <div class="bg-white p-4 rounded-xl border">
                                     <span class="text-xs font-bold block mb-1">Tự Tạo / Kết Nối Phòng</span>
                                     <div class="flex gap-1">
-                                        <input type="text" id="room-id-input" class="p-2 border rounded-lg text-xs flex-1" placeholder="Nhập ID phòng học...">
+                                        <input type="text" id="room-id-input" class="p-2 border rounded-lg text-xs flex-1 text-gray-800" placeholder="Nhập ID phòng học...">
                                         <button onclick="joinStudyRoom()" class="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs font-bold cursor-pointer">Kết Nối</button>
                                     </div>
                                     <p id="current-room-display" class="text-[10px] text-green-600 font-bold mt-2">📍 Chế độ: Đơn độc lập</p>
@@ -416,27 +494,97 @@
                         </div>
                     </div>
 
-                    <!-- BẢNG XẾP HẠNG THEO TUẦN (CẬP NHẬT TUẦN) -->
+                    <!-- BẢNG XẾP HẠNG THEO TUẦN -->
                     <div class="bg-white p-6 rounded-3xl shadow-lg border border-amber-100 h-fit">
-                        <h2 class="text-sm font-black text-gray-900 mb-3 flex items-center gap-1.5">
+                        <h2 class="text-sm font-black text-gray-900 mb-3 flex items-center gap-1.5 cursor-pointer" onclick="openLeaderboardModal()">
                             <i class="fa-solid fa-ranking-star text-amber-500"></i> Bảng Xếp Hạng Ong Vàng Tuần
                         </h2>
                         <div class="text-xs space-y-2 text-gray-600 font-medium" id="leaderboard-container">
-                            <p class="bg-amber-100 p-2 rounded-xl border border-amber-300">🥇 <b>Bạn (Ong Thợ)</b> - <span id="leaderboard-xp">0 Mật</span></p>
-                            <p class="p-2 bg-gray-50 rounded-xl border">🥈 Ong Vàng Chuyên Lý - 890 Mật</p>
-                            <p class="p-2 bg-gray-50 rounded-xl border">🥉 Ong Mật Siêu Ngọt - 640 Mật</p>
+                            <!-- Top 10 will render here dynamically -->
                         </div>
+                        <button onclick="openLeaderboardModal()" class="w-full mt-3 bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs font-black py-2 rounded-xl border border-amber-200 cursor-pointer shadow-sm transition">
+                            <i class="fa-solid fa-eye"></i> Xem bảng xếp hạng đầy đủ
+                        </button>
                         <p class="text-[9px] text-gray-400 mt-3 text-center">Bảng xếp hạng cập nhật realtime theo tuần dựa trên số giọt mật thu hoạch!</p>
                     </div>
 
                 </div>
             </section>
 
-            <!-- ================= TRANG 7: MẬT NGỌT MAY MẮN & TIỆN ÍCH PHỤ TRỢ ================= -->
+            <!-- ================= TRANG 7: HỒ SƠ BẦY ONG (MY PROFILE & PRIVACY) ================= -->
+            <section id="page-profile" class="page-content space-y-6">
+                <div class="bg-white p-6 rounded-3xl shadow-lg border border-amber-100 max-w-xl mx-auto">
+                    <h2 class="text-xl font-black text-amber-900 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-id-card text-amber-500"></i> Hồ Sơ Cá Nhân Bầy Ong
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <!-- Chọn avatar đề xuất hoặc tải ảnh đại diện cá nhân -->
+                        <div class="flex flex-col items-center gap-3 border-b border-amber-100 pb-5">
+                            <div class="relative group">
+                                <div id="profile-page-avatar" class="w-24 h-24 bg-gradient-to-tr from-amber-400 to-orange-300 rounded-full flex items-center justify-center text-4xl shadow border-4 border-white overflow-hidden">🧑‍🎓</div>
+                                <input type="file" id="profile-avatar-uploader" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="uploadAvatar(event)">
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="openAvatarModal()" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold px-3 py-1.5 rounded-xl border cursor-pointer">Chọn Avatar Đề Xuất</button>
+                                <button onclick="document.getElementById('profile-avatar-uploader').click()" class="text-xs bg-orange-100 hover:bg-orange-200 text-orange-800 font-bold px-3 py-1.5 rounded-xl border cursor-pointer">Tải Ảnh Từ Thiết Bị</button>
+                            </div>
+                        </div>
+
+                        <!-- Các trường thông tin chi tiết -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tên tài khoản (Biệt danh)</label>
+                                <input type="text" id="profile-nickname" class="w-full p-2.5 border-2 border-amber-100 rounded-xl text-xs font-bold focus:border-amber-400 focus:outline-none text-gray-800" placeholder="Ví dụ: Ong Vàng Chăm Chỉ">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Mã Số Hòm Thư (Email)</label>
+                                <input type="text" id="profile-email-readonly" readonly class="w-full p-2.5 border border-gray-100 rounded-xl text-xs font-medium bg-gray-100 text-gray-400 cursor-not-allowed" value="guest@beebee.com">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Họ và Tên</label>
+                                <input type="text" id="profile-fullname" class="w-full p-2.5 border-2 border-amber-100 rounded-xl text-xs font-medium focus:border-amber-400 focus:outline-none text-gray-800" placeholder="Nhập họ tên đầy đủ...">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Số điện thoại</label>
+                                <input type="text" id="profile-phone" class="w-full p-2.5 border-2 border-amber-100 rounded-xl text-xs font-medium focus:border-amber-400 focus:outline-none text-gray-800" placeholder="Nhập số điện thoại...">
+                            </div>
+                        </div>
+
+                        <!-- Chế độ ẩn hiện & riêng tư -->
+                        <div class="p-4 bg-amber-50/50 border border-amber-200 rounded-2xl space-y-3 mt-2">
+                            <span class="text-xs font-black text-amber-900 block mb-1">🛡️ Thiết Lập Quyền Riêng Tư:</span>
+                            
+                            <div class="flex items-center justify-between text-xs font-semibold text-gray-700">
+                                <span>Trạng thái Hòm Thư (Email):</span>
+                                <select id="profile-email-visibility" class="border p-1.5 rounded-xl bg-white focus:outline-none text-gray-800">
+                                    <option value="hide">Ẩn Email với bầy ong khác</option>
+                                    <option value="show">Hiện Email công khai</option>
+                                </select>
+                            </div>
+                            
+                            <div class="flex items-center justify-between text-xs font-semibold text-gray-700 border-t border-amber-100 pt-2">
+                                <span>Thông tin cá nhân (Tên, SĐT):</span>
+                                <select id="profile-info-visibility" class="border p-1.5 rounded-xl bg-white focus:outline-none text-gray-800">
+                                    <option value="private">🔒 Chỉ mình tôi (1 Mình Tôi)</option>
+                                    <option value="public">👥 Mọi người cùng thấy</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button onclick="saveProfileData()" class="w-full bg-gradient-to-r from-amber-400 to-orange-400 text-white font-black py-3 rounded-xl shadow-md transition cursor-pointer hover:shadow-lg">LƯU CẤP TỐC HỒ SƠ</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TRANG 8: TIỆN ÍCH MẬT NGỌT & GIẢI TRÍ ================= -->
             <section id="page-utilities" class="page-content space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
-                    <!-- VÒNG QUAY MAY MẮN (GIỚI HẠN CHỈ 3 LẦN 1 NGÀY) -->
+                    <!-- VÒNG QUAY MAY MẮN (CHỈ 3 LẦN 1 NGÀY) -->
                     <div class="bg-white p-6 rounded-3xl shadow-lg border border-amber-100 flex flex-col items-center text-center">
                         <h2 class="text-sm font-black text-gray-900 mb-2">🎰 Vòng Quay Mật Ngọt May Mắn</h2>
                         <p id="spin-counter-text" class="text-[10px] text-orange-600 font-bold mb-3">Lượt quay hôm nay: còn 3/3 lần</p>
@@ -447,40 +595,68 @@
                         <button onclick="spinWheel()" class="mt-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-black px-4 py-2 rounded-xl text-xs transition shadow cursor-pointer">Quay May Mắn</button>
                     </div>
 
-                    <!-- TRỢ LÝ ONG AI THÔNG THÁI -->
+                    <!-- TRỢ LÝ ONG AI THÔNG THÁI CÓ LỊCH SỬ CHAT -->
                     <div class="bg-white p-6 rounded-3xl shadow-lg border border-amber-100">
                         <h2 class="text-sm font-black text-gray-900 mb-2">🤖 Trợ Lý Ong AI Thông Thái</h2>
-                        <div class="bg-gray-50 p-2.5 rounded-xl text-[11px] space-y-2 h-24 overflow-y-auto border mb-2" id="ai-chat-box">
+                        <div class="bg-gray-50 p-2.5 rounded-xl text-[11px] space-y-2 h-36 overflow-y-auto border mb-2" id="ai-chat-box">
                             <p class="text-purple-700 font-medium"><b>AI:</b> Chào bạn! Tôi có thể hỗ trợ bạn thiết lập thời gian biểu học tập một cách tối ưu.</p>
                         </div>
                         <div class="flex gap-1">
-                            <input type="text" id="ai-input" class="flex-1 p-2 border rounded-xl text-xs focus:outline-none" placeholder="Nhập câu hỏi...">
+                            <input type="text" id="ai-input" class="flex-1 p-2 border rounded-xl text-xs focus:outline-none text-gray-800" placeholder="Nhập câu hỏi...">
                             <button onclick="askAI()" class="bg-purple-600 text-white px-3 py-1 rounded-xl text-xs font-bold cursor-pointer">Gửi</button>
                         </div>
                     </div>
 
-                    <!-- NHẬT KÝ CẢM XÚC -->
-                    <div class="bg-white p-6 rounded-3xl shadow-lg border border-amber-100">
-                        <h2 class="text-sm font-black text-gray-900 mb-2">📝 Nhật Ký Cảm Xúc</h2>
-                        <div class="space-y-2">
-                            <input type="text" id="journal-feeling" class="w-full p-2.5 border rounded-xl text-xs focus:outline-none" placeholder="Hôm nay bạn học tập thế nào?">
-                            <select id="journal-stars" class="w-full border rounded-xl p-2 text-xs text-amber-600 font-black bg-white focus:outline-none">
-                                <option value="5">⭐⭐⭐⭐⭐ (Tuyệt đỉnh)</option>
-                                <option value="4">⭐⭐⭐⭐ (Tốt)</option>
-                                <option value="3">⭐⭐⭐ (Tạm ổn)</option>
-                            </select>
-                            <button onclick="saveJournal()" class="w-full bg-blue-500 text-white font-bold py-2 rounded-xl text-xs shadow cursor-pointer">Lưu Sổ Cảm Xúc</button>
+                    <!-- NHẬT KÝ CẢM XÚC & BIỂU ĐỒ STATS -->
+                    <div class="bg-white p-6 rounded-3xl shadow-lg border border-amber-100 col-span-1 md:col-span-2 space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <h2 class="text-sm font-black text-gray-900 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-pen-nib text-blue-500"></i> Viết Nhật Ký Cảm Xúc Hàng Ngày
+                                </h2>
+                                <input type="text" id="journal-feeling" class="w-full p-2.5 border rounded-xl text-xs focus:outline-none text-gray-800" placeholder="Hôm nay bạn học tập thế nào?">
+                                <select id="journal-stars" class="w-full border rounded-xl p-2 text-xs text-amber-600 font-black bg-white focus:outline-none text-gray-800">
+                                    <option value="5">⭐⭐⭐⭐⭐ (Tuyệt đỉnh)</option>
+                                    <option value="4">⭐⭐⭐⭐ (Tốt)</option>
+                                    <option value="3">⭐⭐⭐ (Tạm ổn)</option>
+                                    <option value="2">⭐⭐ (Có xao nhãng)</option>
+                                    <option value="1">⭐ (Kém tập trung)</option>
+                                </select>
+                                <button onclick="saveJournal()" class="w-full bg-blue-500 text-white font-bold py-2 rounded-xl text-xs shadow cursor-pointer">Lưu Sổ Cảm Xúc & Vẽ Biểu Đồ</button>
+                            </div>
+                            
+                            <!-- BIỂU ĐỒ THỐNG KÊ MỨC ĐỘ TẬP TRUNG -->
+                            <div class="bg-gray-50 p-4 rounded-2xl border border-gray-200">
+                                <h3 class="text-xs font-black text-gray-600 mb-2 text-center">📈 Thống Kê Độ Tập Trung Theo Ngày</h3>
+                                <div class="h-32 w-full flex items-end justify-around pb-2 relative" id="journal-chart-container">
+                                    <div class="text-center text-xs text-gray-400 w-full py-10">Chưa có nhật ký để vẽ biểu đồ thống kê.</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- LÁ THƯ GỬI BẢN THÂN TRONG TƯƠNG LAI -->
-                    <div class="bg-white p-6 rounded-3xl shadow-lg border border-amber-100">
-                        <h2 class="text-sm font-black text-gray-900 mb-1">📩 Future Me (Thư Gửi Tương Lai)</h2>
-                        <textarea id="future-letter" rows="2" class="w-full p-2.5 border rounded-xl text-xs focus:outline-none" placeholder="Lời nhắn gửi chính mình trong tương lai..."></textarea>
-                        <button onclick="saveFutureLetter()" class="w-full mt-1 bg-purple-500 text-white font-bold py-2 rounded-xl text-xs shadow cursor-pointer">Niêm Phong Thời Gian</button>
+                    <!-- LÁ THƯ GỬI BẢN THÂN TRONG TƯƠNG LAI CÓ CHỌN THỜI GIAN -->
+                    <div class="bg-white p-6 rounded-3xl shadow-lg border border-amber-100 col-span-1 md:col-span-2">
+                        <h2 class="text-sm font-black text-gray-900 mb-2">📩 Future Me (Thư Gửi Tương Lai Có Đặt Lịch)</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
+                            <div class="md:col-span-2">
+                                <textarea id="future-letter" rows="3" class="w-full p-2.5 border rounded-xl text-xs focus:outline-none text-gray-800" placeholder="Hãy viết những kỳ vọng, lời hứa dành cho chính mình..."></textarea>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-[10px] font-black text-gray-400 uppercase">Thời gian gửi lại:</label>
+                                <select id="future-time-delay" class="w-full p-2 border rounded-xl text-xs bg-white font-bold text-gray-800">
+                                    <option value="1_month">1 Tháng sau</option>
+                                    <option value="6_months">6 Tháng sau</option>
+                                    <option value="1_year">1 Năm sau</option>
+                                    <option value="custom">📅 Tùy chọn ngày cụ thể</option>
+                                </select>
+                                <input type="date" id="future-custom-date" class="w-full p-2 border rounded-xl text-xs bg-white hidden font-bold text-gray-800">
+                            </div>
+                        </div>
+                        <button onclick="saveFutureLetter()" class="w-full bg-purple-500 text-white font-bold py-2 rounded-xl text-xs shadow cursor-pointer">Niêm Phong Thời Gian Gửi</button>
                     </div>
 
-                    <!-- BÀI TẬP HÍT THỞ XẢ STRESS TRỰC QUAN -->
+                    <!-- BÀI TẬP HÍT THỞ XẢ STRESS TRỰC QUAN (2 PHÚT) -->
                     <div class="bg-white p-6 rounded-3xl shadow-lg border border-amber-100 flex flex-col justify-center items-center text-center col-span-1 md:col-span-2">
                         <h2 class="text-sm font-black text-gray-900 mb-2">🧘 Bài Tập Hít Thở Xả Stress (2 Phút)</h2>
                         <div id="breathing-area" class="w-20 h-20 rounded-full bg-teal-600 flex items-center justify-center text-white text-xs font-black cursor-pointer shadow-lg mb-4">HÍT THỞ</div>
@@ -492,7 +668,7 @@
         </main>
     </div>
 
-    <!-- MODAL ĐỔI DIỆN MẠO AVATAR (FALLBACK) -->
+    <!-- MODAL ĐỔI DIỆN MẠO AVATAR -->
     <div id="avatar-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center hidden">
         <div class="bg-white p-6 rounded-3xl max-w-sm w-full text-center border-4 border-amber-400">
             <h3 class="text-lg font-black mb-1 text-amber-700">🛒 Phòng Thay Đồ Ong Thợ</h3>
@@ -504,6 +680,25 @@
                 <button onclick="changeAvatar('🧙')" class="text-3xl p-2 bg-gray-50 border rounded-xl">🧙</button>
             </div>
             <button onclick="closeAvatarModal()" class="bg-gray-900 text-white px-4 py-2 rounded-xl text-xs font-black shadow cursor-pointer">Lưu & Đóng</button>
+        </div>
+    </div>
+
+    <!-- MODAL BẢNG XẾP HẠNG TOÀN BỘ BẦY ONG -->
+    <div id="leaderboard-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-3xl max-w-lg w-full text-center border-4 border-amber-400 max-h-[85vh] flex flex-col">
+            <h3 class="text-xl font-black mb-1 text-amber-700"><i class="fa-solid fa-ranking-star"></i> Bảng Vàng Toàn Bộ Tổ Ong</h3>
+            <p class="text-xs text-gray-400 mb-4">Danh sách tất cả chú ong thợ đang siêng năng chăm chỉ tích lũy mật ngọt</p>
+            <div class="mb-3 relative">
+                <input type="text" id="leaderboard-search" oninput="filterLeaderboard()" placeholder="Tìm kiếm đồng đội..." class="w-full p-2.5 pl-9 border-2 border-amber-100 rounded-xl text-xs focus:outline-none focus:border-amber-400 text-gray-800 font-bold">
+                <i class="fa-solid fa-search absolute left-3 top-3.5 text-amber-400 text-xs"></i>
+            </div>
+            <div class="flex-1 overflow-y-auto space-y-2 pr-1" id="leaderboard-full-list">
+                <!-- Danh sách tất cả thành viên -->
+            </div>
+            <div class="mt-4 pt-4 border-t border-amber-100 flex justify-between items-center text-xs font-bold text-gray-600">
+                <span id="my-rank-status">Vị trí của bạn: Đang tính toán...</span>
+                <button onclick="closeLeaderboardModal()" class="bg-gray-900 text-white px-5 py-2.5 rounded-xl font-black shadow cursor-pointer">Đóng bảng</button>
+            </div>
         </div>
     </div>
 
@@ -527,74 +722,121 @@
         let timerInterval = null;
         let timerTimeLeft = 1500; 
         let audioCtx = null;
-        let continuousNode = null; // Trình tạo âm thanh hỗ trợ học tập liên tục
+        let continuousNode = null; 
+        let isGuest = false; // Trạng thái Guest Mode
+        let activeTaskFilter = 'all'; // all / pending / completed
+        let globalLeaderboardCache = []; // Bộ nhớ đệm bảng xếp hạng
 
-        // Khởi tạo đối tượng lưu trữ của bầy ong
+        // Khởi tạo đối tượng lưu trữ bầy ong
         let userData = {
             level: 1,
             xp: 0,
             avatar: '🧑‍🎓',
-            avatarUrl: '', // Base64 lưu ảnh đại diện cá nhân
+            avatarUrl: '', 
             badges: { pomodoro: false, streak: false, todo: false },
             customQuote: "Thành công là tổng của những nỗ lực nhỏ được lặp lại mỗi ngày.",
             gardenItems: ["🌱"],
-            lastPlantedTimestamp: 0, // Mốc thời gian lần cuối trồng cây
-            lastCheckInTimestamp: 0, // Mốc điểm danh 24h
-            dailySpinsRemaining: 3, // Giới hạn vòng quay 3 lần/ngày
-            lastSpinResetDate: "", // Lưu ngày cuối reset lượt quay
-            petType: "🐱",
-            petName: "Bé Mèo Mun",
+            lastPlantedTimestamp: 0, 
+            lastCheckInTimestamp: 0, 
+            dailySpinsRemaining: 3, 
+            lastSpinResetDate: "", 
+            petType: "🐝",
+            petName: "Bé Ong Vàng",
             petAccessory: "Chưa có",
-            petHungerState: "No", // No / Đói
-            plan: { days: [] }
+            petHungerState: "No", 
+            challengeStreak: 0, 
+            challengeDays: Array(21).fill(false), 
+            nickname: "Khách Danh Dự",
+            fullName: "",
+            phoneNumber: "",
+            emailVisibility: "hide", 
+            infoVisibility: "private", 
+            plan: { days: [] },
+            journals: [], // Nhật ký cảm xúc kèm ngày & điểm sao
+            aiChatHistory: [], // Lịch sử trò chuyện AI trợ lý
+            futureLetters: [] // Lưu thư tương lai
         };
 
         const petCheeringQuotes = {
             "🐱": [
-                "Meo meo! Bạn đã làm được rất nhiều việc hôm nay!",
-                "Hãy tự hào về bản thân nhé chủ nhân chăm chỉ!",
-                "Mệt quá thì ôm tớ một cái rồi học tiếp nha!",
-                "Tớ tin chủ nhân sẽ đỗ đạt điểm tối đa!"
+                "Meo meo! Hôm nay chủ nhân thu hoạch được rất nhiều giọt mật ngọt!",
+                "Hãy tự hào về hành trình chăm chỉ ngày hôm nay nhé!",
+                "Nếu mệt quá, ôm tớ một cái rồi cùng bay tiếp nha!",
+                "Tớ tin bạn nhất định sẽ đạt được mục tiêu học tập đề ra!"
             ],
             "🐶": [
-                "Gâu gâu! Tiếp tục đập cánh bay cao nào bạn ơi!",
-                "Học chăm chỉ để tích hũ mật ong vàng nhé!",
-                "Cố lên cố lên! Mỗi nỗ lực đều rất có giá trị!",
-                "Chủ nhân ơi, dắt tớ đi dạo sau khi làm xong việc nhé!"
+                "Gâu gâu! Bầy ong cùng đập cánh vươn tới tầm cao mới nào!",
+                "Hũ mật ong của chúng ta sắp đầy ắp rồi bạn ơi!",
+                "Cố lên cố lên! Mỗi bước tiến nhỏ hôm nay đều vô cùng giá trị!",
+                "Bấm xong nhiệm vụ dắt tớ đi dạo một vòng nhé chủ nhân!"
             ],
             "🐰": [
-                "Bạn hôm nay rạng rỡ và chăm chỉ quá đi!",
-                "Đừng trì hoãn nhé, chú ong ngọt ngào sẽ thành công!",
-                "Ăn chút mật ngọt rồi tiếp tục tập trung thôi!",
-                "Tớ luôn đứng sau cổ vũ bạn hết mình!"
+                "Bạn hôm nay rạng rỡ và chăm chỉ xuất sắc quá đi!",
+                "Đừng lo lắng, chú ong ngọt ngào chắc chắn sẽ thành công!",
+                "Ăn chút mật ngọt rồi chúng ta cùng ngồi học tiếp nào!",
+                "Tớ luôn đứng sau theo dõi và tiếp sức cho bạn hết mình!"
             ],
             "🐝": [
-                "Bzzz... Chúng ta là bầy ong thợ gương mẫu!",
-                "Chăm chỉ là chìa khóa để kiến tạo tổ ong huy hoàng!",
-                "Cùng đập cánh tập trung học tập thôi chủ nhân ơi!",
-                "Tổ ong bầy đàn của chúng ta là số một!"
+                "Bzzz... Chúng ta là đại diện của bầy ong thợ gương mẫu!",
+                "Chăm chỉ cặm cụi hút mật là chìa khóa kiến tạo nên tổ ong huy hoàng!",
+                "Đập cánh đập cánh! Bật đồng hồ Pomodoro lên học thôi chủ nhân!",
+                "Vườn hoa học tập của chúng ta sắp nở hoa rực rỡ rồi!"
             ]
         };
 
         function switchPage(pageId) {
+            if (pageId === 'auth') {
+                isGuest = false;
+                document.getElementById('guest-mode-banner').classList.add('hidden');
+                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('main-app').classList.add('hidden');
+                return;
+            }
             document.querySelectorAll('.page-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(`page-${pageId}`).classList.add('active');
             document.getElementById(`btn-${pageId}`).classList.add('active');
         }
 
+        // KÍCH HOẠT CHẾ ĐỘ TRẢI NGHIỆM KHÁCH (GUEST MODE)
+        function startGuestMode() {
+            isGuest = true;
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            document.getElementById('guest-mode-banner').classList.remove('hidden');
+            
+            // Khởi tạo các giá trị giả lập trong RAM
+            document.getElementById('my-invite-id').innerText = "GUEST_MODE";
+            document.getElementById('user-display').innerText = "Khách Hút Mật (Offline)";
+            document.getElementById('profile-email-readonly').value = "guest@beebee.com";
+
+            // Giả lập danh sách bầy ong trên bảng xếp hạng cho chế độ khách
+            const mockLeaderboard = [
+                { uid: "mock_1", nickname: "Ong Chúa Chăm Chỉ 👑", avatar: "🐝", totalXP: 1450, level: 14, infoVisibility: "public" },
+                { uid: "mock_2", nickname: "Bác Ong Thợ Già", avatar: "🧙", totalXP: 980, level: 9, infoVisibility: "public" },
+                { uid: "mock_3", nickname: "Bé Ong Học Mầm", avatar: "🧑‍🎓", totalXP: 640, level: 6, infoVisibility: "public" }
+            ];
+            renderLeaderboardUI(mockLeaderboard);
+            updateUI();
+        }
+
         auth.onAuthStateChanged(user => {
             if (user) {
+                isGuest = false;
                 currentUser = user;
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
+                document.getElementById('guest-mode-banner').classList.add('hidden');
                 document.getElementById('my-invite-id').innerText = user.uid.substring(0,8);
-                document.getElementById('user-display').innerText = user.email.split('@')[0];
+                document.getElementById('profile-email-readonly').value = user.email;
                 loadUserData();
+                listenToGlobalLeaderboard();
             } else {
-                currentUser = null;
-                document.getElementById('auth-screen').classList.remove('hidden');
-                document.getElementById('main-app').classList.add('hidden');
+                if (!isGuest) {
+                    currentUser = null;
+                    document.getElementById('auth-screen').classList.remove('hidden');
+                    document.getElementById('main-app').classList.add('hidden');
+                }
             }
         });
 
@@ -613,14 +855,17 @@
             }
         }
 
-        function logout() { auth.signOut(); }
+        function logout() {
+            isGuest = false;
+            auth.signOut();
+        }
 
         function loadUserData() {
+            if (isGuest) return;
             db.ref("study_planner_beebee_v6/" + currentUser.uid).on("value", snapshot => {
                 if(snapshot.exists()) {
                     userData = { ...userData, ...snapshot.val() };
                     
-                    // Reset vòng quay may mắn hàng ngày
                     const todayStr = new Date().toDateString();
                     if (userData.lastSpinResetDate !== todayStr) {
                         userData.dailySpinsRemaining = 3;
@@ -628,18 +873,47 @@
                         saveToServer();
                     }
 
-                    // Tự động kiểm tra héo úa cây trồng (Không làm ít nhất 1 việc trong tuần)
                     checkGardenWithered();
                     updateUI();
                 }
             });
         }
 
-        function saveToServer() {
-            if(currentUser) db.ref("study_planner_beebee_v6/" + currentUser.uid).set(userData);
+        // LẮNG NGHE TOÀN BỘ NGƯỜI DÙNG ĐỂ TỰ ĐỘNG CẬP NHẬT BẢNG XẾP HẠNG REALTIME
+        function listenToGlobalLeaderboard() {
+            if (isGuest) return;
+            db.ref("study_planner_beebee_v6").on("value", snapshot => {
+                if (!snapshot.exists()) return;
+                const allData = snapshot.val();
+                const leaderboard = [];
+                for (let uid in allData) {
+                    const u = allData[uid];
+                    const totalXP = (u.level || 1) * 100 + (u.xp || 0);
+                    leaderboard.push({
+                        uid: uid,
+                        nickname: u.nickname || u.email?.split('@')[0] || "Ong Thợ Ẩn Danh",
+                        avatar: u.avatar || "🧑‍🎓",
+                        avatarUrl: u.avatarUrl || "",
+                        totalXP: totalXP,
+                        level: u.level || 1,
+                        infoVisibility: u.infoVisibility || "private"
+                    });
+                }
+                leaderboard.sort((a, b) => b.totalXP - a.totalXP);
+                renderLeaderboardUI(leaderboard);
+            });
         }
 
-        // TẢI ẢNH ĐẠI DIỆN CỦA BẠN (CÁ NHÂN HÓA)
+        function saveToServer() {
+            if (!isGuest && currentUser) {
+                userData.email = currentUser.email; // Đảm bảo email luôn được lưu
+                db.ref("study_planner_beebee_v6/" + currentUser.uid).set(userData);
+            } else {
+                updateUI();
+            }
+        }
+
+        // TẢI ẢNH ĐẠI DIỆN CỦA BẠN (CÁ NHÂN HÓA - ĐỀ XUẤT HOẶC THIẾT BỊ)
         function uploadAvatar(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -653,36 +927,90 @@
             reader.readAsDataURL(file);
         }
 
+        // ĐIỀU CHỈNH CHẾ ĐỘ PHÁT NHẠC (CUSTOM HOẶC WEB)
+        function toggleAudioSourceType() {
+            const sourceType = document.getElementById('audio-source-type').value;
+            const builtInBox = document.getElementById('box-built-in-audio');
+            const customBox = document.getElementById('box-custom-audio');
+            
+            if (sourceType === 'built-in') {
+                builtInBox.classList.remove('hidden');
+                customBox.classList.add('hidden');
+            } else {
+                builtInBox.classList.add('hidden');
+                customBox.classList.remove('hidden');
+            }
+            stopContinuousSound();
+        }
+
+        // TẢI FILE NHẠC THƯ GIÃN CỦA NGƯỜI DÙNG
+        function uploadCustomAudio(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const localPlayer = document.getElementById('local-music-player');
+            const fileUrl = URL.createObjectURL(file);
+            localPlayer.src = fileUrl;
+
+            document.getElementById('custom-audio-filename').classList.remove('hidden');
+            document.getElementById('custom-audio-filename').innerText = `✓ File nhạc cá nhân đã sẵn sàng phát.`;
+            alert("Đã nhận diện tệp nhạc từ thiết bị!");
+        }
+
+        // LƯU CÁC THÔNG TIN HỒ SƠ CÁ NHÂN VÀ CẤU HÌNH BẢO MẬT
+        function saveProfileData() {
+            userData.nickname = document.getElementById('profile-nickname').value;
+            userData.fullName = document.getElementById('profile-fullname').value;
+            userData.phoneNumber = document.getElementById('profile-phone').value;
+            userData.emailVisibility = document.getElementById('profile-email-visibility').value;
+            userData.infoVisibility = document.getElementById('profile-info-visibility').value;
+            
+            saveToServer();
+            alert("✓ Đã đồng bộ bảo mật hồ sơ cá nhân thành công!");
+        }
+
         function updateUI() {
             document.getElementById('user-level').innerText = `Cấp độ: Lv.${userData.level}`;
             document.getElementById('sidebar-level').innerText = `Cấp độ: Lv.${userData.level}`;
             document.getElementById('user-xp').innerText = `${userData.xp} / 100 Giọt Mật`;
             document.getElementById('xp-bar').style.width = `${userData.xp}%`;
             
-            // Render ảnh đại diện hoặc emoji mặc định
             const avatarBox = document.getElementById('user-avatar');
-            if (userData.avatarUrl) {
-                avatarBox.innerHTML = `<img src="${userData.avatarUrl}" class="w-full h-full object-cover">`;
-            } else {
-                avatarBox.innerText = userData.avatar || "🧑‍🎓";
+            const profilePageAvatar = document.getElementById('profile-page-avatar');
+            
+            const avatarContent = userData.avatarUrl 
+                ? `<img src="${userData.avatarUrl}" class="w-full h-full object-cover">` 
+                : (userData.avatar || "🧑‍🎓");
+
+            avatarBox.innerHTML = avatarContent;
+            if(profilePageAvatar) profilePageAvatar.innerHTML = avatarContent;
+
+            // Đồng bộ form profile
+            document.getElementById('profile-nickname').value = userData.nickname || "";
+            document.getElementById('profile-fullname').value = userData.fullName || "";
+            document.getElementById('profile-phone').value = userData.phoneNumber || "";
+            document.getElementById('profile-email-visibility').value = userData.emailVisibility || "hide";
+            document.getElementById('profile-info-visibility').value = userData.infoVisibility || "private";
+
+            let displayHeaderName = userData.nickname || "Khách Hút Mật";
+            if (!isGuest && userData.emailVisibility === "show" && currentUser) {
+                displayHeaderName += ` (${currentUser.email})`;
             }
+            document.getElementById('user-display').innerText = displayHeaderName;
 
             document.getElementById('motivational-quote').value = userData.customQuote || "";
             document.getElementById('leaderboard-xp').innerText = `${userData.level * 100 + userData.xp} Mật`;
             
-            // Thú cưng
             document.getElementById('pet-display').innerText = userData.petType || "🐱";
-            document.getElementById('pet-name-input').value = userData.petName || "Bé Mèo Mun";
+            document.getElementById('pet-name-input').value = userData.petName || "Bé Ong Vàng";
             
-            // Check trạng thái đói của thú cưng
             let hungerDisplay = "No 🥩";
             if (userData.petHungerState === "Đói") hungerDisplay = "⚠️ Đang Đói (Bị Khóa Cấp Độ)";
-            document.getElementById('pet-status-info').innerText = `Trạng thái: ${hungerDisplay} | Thú cưng Level: ${userData.level}`;
+            document.getElementById('pet-status-info').innerText = `Trạng thái: ${hungerDisplay} | Thú Level: ${userData.level}`;
 
-            // Vòng quay may mắn
             document.getElementById('spin-counter-text').innerText = `Lượt quay hôm nay: còn ${userData.dailySpinsRemaining}/3 lần`;
 
-            // Khu vườn mật ngọt
+            // Đồng bộ khu vườn
             const gardenGrid = document.getElementById('garden-grid');
             gardenGrid.innerHTML = "";
             const items = userData.gardenItems || ["🌱"];
@@ -692,59 +1020,180 @@
                 gardenGrid.appendChild(span);
             });
 
-            // Phòng huy hiệu
-            const badgeBox = document.getElementById('badge-container');
-            badgeBox.innerHTML = '';
-            const list = [
-                {id: 'pomodoro', name: '⏱️ Pomodoro Ong Vàng'}, 
-                {id: 'streak', name: '🔥 Bầy Ong Chăm Chỉ 7 Ngày'}, 
-                {id: 'todo', name: '👑 Vua Xây Tổ'}
-            ];
-            list.forEach(b => {
-                const s = document.createElement('span');
-                s.className = `px-2.5 py-1 rounded-xl text-[10px] font-black border ${userData.badges && userData.badges[b.id] ? 'bg-amber-400 border-amber-500 text-gray-900 shadow-sm' : 'bg-gray-100 text-gray-300 opacity-40'}`;
-                s.innerText = b.name;
-                badgeBox.appendChild(s);
-            });
+            // 21 ngày thử thách
+            build21DayChallengeUI();
+
+            // Biểu đồ cảm xúc
+            drawJournalChart();
+
+            // Đồng bộ chat AI
+            renderAIChatHistory();
 
             renderTimeline();
         }
 
-        // ĐIỂM DANH HÀNG NGÀY CHU KỲ ĐÚNG 24 GIỜ
-        function checkInDaily() {
-            const now = Date.now();
-            const oneDayMs = 24 * 60 * 60 * 1000;
-            
-            if (userData.lastCheckInTimestamp && (now - userData.lastCheckInTimestamp < oneDayMs)) {
-                const diff = oneDayMs - (now - userData.lastCheckInTimestamp);
-                const hrs = Math.ceil(diff / (1000 * 60 * 60));
-                return alert(`⚠️ Bạn đã điểm danh hôm nay rồi! Vui lòng chờ thêm khoảng ${hrs} giờ nữa.`);
+        // RENDERING BẢNG XẾP HẠNG TOP 10 VÀ TÍNH TOÁN VỊ TRÍ CỦA BẢN THÂN
+        function renderLeaderboardUI(leaderboard) {
+            globalLeaderboardCache = leaderboard;
+            const container = document.getElementById('leaderboard-container');
+            if(!container) return;
+            container.innerHTML = "";
+
+            // Nếu đang trong chế độ khách (Guest), chèn thêm User Guest vào xếp hạng để check thứ hạng giả lập
+            if (isGuest) {
+                const guestXP = (userData.level || 1) * 100 + (userData.xp || 0);
+                const guestItem = {
+                    uid: "GUEST_MODE",
+                    nickname: "Khách (Bạn) 👤",
+                    avatar: userData.avatar || "🧑‍🎓",
+                    avatarUrl: userData.avatarUrl || "",
+                    totalXP: guestXP,
+                    level: userData.level || 1,
+                    infoVisibility: "public"
+                };
+                const idx = leaderboard.findIndex(u => u.uid === "GUEST_MODE");
+                if (idx > -1) leaderboard.splice(idx, 1);
+                leaderboard.push(guestItem);
+                leaderboard.sort((a, b) => b.totalXP - a.totalXP);
             }
 
-            userData.lastCheckInTimestamp = now;
-            alert("📅 Điểm danh thành công! Bạn được thưởng +15 Giọt Mật.");
-            addXP(15);
+            // Top 10 rendering
+            const top10 = leaderboard.slice(0, 10);
+            top10.forEach((user, index) => {
+                const isMe = (!isGuest && currentUser && user.uid === currentUser.uid) || (isGuest && user.uid === "GUEST_MODE");
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `p-2 rounded-xl border flex items-center justify-between transition ${isMe ? 'bg-amber-100 border-amber-300 font-black' : 'bg-gray-50 border-gray-100'}`;
+                
+                let rankIcon = `${index + 1}.`;
+                if(index === 0) rankIcon = "🥇";
+                else if(index === 1) rankIcon = "🥈";
+                else if(index === 2) rankIcon = "🥉";
+
+                const avatarHTML = user.avatarUrl 
+                    ? `<img src="${user.avatarUrl}" class="w-6 h-6 rounded-full object-cover inline-block mr-1">`
+                    : `<span class="mr-1">${user.avatar || '🧑‍🎓'}</span>`;
+
+                // Chấp hành thuộc tính bảo mật
+                const nameDisplay = (user.infoVisibility === 'private' && !isMe) ? "Bé Ong Ẩn Danh 🙈" : user.nickname;
+
+                itemDiv.innerHTML = `
+                    <div class="flex items-center gap-2 truncate">
+                        <span class="w-5 text-center font-bold">${rankIcon}</span>
+                        <div class="flex items-center shrink-0">
+                            ${avatarHTML}
+                        </div>
+                        <span class="truncate text-xs">${nameDisplay} ${isMe ? '(Bạn)' : ''}</span>
+                    </div>
+                    <span class="text-[11px] font-black text-amber-600 bg-white px-2 py-0.5 rounded-lg shrink-0 border">${user.totalXP} Mật</span>
+                `;
+                container.appendChild(itemDiv);
+            });
+
+            // Tính toán thứ hạng cá nhân
+            const myIndex = leaderboard.findIndex(u => (!isGuest && currentUser && u.uid === currentUser.uid) || (isGuest && u.uid === "GUEST_MODE"));
+            const rankStatus = document.getElementById('my-rank-status');
+            if(rankStatus) {
+                if (myIndex > -1) {
+                    rankStatus.innerHTML = `<span class="text-amber-600 font-black"><i class="fa-solid fa-crown"></i> Vị trí của bạn: Hạng ${myIndex + 1} / ${leaderboard.length} bầy ong</span>`;
+                } else {
+                    rankStatus.innerText = "Vị trí của bạn: Chưa xếp hạng";
+                }
+            }
         }
 
-        function saveCustomQuote() {
-            userData.customQuote = document.getElementById('motivational-quote').value;
-            saveToServer();
+        // BỘ LỌC VÀ HIỂN THỊ MODAL TOÀN BỘ BẢNG XẾP HẠNG
+        function openLeaderboardModal() {
+            document.getElementById('leaderboard-modal').classList.remove('hidden');
+            filterLeaderboard();
         }
 
-        // TẠO NHIỆM VỤ THEO NGÀY THÁNG NĂM CỤ THỂ (EDITABLE TO-DO LIST)
+        function closeLeaderboardModal() {
+            document.getElementById('leaderboard-modal').classList.add('hidden');
+        }
+
+        function filterLeaderboard() {
+            const query = document.getElementById('leaderboard-search').value.toLowerCase();
+            const listContainer = document.getElementById('leaderboard-full-list');
+            if(!listContainer) return;
+            listContainer.innerHTML = "";
+
+            globalLeaderboardCache.forEach((user, index) => {
+                const isMe = (!isGuest && currentUser && user.uid === currentUser.uid) || (isGuest && user.uid === "GUEST_MODE");
+                const nameDisplay = (user.infoVisibility === 'private' && !isMe) ? "Bé Ong Ẩn Danh 🙈" : user.nickname;
+                
+                if (nameDisplay.toLowerCase().includes(query)) {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = `p-3 rounded-2xl border flex items-center justify-between transition ${isMe ? 'bg-amber-100 border-amber-300 font-black shadow-sm' : 'bg-gray-50 border-gray-100'}`;
+                    
+                    let rankIcon = `${index + 1}.`;
+                    if(index === 0) rankIcon = "🥇";
+                    else if(index === 1) rankIcon = "🥈";
+                    else if(index === 2) rankIcon = "🥉";
+
+                    const avatarHTML = user.avatarUrl 
+                        ? `<img src="${user.avatarUrl}" class="w-7 h-7 rounded-full object-cover inline-block mr-1">`
+                        : `<span class="mr-1 text-lg">${user.avatar || '🧑‍🎓'}</span>`;
+
+                    itemDiv.innerHTML = `
+                        <div class="flex items-center gap-2 truncate">
+                            <span class="w-6 text-center font-bold text-sm text-gray-500">${rankIcon}</span>
+                            <div class="flex items-center shrink-0">
+                                ${avatarHTML}
+                            </div>
+                            <span class="truncate text-xs">${nameDisplay} ${isMe ? '(Bạn)' : ''}</span>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <span class="text-xs font-bold text-gray-500 block">Lv.${user.level}</span>
+                            <span class="text-[11px] font-black text-amber-600 bg-white px-2 py-0.5 rounded-lg border block mt-0.5">${user.totalXP} Mật</span>
+                        </div>
+                    `;
+                    listContainer.appendChild(itemDiv);
+                }
+            });
+        }
+
+        // ĐIỂM DANH HÀNG NGÀY CHU KỲ ĐÚNG 24 GIỜ & UPDATE 21 DAY CHALLENGE
+        function build21DayChallengeUI() {
+            const grid = document.getElementById('challenge-grid');
+            if(!grid) return;
+            grid.innerHTML = "";
+            const days = userData.challengeDays || Array(21).fill(false);
+            const streak = userData.challengeStreak || 0;
+
+            for(let i=0; i<21; i++) {
+                const dayDiv = document.createElement('div');
+                const isDone = days[i];
+                const isCurrent = (i === streak);
+
+                dayDiv.className = `p-3 rounded-2xl border-2 flex flex-col items-center justify-center transition shadow-sm ${isDone ? 'bg-amber-400 border-amber-500 text-gray-900 font-black' : isCurrent ? 'bg-white border-orange-500 animate-pulse font-bold' : 'bg-white border-amber-100 text-gray-300'}`;
+                dayDiv.innerHTML = `
+                    <span class="text-[10px] uppercase font-bold">Ngày</span>
+                    <span class="text-base font-black">${i+1}</span>
+                    <span class="text-xs mt-1">${isDone ? '🐝' : '🔒'}</span>
+                `;
+                grid.appendChild(dayDiv);
+            }
+            document.getElementById('challenge-streak').innerText = `Chuỗi liên tục: ${streak} ngày`;
+        }
+
+        // TẠO NHIỆM VỤ PHÂN CHIA NGÀY GIỜ SỐ LIỆU RÕ RÀNG
         function createNewPlan() {
             const title = document.getElementById('plan-title').value;
+            const startDate = document.getElementById('plan-start-date').value;
+            const startTime = document.getElementById('plan-start-time').value || "08:00";
             const deadline = document.getElementById('plan-deadline').value;
             const time = document.getElementById('plan-time').value || "08:00";
             const priority = document.getElementById('plan-priority').value;
             
-            if(!title || !deadline) return alert("Vui lòng điền tiêu đề nhiệm vụ và chọn thời gian đầy đủ ngày tháng năm!");
+            if(!title || !deadline || !startDate) return alert("Vui lòng điền tiêu đề nhiệm vụ, ngày bắt đầu và ngày kết thúc đầy đủ!");
 
             if(!userData.plan) userData.plan = { days: [] };
             if(!userData.plan.days) userData.plan.days = [];
             
             userData.plan.days.push({
                 task: title,
+                startDate: startDate,
+                startTime: startTime,
                 date: deadline,
                 time: time,
                 done: false,
@@ -752,19 +1201,22 @@
                 completedAt: 0
             });
 
+            document.getElementById('plan-title').value = "";
+            document.getElementById('plan-deadline').value = "";
+            document.getElementById('plan-start-date').value = "";
+            document.getElementById('ai-suggestion-box').classList.add('hidden');
+
             if(!userData.badges) userData.badges = {};
             userData.badges.todo = true;
             addXP(15);
+            saveToServer();
         }
 
         function toggleDay(idx) {
             userData.plan.days[idx].done = !userData.plan.days[idx].done;
             if(userData.plan.days[idx].done) {
                 userData.plan.days[idx].completedAt = Date.now();
-                
-                // Nếu thú cưng đang đói, nó được cho ăn no
-                userData.petHungerState = "No";
-
+                userData.petHungerState = "No"; 
                 addXP(25);
                 playRelaxingSound('bip'); 
             } else {
@@ -778,7 +1230,7 @@
             saveToServer();
         }
 
-        // SỬA TRỰC TIẾP TÊN NHIỆM VỤ TRONG DANH SÁCH
+        // SỬA TRỰC TIẾP TÊN NHIỆM VỤ VÀ CHI TIẾT
         function editTaskName(idx, newName) {
             if(!newName.trim()) return;
             userData.plan.days[idx].task = newName;
@@ -790,9 +1242,62 @@
             saveToServer();
         }
 
+        // SẮP XẾP SẮP ĐẶT ĐỘ ƯU TIÊN VÀ THỜI GIAN NHẮC NHỞ
+        function sortTasksByPriorityAndTime() {
+            if (!userData.plan || !userData.plan.days) return;
+            
+            const priorityWeight = { 'Cao': 3, 'Trung Bình': 2, 'Thấp': 1 };
+            
+            userData.plan.days.sort((a, b) => {
+                if (a.done !== b.done) {
+                    return a.done ? 1 : -1;
+                }
+                const weightA = priorityWeight[a.priority] || 2;
+                const weightB = priorityWeight[b.priority] || 2;
+                if (weightA !== weightB) {
+                    return weightB - weightA;
+                }
+                return new Date(a.date + "T" + (a.time || "00:00")) - new Date(b.date + "T" + (b.time || "00:00"));
+            });
+            saveToServer();
+        }
+
+        function sortTasksManually(idx, direction) {
+            if (!userData.plan || !userData.plan.days) return;
+            const targetIdx = idx + direction;
+            if (targetIdx < 0 || targetIdx >= userData.plan.days.length) return;
+            
+            const temp = userData.plan.days[idx];
+            userData.plan.days[idx] = userData.plan.days[targetIdx];
+            userData.plan.days[targetIdx] = temp;
+            
+            saveToServer();
+        }
+
+        function sortTasksAutomatically() {
+            sortTasksByPriorityAndTime();
+            alert("✓ Đã tự động sắp xếp các nhiệm vụ học tập theo Độ ưu tiên & Hạn chót khẩn cấp nhất lên trước!");
+        }
+
+        function switchTaskFilter(filter) {
+            activeTaskFilter = filter;
+            document.getElementById('tab-task-all').className = "flex-1 py-2 text-xs font-black rounded-xl text-gray-600 hover:bg-amber-50 transition cursor-pointer";
+            document.getElementById('tab-task-pending').className = "flex-1 py-2 text-xs font-black rounded-xl text-gray-600 hover:bg-amber-50 transition cursor-pointer";
+            document.getElementById('tab-task-completed').className = "flex-1 py-2 text-xs font-black rounded-xl text-gray-600 hover:bg-amber-50 transition cursor-pointer";
+            
+            const activeTab = document.getElementById(`tab-task-${filter}`);
+            if (activeTab) {
+                activeTab.className = "flex-1 py-2 text-xs font-black rounded-xl bg-amber-400 text-gray-900 transition cursor-pointer";
+            }
+            renderTimeline();
+        }
+
+        // RENDER CÁC NHIỆM VỤ PHÂN TRANG CHI TIẾT KÈM NÚT SẮP XẾP THỦ CÔNG UP/DOWN
         function renderTimeline() {
             const container = document.getElementById('timeline-container');
+            if(!container) return;
             container.innerHTML = "";
+            
             if(!userData.plan || !userData.plan.days || userData.plan.days.length === 0) {
                 container.innerHTML = '<p class="text-gray-400 text-center py-6 text-sm">Chưa có nhiệm vụ hút mật nào sắp tới.</p>';
                 document.getElementById('remaining-tasks-count').innerText = "⚠️ Hiện tại tổ ong chưa có nhiệm vụ tồn đọng.";
@@ -805,36 +1310,55 @@
             userData.plan.days.forEach((item, idx) => {
                 if(item.done) done++; else pending++;
                 
+                if (activeTaskFilter === 'pending' && item.done) return;
+                if (activeTaskFilter === 'completed' && !item.done) return;
+
                 let pColor = "bg-green-100 text-green-800";
                 if(item.priority === "Cao") pColor = "bg-red-100 text-red-800";
                 if(item.priority === "Trung Bình") pColor = "bg-yellow-100 text-yellow-800";
 
+                const isFirst = (idx === 0);
+                const isLast = (idx === userData.plan.days.length - 1);
+
                 const div = document.createElement('div');
                 div.className = `p-4 border-2 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${item.done ? 'bg-green-50/60 border-green-200' : 'bg-white border-gray-100 shadow-sm'}`;
                 div.innerHTML = `
-                    <div class="flex-1">
-                        <div class="flex items-center gap-2">
-                            <input type="text" onchange="editTaskName(${idx}, this.value)" class="font-bold text-sm bg-transparent border-b border-transparent focus:border-amber-500 focus:outline-none ${item.done ? 'line-through text-gray-400' : 'text-gray-800'}" value="${item.task}">
-                            <select onchange="changeTaskPriority(${idx}, this.value)" class="text-[10px] font-bold border rounded bg-white p-0.5">
-                                <option value="Cao" ${item.priority==='Cao'?'selected':''}>Cao</option>
-                                <option value="Trung Bình" ${item.priority==='Trung Bình'?'selected':''}>Vừa</option>
-                                <option value="Thấp" ${item.priority==='Thấp'?'selected':''}>Thấp</option>
-                            </select>
+                    <div class="flex items-center gap-3 flex-1">
+                        <div class="flex flex-col gap-1 items-center shrink-0 text-gray-400 bg-gray-50 px-2 py-1.5 rounded-xl border border-gray-100">
+                            <button onclick="sortTasksManually(${idx}, -1)" ${isFirst ? 'disabled class="opacity-20"' : 'class="hover:text-amber-500 cursor-pointer text-xs"'}>
+                                <i class="fa-solid fa-chevron-up"></i>
+                            </button>
+                            <span class="text-[9px] font-black text-gray-400 select-none">${idx + 1}</span>
+                            <button onclick="sortTasksManually(${idx}, 1)" ${isLast ? 'disabled class="opacity-20"' : 'class="hover:text-amber-500 cursor-pointer text-xs"'}>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </button>
                         </div>
-                        <p class="text-[11px] text-gray-400 mt-1"><i class="fa-regular fa-clock"></i> Thời hạn: ${item.date} lúc ${item.time || '08:00'}</p>
+
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2">
+                                <input type="text" onchange="editTaskName(${idx}, this.value)" class="font-bold text-sm bg-transparent border-b border-transparent focus:border-amber-500 focus:outline-none ${item.done ? 'line-through text-gray-400' : 'text-gray-800'}" value="${item.task}">
+                                <select onchange="changeTaskPriority(${idx}, this.value)" class="text-[10px] font-bold border rounded bg-white p-0.5 text-gray-700">
+                                    <option value="Cao" ${item.priority==='Cao'?'selected':''}>Cao</option>
+                                    <option value="Trung Bình" ${item.priority==='Trung Bình'?'selected':''}>Vừa</option>
+                                    <option value="Thấp" ${item.priority==='Thấp'?'selected':''}>Thấp</option>
+                                </select>
+                            </div>
+                            <p class="text-[11px] text-gray-400 mt-1"><i class="fa-regular fa-clock"></i> Kế hoạch: ${item.startDate || item.date} ${item.startTime || '08:00'} ➔ ${item.date} ${item.time || '08:00'}</p>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-4 justify-between sm:justify-end">
+                    <div class="flex items-center gap-4 justify-between sm:justify-end shrink-0">
                         <span class="text-[10px] font-black px-2 py-0.5 rounded-lg ${pColor}">${item.priority || "Vừa"}</span>
                         <div class="flex items-center gap-2">
                             <input type="checkbox" ${item.done ? 'checked' : ''} onclick="toggleDay(${idx})" class="w-6 h-6 accent-green-600 cursor-pointer">
-                            <button onclick="deleteDay(${idx})" class="text-red-400 hover:text-red-600 p-1 text-xs"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="deleteDay(${idx})" class="text-red-400 hover:text-red-600 p-1 text-xs cursor-pointer"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                 `;
                 container.appendChild(div);
             });
 
-            const pct = Math.round((done / userData.plan.days.length) * 100);
+            const totalCount = userData.plan.days.length;
+            const pct = totalCount > 0 ? Math.round((done / totalCount) * 100) : 0;
             document.getElementById('dashboard-progress-percentage').innerText = `${pct}% Hoàn Thành`;
             document.getElementById('dashboard-progress-bar').style.width = `${pct}%`;
 
@@ -847,27 +1371,20 @@
             }
         }
 
-        // TỰ ĐỘNG KIỂM TRA HÉO ÚA KHU VƯỜN (7 NGÀY QUA PHẢI CÓ ÍT NHẤT 1 VIỆC HOÀN THÀNH)
         function checkGardenWithered() {
             if (!userData.plan || !userData.plan.days || userData.plan.days.length === 0) return;
-            
             const now = Date.now();
             const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
-            
-            // Tìm xem có công việc nào hoàn thành trong vòng 7 ngày qua không
             const activeTasks = userData.plan.days.filter(item => item.done && item.completedAt && (now - item.completedAt < sevenDaysMs));
             
             if (activeTasks.length === 0) {
-                // Toàn bộ khu vườn héo úa
                 userData.gardenItems = userData.gardenItems.map(item => '🥀');
-                
-                // Thú cưng đói
                 userData.petHungerState = "Đói";
                 saveToServer();
             }
         }
 
-        // GIỚI HẠN CHỈ TRỒNG ĐƯỢC 1 CÂY MỖI NGÀY
+        // GIEO CÂY BẮT BUỘC TRƯỚC KHI BẮT ĐẦU HỌC
         function plantNewItem() {
             const now = Date.now();
             const oneDayMs = 24 * 60 * 60 * 1000;
@@ -884,10 +1401,10 @@
             userData.gardenItems.push(choice);
             userData.lastPlantedTimestamp = now;
             addXP(10);
-            alert("🌱 Trồng thêm cây xanh thành công! Khu vườn bầy ong càng ngày càng xanh ngát!");
+            alert("🌱 Trồng thêm cây xanh thành công!");
         }
 
-        // THÚ CƯNG TƯƠNG TÁC PHÒNG CHĂM SÓC
+        // TƯƠNG TÁC THÚ CƯNG
         function interactWithPet() {
             const petBubble = document.getElementById('pet-bubble');
             const choices = petCheeringQuotes[userData.petType || "🐱"] || ["Cố lên bầy ong thợ!"];
@@ -895,12 +1412,9 @@
             
             petBubble.innerText = randomQuote;
             petBubble.style.opacity = "1";
-            
             playRelaxingSound('bip');
 
-            setTimeout(() => {
-                petBubble.style.opacity = "0";
-            }, 3500);
+            setTimeout(() => { petBubble.style.opacity = "0"; }, 3500);
         }
 
         function savePetName() {
@@ -915,7 +1429,7 @@
 
         function buyAccessory(acc, cost) {
             const currentTotalScore = (userData.level * 100) + userData.xp;
-            if(currentTotalScore < cost) return alert("❌ Bạn không có đủ giọt mật tích lũy để mua vật phẩm này!");
+            if(currentTotalScore < cost) return alert("❌ Bạn không có đủ giọt mật tích lũy!");
             
             userData.petAccessory = acc;
             userData.xp -= cost;
@@ -927,7 +1441,6 @@
             alert(`👑 Trang bị thành công phụ kiện ${acc} cho thú cưng!`);
         }
 
-        // ĐỒNG HỒ TẬP TRUNG POMODORO
         function adjustTimerSettings() {
             const lTime = parseInt(document.getElementById('input-learn-time').value) || 25;
             timerTimeLeft = lTime * 60;
@@ -941,7 +1454,7 @@
                 stopContinuousSound();
             } else {
                 document.getElementById('timer-start-btn').innerText = "Tạm dừng";
-                startContinuousSound(); // Bắt đầu phát âm thanh hỗ trợ học tập liên tục
+                startContinuousSound(); 
                 
                 timerInterval = setInterval(() => {
                     if(timerTimeLeft > 0) { 
@@ -952,8 +1465,15 @@
                         document.getElementById('timer-start-btn').innerText = "Bắt đầu học";
                         stopContinuousSound();
                         playRelaxingSound('bip');
-                        alert("⏱️ Kết thúc thời gian tập trung! Thưởng +10 Mật.");
-                        addXP(10);
+                        
+                        // GIEO MẦM CÂY ĐÃ CHỌN TRƯỚC PHIÊN HỌC THÀNH CÔNG
+                        const selectedSeed = document.getElementById('timer-select-seed').value;
+                        if (!userData.gardenItems) userData.gardenItems = [];
+                        userData.gardenItems.push(selectedSeed);
+                        userData.lastPlantedTimestamp = Date.now();
+
+                        alert(`⏱️ Chúc mừng! Kết thúc thời gian tập trung, bạn nhận +15 XP và gieo mầm thành công mầm ${selectedSeed} vào nông trại!`);
+                        addXP(15);
                     }
                 }, 1000);
             }
@@ -971,109 +1491,55 @@
             document.getElementById('timer-display').innerText = `${m}:${s}`;
         }
 
-        // PHÁT THƯ GIÃN SÓNG NÃO BỘ VÔ TẬN TRONG PHIÊN HỌC (WEB AUDIO SYNTH)
+        // HỆ THỐNG ÂM THANH WEBAUDIO PHÁT LOOPS CHUẨN XUYÊN SUỐT PHIÊN TẬP TRUNG
         function startContinuousSound() {
-            const soundType = document.getElementById('sound-selection').value;
-            if (soundType === 'none') return;
+            const sourceType = document.getElementById('audio-source-type').value;
 
+            if (sourceType === 'custom') {
+                const localPlayer = document.getElementById('local-music-player');
+                if (localPlayer && localPlayer.src) {
+                    localPlayer.play().catch(err => console.log("Không phát được nhạc thiết bị: ", err));
+                } else {
+                    alert("⚠️ Bạn chưa nạp nhạc từ thiết bị! Vui lòng chọn file nhạc trước.");
+                }
+                return;
+            }
+
+            // Web Audio API Synthesizer
             try {
                 if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 stopContinuousSound();
 
                 continuousNode = audioCtx.createGain();
-                continuousNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                continuousNode.gain.setValueAtTime(0.04, audioCtx.currentTime);
 
-                if (soundType === 'alpha') {
-                    // Binaural Alpha Beat: 100Hz Left, 110Hz Right
-                    const merger = audioCtx.createChannelMerger(2);
+                const synthTimer = setInterval(() => {
+                    const osc = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    osc.type = 'sine';
+                    const freqs = [146.83, 164.81, 196.00, 220.00]; 
+                    osc.frequency.setValueAtTime(freqs[Math.floor(Math.random() * freqs.length)], audioCtx.currentTime);
                     
-                    const oscL = audioCtx.createOscillator();
-                    oscL.frequency.value = 100;
-                    const gainL = audioCtx.createGain();
-                    gainL.gain.value = 0.5;
-                    oscL.connect(gainL).connect(merger, 0, 0);
-
-                    const oscR = audioCtx.createOscillator();
-                    oscR.frequency.value = 110;
-                    const gainR = audioCtx.createGain();
-                    gainR.gain.value = 0.5;
-                    oscR.connect(gainR).connect(merger, 0, 1);
-
-                    merger.connect(continuousNode);
-                    continuousNode.connect(audioCtx.destination);
-
-                    oscL.start(); oscR.start();
-                    continuousNode.activeOscillators = [oscL, oscR];
-
-                } else if (soundType === 'rain') {
-                    // Synthesized Pink/White Noise for Rain
-                    const bufferSize = 2 * audioCtx.sampleRate;
-                    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                    const output = noiseBuffer.getChannelData(0);
-                    for (let i = 0; i < bufferSize; i++) {
-                        output[i] = Math.random() * 2 - 1;
-                    }
-                    const whiteNoise = audioCtx.createBufferSource();
-                    whiteNoise.buffer = noiseBuffer;
-                    whiteNoise.loop = true;
-
-                    const filter = audioCtx.createBiquadFilter();
-                    filter.type = 'lowpass';
-                    filter.frequency.value = 800; // Tiếng mưa lâm thâm ngoài tổ ong
-
-                    whiteNoise.connect(filter).connect(continuousNode);
-                    continuousNode.connect(audioCtx.destination);
-                    whiteNoise.start();
-                    continuousNode.activeSource = whiteNoise;
-
-                } else if (soundType === 'wind') {
-                    // Sweeping bandpass modulated noise for wind
-                    const bufferSize = 2 * audioCtx.sampleRate;
-                    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                    const output = noiseBuffer.getChannelData(0);
-                    for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+                    gainNode.gain.setValueAtTime(0.03, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.0);
                     
-                    const noise = audioCtx.createBufferSource();
-                    noise.buffer = noiseBuffer;
-                    noise.loop = true;
+                    osc.connect(gainNode).connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 2.0);
+                }, 2000);
 
-                    const filter = audioCtx.createBiquadFilter();
-                    filter.type = 'bandpass';
-                    filter.Q.value = 3.0;
+                continuousNode.activeInterval = synthTimer;
+                continuousNode.connect(audioCtx.destination);
 
-                    const modulator = audioCtx.createOscillator();
-                    modulator.frequency.value = 0.1; // 10 second sweep
-                    const modulatorGain = audioCtx.createGain();
-                    modulatorGain.gain.value = 200;
-
-                    modulator.connect(modulatorGain).connect(filter.frequency);
-                    noise.connect(filter).connect(continuousNode);
-                    continuousNode.connect(audioCtx.destination);
-
-                    modulator.start(); noise.start();
-                    continuousNode.activeSource = noise;
-                    continuousNode.activeOscillators = [modulator];
-
-                } else if (soundType === 'lofi') {
-                    // Generative lo-fi background beats
-                    const synthTimer = setInterval(() => {
-                        const osc = audioCtx.createOscillator();
-                        const gain = audioCtx.createGain();
-                        osc.type = 'sine';
-                        // Lo-fi chord sequence
-                        const freqs = [130.81, 146.83, 164.81, 196.00]; 
-                        osc.frequency.value = freqs[Math.floor(Math.random() * freqs.length)];
-                        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
-                        osc.connect(gain).connect(audioCtx.destination);
-                        osc.start(); osc.stop(audioCtx.currentTime + 1.2);
-                    }, 1500);
-                    continuousNode.activeInterval = synthTimer;
-                }
             } catch (e) { console.log(e); }
         }
 
         function stopContinuousSound() {
+            const localPlayer = document.getElementById('local-music-player');
+            if (localPlayer) {
+                localPlayer.pause();
+            }
+
             if (continuousNode) {
                 if (continuousNode.activeOscillators) {
                     continuousNode.activeOscillators.forEach(osc => { try { osc.stop(); } catch(e){} });
@@ -1089,13 +1555,6 @@
             }
         }
 
-        function switchContinuousSound() {
-            if (timerInterval) {
-                startContinuousSound();
-            }
-        }
-
-        // HỆ THỐNG PHÁT ÂM THANH BÍP ÊM DỊU KHI HOÀN THÀNH
         function playRelaxingSound(type) {
             try {
                 if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1112,7 +1571,7 @@
             } catch (e) { console.log(e); }
         }
 
-        // PHÒNG HỌC NHÓM
+        // HỒ SƠ & BẢO MẬT PHÒNG HỌC NHÓM
         function joinStudyRoom() {
             const rID = document.getElementById('room-id-input').value.trim();
             if(!rID) return alert("Vui lòng nhập ID phòng nhóm!");
@@ -1127,14 +1586,13 @@
         }
 
         function copyInviteID() {
-            navigator.clipboard.writeText(currentUser.uid.substring(0,8));
+            navigator.clipboard.writeText(currentUser ? currentUser.uid.substring(0,8) : "GUEST_ID");
             alert("Đã sao chép mã số phòng bầy ong!");
         }
 
-        // VÒNG QUAY MAY MẮN (CHỈ 3 LẦN 1 NGÀY)
         function spinWheel() {
             if (userData.dailySpinsRemaining <= 0) {
-                return alert("⚠️ Giới hạn: Bạn đã hết lượt quay ngày hôm nay! Vui lòng chờ reset vào ngày mai.");
+                return alert("⚠️ Giới hạn: Bạn đã hết lượt quay ngày hôm nay!");
             }
 
             userData.dailySpinsRemaining -= 1;
@@ -1151,20 +1609,166 @@
             }, 1200);
         }
 
+        // TRỢ LÝ ONG AI LƯU TRỮ LỊCH SỬ CHAT
         function askAI() {
-            const val = document.getElementById('ai-input').value; if(!val) return;
-            document.getElementById('ai-chat-box').innerHTML += `<p><b>Bạn:</b> ${val}</p><p class="text-purple-700"><b>AI:</b> Chào chú ong chăm chỉ! Để nâng cao chất lượng học tập, hãy tập trung đập cánh Pomodoro ngay nhé!</p>`;
+            const val = document.getElementById('ai-input').value.trim();
+            if(!val) return;
+            
+            if(!userData.aiChatHistory) userData.aiChatHistory = [];
+            
+            // Thêm tin nhắn người dùng vào lịch sử
+            userData.aiChatHistory.push({ sender: 'user', text: val });
             document.getElementById('ai-input').value = "";
+            
+            // Tạo phản hồi ngẫu nhiên từ trợ lý Ong AI thông thái
+            const aiResponses = [
+                "Bzzz... Theo sơ đồ mật ngọt, bạn nên hoàn thành các kế hoạch ưu tiên Cao trước để tránh bị đói thú cưng nhé!",
+                "Cùng đập cánh học tập thói quen 21 ngày thôi! Bạn có cần tôi lập sẵn thời gian biểu không?",
+                "Nghiên cứu chỉ ra học Pomodoro 25 phút kèm nhạc sóng Alpha sẽ giúp tăng gấp 2 lần độ tập trung trí não!",
+                "Mỗi nỗ lực tích lũy mật ngọt đều sẽ giúp chú ong xây dựng nên đế chế của riêng mình. Cố lên bạn ơi!"
+            ];
+            const aiText = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+            
+            setTimeout(() => {
+                userData.aiChatHistory.push({ sender: 'ai', text: aiText });
+                saveToServer();
+            }, 800);
+            
+            renderAIChatHistory();
         }
 
-        function saveJournal() { alert("Đã lưu cảm xúc vào tổ ong!"); addXP(5); }
-        function saveFutureLetter() { alert("Đã khóa kín bức thư gửi tương lai của bạn!"); }
+        function renderAIChatHistory() {
+            const chatBox = document.getElementById('ai-chat-box');
+            if(!chatBox) return;
+            chatBox.innerHTML = "";
+            
+            const history = userData.aiChatHistory || [];
+            if (history.length === 0) {
+                chatBox.innerHTML = `<p class="text-purple-700 font-medium"><b>AI:</b> Chào bạn! Tôi là Ong Trợ Lý AI. Tôi có lịch sử lưu trữ trò chuyện thông minh!</p>`;
+                return;
+            }
+            
+            history.forEach(msg => {
+                const p = document.createElement('p');
+                if (msg.sender === 'user') {
+                    p.className = "text-gray-700";
+                    p.innerHTML = `<b>Bạn:</b> ${msg.text}`;
+                } else {
+                    p.className = "text-purple-700 font-medium";
+                    p.innerHTML = `<b>AI:</b> ${msg.text}`;
+                }
+                chatBox.appendChild(p);
+            });
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // LƯU TRỮ NHẬT KÝ CẢM XÚC & VẼ BIỂU ĐỒ STATS DẠNG CỘT SVG
+        function saveJournal() {
+            const feeling = document.getElementById('journal-feeling').value.trim();
+            const stars = parseInt(document.getElementById('journal-stars').value) || 5;
+            
+            if(!feeling) return alert("Vui lòng nhập cảm nhận hôm nay của bạn!");
+            
+            if(!userData.journals) userData.journals = [];
+            
+            const dateStr = new Date().toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' });
+            userData.journals.push({ date: dateStr, feeling: feeling, stars: stars });
+            
+            document.getElementById('journal-feeling').value = "";
+            addXP(10);
+            alert("✓ Đã lưu nhật ký cảm xúc & cập nhật trực quan lên biểu đồ!");
+        }
+
+        function drawJournalChart() {
+            const chartContainer = document.getElementById('journal-chart-container');
+            if(!chartContainer) return;
+            chartContainer.innerHTML = "";
+
+            const journals = userData.journals || [];
+            if(journals.length === 0) {
+                chartContainer.innerHTML = `<div class="text-center text-xs text-gray-400 w-full py-10">Chưa có nhật ký để vẽ biểu đồ thống kê.</div>`;
+                return;
+            }
+
+            // Lấy tối đa 7 nhật ký gần nhất để vẽ biểu đồ
+            const lastJournals = journals.slice(-7);
+            
+            lastJournals.forEach(item => {
+                const colDiv = document.createElement('div');
+                colDiv.className = "flex flex-col items-center justify-end h-full w-8 group relative";
+                
+                // Chiều cao cột tương ứng với số sao (tối đa h-24 tương ứng 5 sao)
+                const pctHeight = (item.stars / 5) * 100;
+                
+                colDiv.innerHTML = `
+                    <div class="absolute -top-8 bg-amber-500 text-white text-[9px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
+                        ${item.feeling} (${item.stars}⭐)
+                    </div>
+                    <div class="w-6 bg-gradient-to-t from-orange-400 to-amber-400 rounded-t-md transition-all duration-500 shadow-sm" style="height: ${pctHeight}%"></div>
+                    <span class="text-[9px] font-bold text-gray-400 mt-1">${item.date}</span>
+                `;
+                chartContainer.appendChild(colDiv);
+            });
+        }
+
+        // LƯU LÁ THƯ FUTURE ME CÓ ĐẶT LỊCH GỬI
+        function saveFutureLetter() {
+            const text = document.getElementById('future-letter').value.trim();
+            const delaySelect = document.getElementById('future-time-delay').value;
+            let deliveryDate = "";
+
+            if (!text) return alert("Vui lòng điền nội dung bức thư!");
+
+            if (delaySelect === "custom") {
+                deliveryDate = document.getElementById('future-custom-date').value;
+                if(!deliveryDate) return alert("Vui lòng chọn ngày giao thư tương lai trên lịch!");
+            } else {
+                const now = new Date();
+                if (delaySelect === "1_month") now.setMonth(now.getMonth() + 1);
+                if (delaySelect === "6_months") now.setMonth(now.getMonth() + 6);
+                if (delaySelect === "1_year") now.setFullYear(now.getFullYear() + 1);
+                deliveryDate = now.toLocaleDateString('vi-VN');
+            }
+
+            if(!userData.futureLetters) userData.futureLetters = [];
+            userData.futureLetters.push({ text: text, deliveryDate: deliveryDate });
+            userData.letterSaved = true;
+
+            document.getElementById('future-letter').value = "";
+            saveToServer();
+            alert(`📩 Lá thư tương lai đã được niêm phong! Hệ thống sẽ mở và hiển thị lại cho bạn vào ngày: ${deliveryDate}`);
+        }
+
+        // Toggle date input if custom is selected
+        document.getElementById('future-time-delay').addEventListener('change', function(e) {
+            const customDateInput = document.getElementById('future-custom-date');
+            if (e.target.value === 'custom') {
+                customDateInput.classList.remove('hidden');
+            } else {
+                customDateInput.classList.add('hidden');
+            }
+        });
+
+        function addXP(amt) {
+            if (userData.petHungerState === "Đói") {
+                alert("⚠️ THÚ CƯNG ĐANG ĐÓI! Hãy hoàn thành ít nhất 1 nhiệm vụ gieo mật để thú cưng ăn no trước khi thăng cấp nhé!");
+                return;
+            }
+
+            userData.xp += amt;
+            if(userData.xp >= 100) {
+                userData.level += Math.floor(userData.xp / 100);
+                userData.xp = userData.xp % 100;
+                alert(`🎉 LÊN CẤP! Bạn đạt Cấp độ mới: Lv.${userData.level}!`);
+            }
+            saveToServer();
+        }
 
         function openAvatarModal() { document.getElementById('avatar-modal').classList.remove('hidden'); }
         function closeAvatarModal() { document.getElementById('avatar-modal').classList.add('hidden'); }
         function changeAvatar(emoji) { userData.avatar = emoji; userData.avatarUrl = ""; saveToServer(); closeAvatarModal(); }
 
-        // BÀI TẬP HÍT THỞ 2 PHÚT TRỰC QUAN
+        // BÀI TẬP HÍT THỞ XẢ STRESS
         function startBreathing() {
             const area = document.getElementById('breathing-area');
             const btn = document.getElementById('breath-btn');
@@ -1175,7 +1779,7 @@
 
             setTimeout(() => {
                 area.classList.remove('breathing-circle');
-                btn.innerText = "Bắt Đầu Tập Thở";
+                btn.innerText = "Bắt Đầu Tập Thở (2 Phút)";
                 btn.disabled = false;
                 alert("🍀 Kết thúc bài thở xả stress. Bạn đã hồi phục 100% năng lượng!");
             }, 8000); 
