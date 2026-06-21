@@ -102,7 +102,7 @@
                         <i class="fa-solid fa-map text-amber-500"></i> Nhiệm Vụ Hút Mật
                     </button>
                     <button onclick="switchPage('timer')" id="btn-timer" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-600 hover:bg-amber-50 transition text-left cursor-pointer">
-                        <i class="fa-solid fa-clock text-amber-500"></i> Đồng Đồng Đập Cánh
+                        <i class="fa-solid fa-clock text-amber-500"></i> Đồng Hồ Đập Cánh
                     </button>
                     <button onclick="switchPage('pet')" id="btn-pet" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-600 hover:bg-amber-50 transition text-left cursor-pointer">
                         <i class="fa-solid fa-paw text-amber-500"></i> Thú Cưng Bé Ong
@@ -161,16 +161,30 @@
             <!-- ================= TRANG 1: TỔNG QUAN TỔ ONG ================= -->
             <section id="page-dashboard" class="page-content active space-y-6">
                 
-                <!-- THỬ THÁCH 21 NGÀY HÌNH THÀNH THÓI QUEN -->
+                <!-- THỬ THÁCH 21 NGÀY HÌNH THÀNH THÓI QUEN (ĐIỂM DANH LIÊN TỤC KHÔNG GIỚI HẠN) -->
                 <div class="bg-gradient-to-r from-amber-100 to-orange-100 p-6 rounded-3xl shadow-lg border border-amber-300">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-lg font-black text-amber-900 flex items-center gap-2">
-                            <i class="fa-solid fa-calendar-days text-amber-600"></i> Thử Thách 21 Ngày Kiến Tạo Thói Quen
+                            <i class="fa-solid fa-calendar-days text-amber-600"></i> Thử Thách Điểm Danh & Tạo Thói Quen (Vô Hạn)
                         </h2>
                         <span id="challenge-streak" class="text-xs bg-orange-500 text-white font-black px-2.5 py-1 rounded-full">Chuỗi liên tục: 0 ngày</span>
                     </div>
                     <div class="grid grid-cols-7 gap-2.5 text-center" id="challenge-grid"></div>
-                    <p class="text-[11px] text-amber-800 font-bold mt-3"><i class="fa-solid fa-circle-info"></i> Hãy điểm danh đều đặn mỗi 24 giờ. Nếu bỏ lỡ một ngày, chuỗi ngày liên tục sẽ bị reset về 0!</p>
+                    <p class="text-[11px] text-amber-800 font-bold mt-3"><i class="fa-solid fa-circle-info"></i> Bạn có thể tiếp tục điểm danh vượt mốc 21 ngày! Mỗi khi hoàn tất chuỗi 21 ngày chăm chỉ liên tiếp sẽ được thưởng ngay **100 XP**.</p>
+                </div>
+
+                <!-- BIỂU ĐỒ THỐNG KÊ NGÀY VÀO HỌC (ATTENDANCE HEATMAP) -->
+                <div class="bg-white p-6 rounded-3xl shadow-lg border border-amber-100">
+                    <h2 class="text-lg font-black text-amber-900 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-check text-green-500"></i> Bản Đồ Điểm Danh & Chăm Chỉ Trong Tháng
+                    </h2>
+                    <div id="attendance-heatmap-container" class="grid grid-cols-7 gap-2 text-center p-3 bg-gray-50 rounded-2xl border">
+                        <!-- Sẽ sinh các ô ngày trong tháng tự động qua JS -->
+                    </div>
+                    <div class="flex gap-4 justify-center text-xs mt-3 font-bold text-gray-500">
+                        <span class="flex items-center gap-1"><span class="w-3.5 h-3.5 rounded bg-gray-200 inline-block"></span> Chưa học</span>
+                        <span class="flex items-center gap-1"><span class="w-3.5 h-3.5 rounded bg-amber-400 inline-block"></span> Đã điểm danh</span>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -218,7 +232,7 @@
                 </div>
             </section>
 
-            <!-- ================= TRANG 2: NHIỆM VỤ HÚT MẬT (PLANS & COMPLETED & REMAINING BY DAY) ================= -->
+            <!-- ================= TRANG 2: NHIỆM VỤ HÚT MẬT ================= -->
             <section id="page-roadmap" class="page-content space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     
@@ -408,7 +422,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
                         <div class="bg-gray-50 p-4 rounded-2xl border">
                             <span class="text-xs font-black text-gray-600 block mb-1">Chọn loại thú đồng hành</span>
-                            <select id="select-pet" onchange="changePetType()" class="text-xs p-2 border rounded-xl bg-white font-bold text-gray-800 w-full focus:outline-none">
+                            <select id="select-pet" onchange="changePetType()" class="text-xs p-2 border rounded-xl bg-white font-bold text-gray-700 w-full focus:outline-none">
                                 <option value="🐱">Bé Mèo Mun</option>
                                 <option value="🐶">Bé Cún Con</option>
                                 <option value="🐰">Bé Thỏ Bông</option>
@@ -442,73 +456,126 @@
                 </div>
             </section>
 
-            <!-- ================= TRANG 6: BẦY ONG CHĂM CHỈ (SOCIAL & ROOM & LEADERBOARD) ================= -->
+            <!-- ================= TRANG 6: BẦY ONG CHĂM CHỈ (SOCIAL & ROOM & LEADERBOARD & CHAT) ================= -->
             <section id="page-groups" class="page-content space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    
-                    <div class="md:col-span-2 space-y-6">
-                        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-3xl shadow-lg border border-blue-100">
-                            <h2 class="text-xl font-black text-blue-950 mb-1 flex items-center gap-2">
-                                <i class="fa-solid fa-users text-blue-600"></i> Phòng Học Nhóm Bầy Ong
-                            </h2>
-                            <p class="text-xs text-blue-800/70 mb-4">Nhập mã số phòng hoặc tham gia nhanh bầy ong đang trực tuyến dưới đây:</p>
-                            
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                                <div class="bg-white p-4 rounded-xl border">
-                                    <span class="text-xs font-bold block mb-1">Tự Tạo / Kết Nối Phòng</span>
-                                    <div class="flex gap-1">
-                                        <input type="text" id="room-id-input" class="p-2 border rounded-lg text-xs flex-1 text-gray-800" placeholder="Nhập ID phòng học...">
-                                        <button onclick="joinStudyRoom()" class="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs font-bold cursor-pointer">Kết Nối</button>
-                                    </div>
-                                    <p id="current-room-display" class="text-[10px] text-green-600 font-bold mt-2">📍 Chế độ: Đơn độc lập</p>
-                                </div>
-                                <div class="bg-white p-4 rounded-xl border">
-                                    <span class="text-xs font-bold block mb-1">Mã Số Để Mời Bạn Bè</span>
-                                    <div class="flex items-center justify-between bg-gray-50 p-2 rounded-lg border">
-                                        <span id="my-invite-id" class="text-xs font-mono font-bold text-gray-500 truncate max-w-[120px]">Loading...</span>
-                                        <button onclick="copyInviteID()" class="text-[10px] bg-blue-100 text-blue-700 px-2 py-1 rounded font-black cursor-pointer">Copy</button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- ĐỀ XUẤT NHÓM ĐANG HỌC TRỰC TUYẾN -->
-                            <div class="bg-white p-4 rounded-xl border border-blue-200">
-                                <span class="text-xs font-black text-gray-700 block mb-2">🔥 Tham gia bầy ong đang học trực tuyến:</span>
-                                <div class="space-y-2">
-                                    <div class="flex justify-between items-center bg-gray-50 p-2.5 rounded-lg border">
-                                        <div>
-                                            <p class="text-xs font-bold text-gray-800">🍯 Nhóm Ong Thợ Chuyên Anh 24/7</p>
-                                            <p class="text-[10px] text-gray-400">Đang có 14 thành viên cùng học</p>
-                                        </div>
-                                        <button onclick="joinSuggestedRoom('Group_IELTS_247')" class="bg-green-600 text-white text-[11px] font-black px-3 py-1 rounded-lg cursor-pointer">Tham Gia</button>
-                                    </div>
-                                    <div class="flex justify-between items-center bg-gray-50 p-2.5 rounded-lg border">
-                                        <div>
-                                            <p class="text-xs font-bold text-gray-800">📐 Luyện Đề Toán Cùng Ong Vàng</p>
-                                            <p class="text-[10px] text-gray-400">Đang có 9 thành viên cùng học</p>
-                                        </div>
-                                        <button onclick="joinSuggestedRoom('Group_ToanHoc_Vang')" class="bg-green-600 text-white text-[11px] font-black px-3 py-1 rounded-lg cursor-pointer">Tham Gia</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- BẢNG XẾP HẠNG THEO TUẦN -->
-                    <div class="bg-white p-6 rounded-3xl shadow-lg border border-amber-100 h-fit">
-                        <h2 class="text-sm font-black text-gray-900 mb-3 flex items-center gap-1.5 cursor-pointer" onclick="openLeaderboardModal()">
-                            <i class="fa-solid fa-ranking-star text-amber-500"></i> Bảng Xếp Hạng Ong Vàng Tuần
-                        </h2>
-                        <div class="text-xs space-y-2 text-gray-600 font-medium" id="leaderboard-container">
-                            <!-- Top 10 will render here dynamically -->
-                        </div>
-                        <button onclick="openLeaderboardModal()" class="w-full mt-3 bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs font-black py-2 rounded-xl border border-amber-200 cursor-pointer shadow-sm transition">
-                            <i class="fa-solid fa-eye"></i> Xem bảng xếp hạng đầy đủ
-                        </button>
-                        <p class="text-[9px] text-gray-400 mt-3 text-center">Bảng xếp hạng cập nhật realtime theo tuần dựa trên số giọt mật thu hoạch!</p>
-                    </div>
-
+                
+                <!-- MENU SUB-TABS TRONG BẦY ONG CHĂM CHỈ -->
+                <div class="bg-white p-2 rounded-2xl shadow-md flex gap-2 border border-amber-100">
+                    <button onclick="switchGroupSubTab('rooms')" id="sub-tab-rooms" class="flex-1 py-2 text-xs font-black rounded-xl bg-amber-400 text-gray-900 transition cursor-pointer">👥 Phòng Học Nhóm</button>
+                    <button onclick="switchGroupSubTab('leaderboard')" id="sub-tab-leaderboard" class="flex-1 py-2 text-xs font-black rounded-xl text-gray-600 hover:bg-amber-50 transition cursor-pointer">🏆 Bảng Ong Vàng</button>
+                    <button onclick="switchGroupSubTab('chat')" id="sub-tab-chat" class="flex-1 py-2 text-xs font-black rounded-xl text-gray-600 hover:bg-amber-50 transition cursor-pointer">💬 Sảnh Trò Chuyện & Kết Bạn</button>
                 </div>
+
+                <!-- SUB-TAB A: PHÒNG HỌC NHÓM -->
+                <div id="sub-page-rooms" class="group-sub-content space-y-6">
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-3xl shadow-lg border border-blue-100">
+                        <h2 class="text-xl font-black text-blue-950 mb-1 flex items-center gap-2">
+                            <i class="fa-solid fa-users text-blue-600"></i> Phòng Học Nhóm Bầy Ong
+                        </h2>
+                        <p class="text-xs text-blue-800/70 mb-4">Nhập mã số phòng hoặc tham gia nhanh bầy ong đang trực tuyến dưới đây:</p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                            <div class="bg-white p-4 rounded-xl border">
+                                <span class="text-xs font-bold block mb-1">Tự Tạo / Kết Nối Phòng</span>
+                                <div class="flex gap-1">
+                                    <input type="text" id="room-id-input" class="p-2 border rounded-lg text-xs flex-1 text-gray-800 font-bold" placeholder="Nhập ID phòng học...">
+                                    <button onclick="joinStudyRoom()" class="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs font-bold cursor-pointer">Kết Nối</button>
+                                </div>
+                                <p id="current-room-display" class="text-[10px] text-green-600 font-bold mt-2">📍 Chế độ: Đơn độc lập</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border">
+                                <span class="text-xs font-bold block mb-1">Mã Số Để Mời Bạn Bè</span>
+                                <div class="flex items-center justify-between bg-gray-50 p-2 rounded-lg border">
+                                    <span id="my-invite-id" class="text-xs font-mono font-bold text-gray-500 truncate max-w-[120px]">Loading...</span>
+                                    <button onclick="copyInviteID()" class="text-[10px] bg-blue-100 text-blue-700 px-2 py-1 rounded font-black cursor-pointer">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ĐỀ XUẤT NHÓM ĐANG HỌC TRỰC TUYẾN -->
+                        <div class="bg-white p-4 rounded-xl border border-blue-200">
+                            <span class="text-xs font-black text-gray-700 block mb-2">🔥 Tham gia bầy ong đang học trực tuyến:</span>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center bg-gray-50 p-2.5 rounded-lg border">
+                                    <div>
+                                        <p class="text-xs font-bold text-gray-800">🍯 Nhóm Ong Thợ Chuyên Anh 24/7</p>
+                                        <p class="text-[10px] text-gray-400">Đang có 14 thành viên cùng học</p>
+                                    </div>
+                                    <button onclick="joinSuggestedRoom('Group_IELTS_247')" class="bg-green-600 text-white text-[11px] font-black px-3 py-1 rounded-lg cursor-pointer">Tham Gia</button>
+                                </div>
+                                <div class="flex justify-between items-center bg-gray-50 p-2.5 rounded-lg border">
+                                    <div>
+                                        <p class="text-xs font-bold text-gray-800">📐 Luyện Đề Toán Cùng Ong Vàng</p>
+                                        <p class="text-[10px] text-gray-400">Đang có 9 thành viên cùng học</p>
+                                    </div>
+                                    <button onclick="joinSuggestedRoom('Group_ToanHoc_Vang')" class="bg-green-600 text-white text-[11px] font-black px-3 py-1 rounded-lg cursor-pointer">Tham Gia</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-TAB B: BẢNG ONG VÀNG -->
+                <div id="sub-page-leaderboard" class="group-sub-content hidden space-y-6">
+                    <div class="bg-white p-6 rounded-3xl shadow-lg border border-amber-100">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-black text-gray-900 flex items-center gap-1.5">
+                                <i class="fa-solid fa-ranking-star text-amber-500"></i> Bảng Xếp Hạng Ong Vàng Tuần (Top 10)
+                            </h2>
+                            <button onclick="openLeaderboardModal()" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-800 font-black px-3 py-1.5 rounded-xl border border-amber-200 cursor-pointer">
+                                <i class="fa-solid fa-eye"></i> Xem bảng đầy đủ
+                            </button>
+                        </div>
+                        <div class="text-xs space-y-2 text-gray-600 font-medium" id="leaderboard-container"></div>
+                        <p class="text-[10px] text-gray-400 mt-4 text-center">Cập nhật realtime tự động dựa trên số Giọt Mật tích lũy của toàn hệ thống!</p>
+                    </div>
+                </div>
+
+                <!-- SUB-TAB C: TRÒ CHUYỆN SẢNH CHUNG & KẾT BẠN -->
+                <div id="sub-page-chat" class="group-sub-content hidden space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        
+                        <!-- DANH SÁCH BẦY ONG ONLINE & KẾT BẠN -->
+                        <div class="bg-white p-5 rounded-3xl shadow-md border border-amber-100 flex flex-col h-[400px]">
+                            <h3 class="text-sm font-black text-gray-800 mb-3 flex items-center gap-1.5">
+                                <i class="fa-solid fa-address-book text-amber-500"></i> Đồng Đội Mật Ngọt
+                            </h3>
+                            
+                            <!-- Tab tìm bạn hoặc list bạn -->
+                            <div class="flex gap-1 mb-2 bg-gray-50 p-1 rounded-xl border text-[10px] font-black">
+                                <button onclick="switchSocialView('directory')" id="btn-social-directory" class="flex-1 py-1 rounded-lg bg-white shadow text-amber-600">Hội Ong 👥</button>
+                                <button onclick="switchSocialView('friends')" id="btn-social-friends" class="flex-1 py-1 rounded-lg text-gray-500">Bạn Bè 🍯</button>
+                            </div>
+
+                            <!-- List hiển thị -->
+                            <div class="flex-1 overflow-y-auto space-y-2 pr-1" id="social-list-container"></div>
+                        </div>
+
+                        <!-- KHU VỰC KHUNG CHAT (SẢNH CHUNG HOẶC NHẮN TIN RIÊNG) -->
+                        <div class="md:col-span-2 bg-white p-5 rounded-3xl shadow-md border border-amber-100 flex flex-col h-[400px]">
+                            <div class="flex justify-between items-center border-b pb-3 mb-3">
+                                <div>
+                                    <h3 class="text-sm font-black text-gray-800" id="chat-header-title">💬 Sảnh Trò Chuyện Tổ Ong</h3>
+                                    <p class="text-[10px] text-gray-400 font-medium" id="chat-header-subtitle">Kênh giao lưu chung cho tất cả các Ong Thợ</p>
+                                </div>
+                                <button onclick="openGlobalLobby()" id="btn-back-to-lobby" class="hidden text-xs bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold px-3 py-1.5 rounded-xl border cursor-pointer">
+                                    <i class="fa-solid fa-arrow-left"></i> Quay lại sảnh
+                                </button>
+                            </div>
+
+                            <!-- Tin nhắn -->
+                            <div class="flex-1 overflow-y-auto space-y-3 p-2 bg-gray-50/70 rounded-2xl border" id="chat-messages-box"></div>
+
+                            <!-- Input chat -->
+                            <div class="mt-3 flex gap-2">
+                                <input type="text" id="chat-input-text" onkeypress="handleChatKeyPress(event)" placeholder="Gửi tin nhắn mật ngọt..." class="flex-1 p-2.5 border-2 border-gray-150 rounded-xl text-xs focus:outline-none focus:border-amber-400 font-bold text-gray-800">
+                                <button onclick="sendChatMessage()" class="bg-gradient-to-r from-amber-400 to-orange-400 text-white font-black px-4 py-2 rounded-xl text-xs shadow cursor-pointer">Gửi</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
             </section>
 
             <!-- ================= TRANG 7: HỒ SƠ BẦY ONG (MY PROFILE & PRIVACY) ================= -->
@@ -582,6 +649,60 @@
 
             <!-- ================= TRANG 8: TIỆN ÍCH MẬT NGỌT & GIẢI TRÍ ================= -->
             <section id="page-utilities" class="page-content space-y-6">
+                
+                <!-- ĐẤU TRƯỜNG THỬ THÁCH (TỰ TẠO THỬ THÁCH VỚI BẠN BÈ HOẶC HỆ THỐNG) -->
+                <div class="bg-gradient-to-br from-amber-100 to-orange-100 p-6 rounded-3xl shadow-lg border border-amber-300 space-y-6">
+                    <div class="flex justify-between items-center border-b border-amber-200 pb-3">
+                        <h2 class="text-lg font-black text-amber-950 flex items-center gap-2">
+                            <i class="fa-solid fa-gamepad text-orange-600 animate-bounce"></i> Đấu Trường Thử Thách Tổ Ong
+                        </h2>
+                        <span class="text-xs bg-amber-400 text-gray-900 px-2 py-1 rounded-full font-black">Quest & PvP Mode</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Cột Trái: Tạo Thử Thách & Mời Bạn Bè -->
+                        <div class="bg-white p-4 rounded-2xl border shadow-sm space-y-3">
+                            <h3 class="text-xs font-black text-amber-900 uppercase tracking-wider"><i class="fa-solid fa-paper-plane text-orange-400"></i> Giao Thử Thách Cho Đồng Đội</h3>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400">Tên thách đấu:</label>
+                                <input type="text" id="pvp-quest-name" class="w-full p-2 border rounded-xl text-xs font-bold text-gray-800 focus:outline-amber-400" placeholder="Ví dụ: Học 2 tiếng liên tục">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400">Yêu cầu mô tả:</label>
+                                <input type="text" id="pvp-quest-desc" class="w-full p-2 border rounded-xl text-xs font-bold text-gray-800 focus:outline-amber-400" placeholder="Nội dung cần vượt qua...">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-400">Mã ID Bạn Bè:</label>
+                                    <input type="text" id="pvp-quest-target-id" class="w-full p-2 border rounded-xl text-xs font-bold text-gray-800 focus:outline-amber-400" placeholder="Nhập 8 chữ số ID...">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-400">Thưởng XP:</label>
+                                    <select id="pvp-quest-reward" class="w-full p-2 border rounded-xl text-xs font-bold text-gray-800 focus:outline-none">
+                                        <option value="30">🟢 Dễ (+30 XP)</option>
+                                        <option value="60">🟡 Vừa (+60 XP)</option>
+                                        <option value="120">🔴 Khó (+120 XP)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button onclick="sendPvPChallenge()" class="w-full bg-gradient-to-r from-orange-400 to-amber-500 text-white font-black py-2 rounded-xl text-xs shadow-md">GỬI LỜI THÁCH ĐẤU ⚔️</button>
+                        </div>
+
+                        <!-- Cột Phải: Các Thử Thách Đang Chờ/Chấp Nhận -->
+                        <div class="lg:col-span-2 space-y-4">
+                            <h3 class="text-xs font-black text-amber-900 uppercase tracking-wider flex items-center gap-1"><i class="fa-solid fa-bell text-yellow-500"></i> Lời mời thách đấu từ bầy ong:</h3>
+                            <div id="pvp-received-quests-container" class="space-y-2 max-h-[180px] overflow-y-auto">
+                                <p class="text-center text-xs text-gray-400 py-6 font-bold">Chưa có lời mời thách đấu cá nhân nào.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-amber-200 pt-4">
+                        <h3 class="text-xs font-black text-amber-900 uppercase tracking-wider mb-3"><i class="fa-solid fa-robot"></i> Thử Thách Hệ Thống Web Tự Tạo</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="challenges-arena-container"></div>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
                     <!-- VÒNG QUAY MAY MẮN (CHỈ 3 LẦN 1 NGÀY) -->
@@ -619,8 +740,6 @@
                                     <option value="5">⭐⭐⭐⭐⭐ (Tuyệt đỉnh)</option>
                                     <option value="4">⭐⭐⭐⭐ (Tốt)</option>
                                     <option value="3">⭐⭐⭐ (Tạm ổn)</option>
-                                    <option value="2">⭐⭐ (Có xao nhãng)</option>
-                                    <option value="1">⭐ (Kém tập trung)</option>
                                 </select>
                                 <button onclick="saveJournal()" class="w-full bg-blue-500 text-white font-bold py-2 rounded-xl text-xs shadow cursor-pointer">Lưu Sổ Cảm Xúc & Vẽ Biểu Đồ</button>
                             </div>
@@ -692,13 +811,27 @@
                 <input type="text" id="leaderboard-search" oninput="filterLeaderboard()" placeholder="Tìm kiếm đồng đội..." class="w-full p-2.5 pl-9 border-2 border-amber-100 rounded-xl text-xs focus:outline-none focus:border-amber-400 text-gray-800 font-bold">
                 <i class="fa-solid fa-search absolute left-3 top-3.5 text-amber-400 text-xs"></i>
             </div>
-            <div class="flex-1 overflow-y-auto space-y-2 pr-1" id="leaderboard-full-list">
-                <!-- Danh sách tất cả thành viên -->
-            </div>
+            <div class="flex-1 overflow-y-auto space-y-2 pr-1" id="leaderboard-full-list"></div>
             <div class="mt-4 pt-4 border-t border-amber-100 flex justify-between items-center text-xs font-bold text-gray-600">
                 <span id="my-rank-status">Vị trí của bạn: Đang tính toán...</span>
                 <button onclick="closeLeaderboardModal()" class="bg-gray-900 text-white px-5 py-2.5 rounded-xl font-black shadow cursor-pointer">Đóng bảng</button>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL HIỂN THỊ POPUP ĐIỂM DANH 21 NGÀY -->
+    <div id="checkin-challenge-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-3xl max-w-md w-full text-center border-4 border-amber-400">
+            <h3 class="text-2xl font-black text-amber-600 mb-2"><i class="fa-solid fa-calendar-check"></i> Thử Thách 21 Ngày</h3>
+            <p class="text-xs text-gray-400 mb-4">Tiến trình tích lũy thói quen học tập siêng năng</p>
+            
+            <div class="grid grid-cols-7 gap-1.5 text-center my-4" id="modal-challenge-grid"></div>
+            
+            <div class="bg-amber-50 p-3 rounded-2xl border mb-4 text-xs font-black text-amber-800">
+                🎉 Chuỗi ngày chăm chỉ hiện tại: <span id="modal-streak-count" class="text-orange-600 text-base">0</span> ngày!
+                <p id="modal-reward-notice" class="text-[10px] text-gray-400 mt-1">Hoàn thành chu kỳ liên tục để húp trọn gói quà tặng khổng lồ 100 XP!</p>
+            </div>
+            <button onclick="closeCheckinModal()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-black py-2.5 rounded-xl text-sm shadow cursor-pointer">Tuyệt vời bầy ong!</button>
         </div>
     </div>
 
@@ -718,14 +851,19 @@
         const auth = firebase.auth();
         const db = firebase.database(); 
 
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'beebee-study-planner';
+
         let currentUser = null;
         let timerInterval = null;
         let timerTimeLeft = 1500; 
         let audioCtx = null;
         let continuousNode = null; 
-        let isGuest = false; // Trạng thái Guest Mode
-        let activeTaskFilter = 'all'; // all / pending / completed
-        let globalLeaderboardCache = []; // Bộ nhớ đệm bảng xếp hạng
+        let isGuest = false; 
+        let activeTaskFilter = 'all'; 
+        let activeGroupSubTab = 'rooms'; 
+        let activeSocialTab = 'directory'; 
+        let activePrivateChatPartner = null; 
+        let globalLeaderboardCache = []; 
 
         // Khởi tạo đối tượng lưu trữ bầy ong
         let userData = {
@@ -746,16 +884,26 @@
             petHungerState: "No", 
             challengeStreak: 0, 
             challengeDays: Array(21).fill(false), 
+            challengeRewardedCount: 0, // Đếm số chu kỳ 21 ngày đã hoàn thành
             nickname: "Khách Danh Dự",
             fullName: "",
             phoneNumber: "",
             emailVisibility: "hide", 
             infoVisibility: "private", 
             plan: { days: [] },
-            journals: [], // Nhật ký cảm xúc kèm ngày & điểm sao
-            aiChatHistory: [], // Lịch sử trò chuyện AI trợ lý
-            futureLetters: [] // Lưu thư tương lai
+            journals: [], 
+            aiChatHistory: [], 
+            futureLetters: [], 
+            friends: {}, 
+            activeChallengeId: "",
+            checkInHistory: [] // Mảng lưu tất cả ngày đã điểm danh dạng YYYY-MM-DD
         };
+
+        const customChallengesData = [
+            { id: "quest_easy", name: "Học tập siêu tốc ⚡", desc: "Xử lý thành công ít nhất 1 nhiệm vụ hút mật hôm nay.", difficulty: "Dễ", reward: 20 },
+            { id: "quest_medium", name: "Ong thợ miệt mài 🌻", desc: "Đập cánh tập trung thành công 1 phiên học Pomodoro.", difficulty: "Vừa", reward: 50 },
+            { id: "quest_hard", name: "Xây tổ vĩ đại 👑", desc: "Hoàn thành 3 nhiệm vụ mức độ ưu tiên Cao.", difficulty: "Khó", reward: 100 }
+        ];
 
         const petCheeringQuotes = {
             "🐱": [
@@ -798,19 +946,16 @@
             document.getElementById(`btn-${pageId}`).classList.add('active');
         }
 
-        // KÍCH HOẠT CHẾ ĐỘ TRẢI NGHIỆM KHÁCH (GUEST MODE)
         function startGuestMode() {
             isGuest = true;
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
             document.getElementById('guest-mode-banner').classList.remove('hidden');
             
-            // Khởi tạo các giá trị giả lập trong RAM
             document.getElementById('my-invite-id').innerText = "GUEST_MODE";
             document.getElementById('user-display').innerText = "Khách Hút Mật (Offline)";
             document.getElementById('profile-email-readonly').value = "guest@beebee.com";
 
-            // Giả lập danh sách bầy ong trên bảng xếp hạng cho chế độ khách
             const mockLeaderboard = [
                 { uid: "mock_1", nickname: "Ong Chúa Chăm Chỉ 👑", avatar: "🐝", totalXP: 1450, level: 14, infoVisibility: "public" },
                 { uid: "mock_2", nickname: "Bác Ong Thợ Già", avatar: "🧙", totalXP: 980, level: 9, infoVisibility: "public" },
@@ -818,6 +963,8 @@
             ];
             renderLeaderboardUI(mockLeaderboard);
             updateUI();
+            renderSocialList();
+            renderChatHistory();
         }
 
         auth.onAuthStateChanged(user => {
@@ -831,6 +978,9 @@
                 document.getElementById('profile-email-readonly').value = user.email;
                 loadUserData();
                 listenToGlobalLeaderboard();
+                listenToPublicSocialDirectory();
+                listenToChatMessages();
+                listenToPvPChallenges();
             } else {
                 if (!isGuest) {
                     currentUser = null;
@@ -862,7 +1012,8 @@
 
         function loadUserData() {
             if (isGuest) return;
-            db.ref("study_planner_beebee_v6/" + currentUser.uid).on("value", snapshot => {
+            // RULE 1: Strict Paths compliance for Realtime Database
+            db.ref(`artifacts/${appId}/users/${currentUser.uid}/userData`).on("value", snapshot => {
                 if(snapshot.exists()) {
                     userData = { ...userData, ...snapshot.val() };
                     
@@ -875,19 +1026,29 @@
 
                     checkGardenWithered();
                     updateUI();
+                    
+                    db.ref(`artifacts/${appId}/public/data/users/${currentUser.uid}`).set({
+                        uid: currentUser.uid,
+                        nickname: userData.nickname || currentUser.email.split('@')[0],
+                        avatar: userData.avatar || "🧑‍🎓",
+                        avatarUrl: userData.avatarUrl || "",
+                        online: true,
+                        level: userData.level || 1,
+                        infoVisibility: userData.infoVisibility || "private"
+                    });
                 }
             });
         }
 
-        // LẮNG NGHE TOÀN BỘ NGƯỜI DÙNG ĐỂ TỰ ĐỘNG CẬP NHẬT BẢNG XẾP HẠNG REALTIME
         function listenToGlobalLeaderboard() {
             if (isGuest) return;
-            db.ref("study_planner_beebee_v6").on("value", snapshot => {
+            db.ref(`artifacts/${appId}/users`).on("value", snapshot => {
                 if (!snapshot.exists()) return;
                 const allData = snapshot.val();
                 const leaderboard = [];
                 for (let uid in allData) {
-                    const u = allData[uid];
+                    const u = allData[uid].userData;
+                    if(!u) continue;
                     const totalXP = (u.level || 1) * 100 + (u.xp || 0);
                     leaderboard.push({
                         uid: uid,
@@ -906,14 +1067,13 @@
 
         function saveToServer() {
             if (!isGuest && currentUser) {
-                userData.email = currentUser.email; // Đảm bảo email luôn được lưu
-                db.ref("study_planner_beebee_v6/" + currentUser.uid).set(userData);
+                userData.email = currentUser.email; 
+                db.ref(`artifacts/${appId}/users/${currentUser.uid}/userData`).set(userData);
             } else {
                 updateUI();
             }
         }
 
-        // TẢI ẢNH ĐẠI DIỆN CỦA BẠN (CÁ NHÂN HÓA - ĐỀ XUẤT HOẶC THIẾT BỊ)
         function uploadAvatar(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -927,7 +1087,6 @@
             reader.readAsDataURL(file);
         }
 
-        // ĐIỀU CHỈNH CHẾ ĐỘ PHÁT NHẠC (CUSTOM HOẶC WEB)
         function toggleAudioSourceType() {
             const sourceType = document.getElementById('audio-source-type').value;
             const builtInBox = document.getElementById('box-built-in-audio');
@@ -943,7 +1102,6 @@
             stopContinuousSound();
         }
 
-        // TẢI FILE NHẠC THƯ GIÃN CỦA NGƯỜI DÙNG
         function uploadCustomAudio(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -953,11 +1111,10 @@
             localPlayer.src = fileUrl;
 
             document.getElementById('custom-audio-filename').classList.remove('hidden');
-            document.getElementById('custom-audio-filename').innerText = `✓ File nhạc cá nhân đã sẵn sàng phát.`;
-            alert("Đã nhận diện tệp nhạc từ thiết bị!");
+            document.getElementById('custom-audio-filename').innerText = `✓ File sẵn sàng: ${file.name}`;
+            alert("Đã tiếp nhận file âm thanh thành công!");
         }
 
-        // LƯU CÁC THÔNG TIN HỒ SƠ CÁ NHÂN VÀ CẤU HÌNH BẢO MẬT
         function saveProfileData() {
             userData.nickname = document.getElementById('profile-nickname').value;
             userData.fullName = document.getElementById('profile-fullname').value;
@@ -1020,8 +1177,9 @@
                 gardenGrid.appendChild(span);
             });
 
-            // 21 ngày thử thách
+            // 21 ngày thử thách & Bản đồ điểm danh tháng
             build21DayChallengeUI();
+            buildAttendanceHeatmap();
 
             // Biểu đồ cảm xúc
             drawJournalChart();
@@ -1029,7 +1187,38 @@
             // Đồng bộ chat AI
             renderAIChatHistory();
 
+            // Render đấu trường thử thách
+            renderChallengesArena();
+
             renderTimeline();
+        }
+
+        // BIỂU ĐỒ ĐIỂM DANH TRONG THÁNG (ATTENDANCE HEATMAP)
+        function buildAttendanceHeatmap() {
+            const container = document.getElementById('attendance-heatmap-container');
+            if(!container) return;
+            container.innerHTML = "";
+
+            const history = userData.checkInHistory || [];
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth();
+
+            // Lấy số ngày trong tháng hiện tại
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
+                const hasCheckedIn = history.includes(dayStr);
+
+                const dayDiv = document.createElement('div');
+                dayDiv.className = `p-2 rounded-lg text-xs font-black transition-all ${hasCheckedIn ? 'bg-amber-400 text-gray-900 border border-amber-500 shadow-sm' : 'bg-gray-100 text-gray-400'}`;
+                dayDiv.innerHTML = `
+                    <span class="block text-[8px] text-gray-500 font-bold">Ngày</span>
+                    <span class="block text-xs">${i}</span>
+                `;
+                container.appendChild(dayDiv);
+            }
         }
 
         // RENDERING BẢNG XẾP HẠNG TOP 10 VÀ TÍNH TOÁN VỊ TRÍ CỦA BẢN THÂN
@@ -1039,7 +1228,6 @@
             if(!container) return;
             container.innerHTML = "";
 
-            // Nếu đang trong chế độ khách (Guest), chèn thêm User Guest vào xếp hạng để check thứ hạng giả lập
             if (isGuest) {
                 const guestXP = (userData.level || 1) * 100 + (userData.xp || 0);
                 const guestItem = {
@@ -1057,7 +1245,6 @@
                 leaderboard.sort((a, b) => b.totalXP - a.totalXP);
             }
 
-            // Top 10 rendering
             const top10 = leaderboard.slice(0, 10);
             top10.forEach((user, index) => {
                 const isMe = (!isGuest && currentUser && user.uid === currentUser.uid) || (isGuest && user.uid === "GUEST_MODE");
@@ -1073,7 +1260,6 @@
                     ? `<img src="${user.avatarUrl}" class="w-6 h-6 rounded-full object-cover inline-block mr-1">`
                     : `<span class="mr-1">${user.avatar || '🧑‍🎓'}</span>`;
 
-                // Chấp hành thuộc tính bảo mật
                 const nameDisplay = (user.infoVisibility === 'private' && !isMe) ? "Bé Ong Ẩn Danh 🙈" : user.nickname;
 
                 itemDiv.innerHTML = `
@@ -1089,7 +1275,6 @@
                 container.appendChild(itemDiv);
             });
 
-            // Tính toán thứ hạng cá nhân
             const myIndex = leaderboard.findIndex(u => (!isGuest && currentUser && u.uid === currentUser.uid) || (isGuest && u.uid === "GUEST_MODE"));
             const rankStatus = document.getElementById('my-rank-status');
             if(rankStatus) {
@@ -1101,7 +1286,6 @@
             }
         }
 
-        // BỘ LỌC VÀ HIỂN THỊ MODAL TOÀN BỘ BẢNG XẾP HẠNG
         function openLeaderboardModal() {
             document.getElementById('leaderboard-modal').classList.remove('hidden');
             filterLeaderboard();
@@ -1152,7 +1336,67 @@
             });
         }
 
-        // ĐIỂM DANH HÀNG NGÀY CHU KỲ ĐÚNG 24 GIỜ & UPDATE 21 DAY CHALLENGE
+        // ĐIỂM DANH HÀNG NGÀY CHU KỲ ĐÚNG 24 GIỜ VÔ HẠN & HIỂN THỊ POPUP THỬ THÁCH 21 NGÀY KÈM PHẦN THƯỞNG 100 XP
+        function checkInDaily() {
+            const now = Date.now();
+            const oneDayMs = 24 * 60 * 60 * 1000;
+            
+            if(!userData.challengeDays) {
+                userData.challengeDays = Array(21).fill(false);
+                userData.challengeStreak = 0;
+            }
+            if(!userData.checkInHistory) {
+                userData.checkInHistory = [];
+            }
+
+            if (userData.lastCheckInTimestamp && (now - userData.lastCheckInTimestamp < oneDayMs)) {
+                const diff = oneDayMs - (now - userData.lastCheckInTimestamp);
+                const hrs = Math.ceil(diff / (1000 * 60 * 60));
+                alert(`⚠️ Bạn đã điểm danh hôm nay rồi! Vui lòng chờ thêm khoảng ${hrs} giờ nữa.`);
+                openCheckinModal(); 
+                return;
+            }
+
+            if (userData.lastCheckInTimestamp && (now - userData.lastCheckInTimestamp > oneDayMs * 2)) {
+                alert("⚠️ Chuỗi thói quen liên tục bị đứt đoạn! Hãy gieo trồng lại chuỗi ngày chăm chỉ từ ngày 1 nhé!");
+                userData.challengeStreak = 0;
+                userData.challengeDays = Array(21).fill(false);
+            }
+
+            // Đếm chu kỳ 21 ngày liên tục
+            userData.challengeStreak = (userData.challengeStreak || 0) + 1;
+            
+            // Tìm vị trí tương ứng trong bảng chu kỳ 21 ngày (Nếu vượt mốc 21 ngày, tự động tính modulo 21)
+            const cycleIndex = (userData.challengeStreak - 1) % 21;
+            
+            // Reset bảng chu kỳ mới nếu bắt đầu chu kỳ 21 ngày tiếp theo
+            if (cycleIndex === 0) {
+                userData.challengeDays = Array(21).fill(false);
+            }
+            
+            userData.challengeDays[cycleIndex] = true;
+            userData.lastCheckInTimestamp = now;
+
+            // Thêm ngày hiện tại vào lịch sử điểm danh
+            const todayStr = new Date().toISOString().split('T')[0];
+            if (!userData.checkInHistory.includes(todayStr)) {
+                userData.checkInHistory.push(todayStr);
+            }
+
+            // Thưởng 100 XP khi hoàn thành mỗi chu kỳ 21 ngày
+            if(userData.challengeStreak > 0 && userData.challengeStreak % 21 === 0) {
+                userData.challengeRewardedCount = (userData.challengeRewardedCount || 0) + 1;
+                addXP(100);
+                alert(`🎉 ONG CHÚA XUẤT SẮC! Bạn vừa hoàn thành chu kỳ 21 ngày chăm chỉ liên tục lần thứ ${userData.challengeRewardedCount}! Thưởng nóng +100 XP!`);
+            } else {
+                alert(`📅 Điểm danh ngày thứ ${userData.challengeStreak} thành công! Thưởng +15 XP.`);
+                addXP(15);
+            }
+            
+            saveToServer();
+            openCheckinModal(); 
+        }
+
         function build21DayChallengeUI() {
             const grid = document.getElementById('challenge-grid');
             if(!grid) return;
@@ -1163,17 +1407,46 @@
             for(let i=0; i<21; i++) {
                 const dayDiv = document.createElement('div');
                 const isDone = days[i];
-                const isCurrent = (i === streak);
+                const isCurrent = (i === (streak - 1) % 21);
 
                 dayDiv.className = `p-3 rounded-2xl border-2 flex flex-col items-center justify-center transition shadow-sm ${isDone ? 'bg-amber-400 border-amber-500 text-gray-900 font-black' : isCurrent ? 'bg-white border-orange-500 animate-pulse font-bold' : 'bg-white border-amber-100 text-gray-300'}`;
                 dayDiv.innerHTML = `
                     <span class="text-[10px] uppercase font-bold">Ngày</span>
-                    <span class="text-base font-black">${i+1}</span>
+                    <span class="text-base font-black">${Math.floor((streak - 1) / 21) * 21 + i + 1}</span>
                     <span class="text-xs mt-1">${isDone ? '🐝' : '🔒'}</span>
                 `;
                 grid.appendChild(dayDiv);
             }
             document.getElementById('challenge-streak').innerText = `Chuỗi liên tục: ${streak} ngày`;
+        }
+
+        // ĐIỀU KHIỂN POPUP ĐIỂM DANH 21 NGÀY
+        function openCheckinModal() {
+            const modal = document.getElementById('checkin-challenge-modal');
+            const grid = document.getElementById('modal-challenge-grid');
+            const streakCount = document.getElementById('modal-streak-count');
+            
+            modal.classList.remove('hidden');
+            grid.innerHTML = "";
+            
+            const days = userData.challengeDays || Array(21).fill(false);
+            const streak = userData.challengeStreak || 0;
+            streakCount.innerText = streak;
+
+            for(let i=0; i<21; i++) {
+                const dayDiv = document.createElement('div');
+                const isDone = days[i];
+                dayDiv.className = `p-2 rounded-xl border flex flex-col items-center justify-center text-[10px] ${isDone ? 'bg-amber-400 border-amber-500 text-gray-900 font-black' : 'bg-gray-100 text-gray-300'}`;
+                dayDiv.innerHTML = `
+                    <span class="block">N.${Math.floor((streak - 1) / 21) * 21 + i + 1}</span>
+                    <span class="text-xs mt-0.5">${isDone ? '🐝' : '🔒'}</span>
+                `;
+                grid.appendChild(dayDiv);
+            }
+        }
+
+        function closeCheckinModal() {
+            document.getElementById('checkin-challenge-modal').classList.add('hidden');
         }
 
         // TẠO NHIỆM VỤ PHÂN CHIA NGÀY GIỜ SỐ LIỆU RÕ RÀNG
@@ -1210,6 +1483,10 @@
             userData.badges.todo = true;
             addXP(15);
             saveToServer();
+
+            if(userData.activeChallengeId === 'quest_easy') {
+                checkAndCompleteQuest('quest_easy');
+            }
         }
 
         function toggleDay(idx) {
@@ -1219,6 +1496,10 @@
                 userData.petHungerState = "No"; 
                 addXP(25);
                 playRelaxingSound('bip'); 
+
+                if(userData.activeChallengeId === 'quest_hard') {
+                    checkAndCompleteQuest('quest_hard');
+                }
             } else {
                 userData.plan.days[idx].completedAt = 0;
             }
@@ -1230,7 +1511,6 @@
             saveToServer();
         }
 
-        // SỬA TRỰC TIẾP TÊN NHIỆM VỤ VÀ CHI TIẾT
         function editTaskName(idx, newName) {
             if(!newName.trim()) return;
             userData.plan.days[idx].task = newName;
@@ -1242,7 +1522,6 @@
             saveToServer();
         }
 
-        // SẮP XẾP SẮP ĐẶT ĐỘ ƯU TIÊN VÀ THỜI GIAN NHẮC NHỞ
         function sortTasksByPriorityAndTime() {
             if (!userData.plan || !userData.plan.days) return;
             
@@ -1292,7 +1571,6 @@
             renderTimeline();
         }
 
-        // RENDER CÁC NHIỆM VỤ PHÂN TRANG CHI TIẾT KÈM NÚT SẮP XẾP THỦ CÔNG UP/DOWN
         function renderTimeline() {
             const container = document.getElementById('timeline-container');
             if(!container) return;
@@ -1371,6 +1649,469 @@
             }
         }
 
+        // LẮNG NGHE DIRECTORY THÀNH VIÊN ĐĂNG KÝ ONLINE TRỰC TUYẾN
+        let globalSocialUsers = {};
+        function listenToPublicSocialDirectory() {
+            if (isGuest) return;
+            // RULE 1 compliant path
+            db.ref(`artifacts/${appId}/public/data/users`).on("value", snapshot => {
+                if (!snapshot.exists()) return;
+                globalSocialUsers = snapshot.val();
+                renderSocialList();
+            });
+        }
+
+        // QUẢN LÝ TAB SOCIAL
+        function switchSocialView(tab) {
+            activeSocialTab = tab;
+            document.getElementById('btn-social-directory').className = `flex-1 py-1 rounded-lg ${tab === 'directory' ? 'bg-white shadow text-amber-600' : 'text-gray-500'}`;
+            document.getElementById('btn-social-friends').className = `flex-1 py-1 rounded-lg ${tab === 'friends' ? 'bg-white shadow text-amber-600' : 'text-gray-500'}`;
+            renderSocialList();
+        }
+
+        function renderSocialList() {
+            const container = document.getElementById('social-list-container');
+            if(!container) return;
+            container.innerHTML = "";
+
+            if (isGuest) {
+                const virtualBees = [
+                    { uid: "bot_1", nickname: "Ong Vàng Sáng Tạo 🎨", avatar: "🐝", online: true },
+                    { uid: "bot_2", nickname: "Ong Mật Cần Cù 🍯", avatar: "👑", online: true },
+                    { uid: "bot_3", nickname: "Ong Chúa Thần Đồng 📐", avatar: "🧙", online: false }
+                ];
+                
+                virtualBees.forEach(user => {
+                    const isFriend = userData.friends && userData.friends[user.uid];
+                    if (activeSocialTab === 'friends' && !isFriend) return;
+
+                    const div = document.createElement('div');
+                    div.className = "p-2 bg-gray-50 rounded-2xl border border-gray-150 flex items-center justify-between";
+                    div.innerHTML = `
+                        <div class="flex items-center gap-2 cursor-pointer truncate" onclick="startPrivateChat('${user.uid}', '${user.nickname}')">
+                            <span class="text-xl">${user.avatar}</span>
+                            <div class="truncate">
+                                <p class="text-xs font-black truncate">${user.nickname}</p>
+                                <p class="text-[9px] text-green-500 font-bold">● Trực tuyến</p>
+                            </div>
+                        </div>
+                        <button onclick="toggleFriendLocal('${user.uid}')" class="text-[10px] ${isFriend ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-amber-400 text-gray-900'} px-2.5 py-1 rounded-xl font-black shrink-0">
+                            ${isFriend ? 'Hủy' : 'Kết bạn'}
+                        </button>
+                    `;
+                    container.appendChild(div);
+                });
+                return;
+            }
+
+            const users = globalSocialUsers || {};
+            let count = 0;
+
+            for (let uid in users) {
+                if (uid === currentUser.uid) continue; 
+                const user = users[uid];
+                const isFriend = userData.friends && userData.friends[uid];
+
+                if (activeSocialTab === 'friends' && !isFriend) continue;
+
+                count++;
+                const avatarHTML = user.avatarUrl 
+                    ? `<img src="${user.avatarUrl}" class="w-7 h-7 rounded-full object-cover">`
+                    : `<span class="text-xl">${user.avatar || '🧑‍🎓'}</span>`;
+
+                const nameDisplay = (user.infoVisibility === 'private') ? "Ong Thợ Ẩn Danh 🙈" : user.nickname;
+
+                const div = document.createElement('div');
+                div.className = "p-2 bg-gray-50 rounded-2xl border border-gray-150 flex items-center justify-between";
+                div.innerHTML = `
+                    <div class="flex items-center gap-2 cursor-pointer truncate flex-1" onclick="startPrivateChat('${uid}', '${nameDisplay}')">
+                        <div class="w-7 h-7 rounded-full flex items-center justify-center bg-gray-200 overflow-hidden shrink-0">
+                            ${avatarHTML}
+                        </div>
+                        <div class="truncate">
+                            <p class="text-xs font-black truncate">${nameDisplay}</p>
+                            <p class="text-[9px] text-green-500 font-bold">● Trực tuyến (Lv.${user.level})</p>
+                        </div>
+                    </div>
+                    <button onclick="toggleFriend('${uid}')" class="text-[10px] ${isFriend ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-amber-400 text-gray-900'} px-2.5 py-1 rounded-xl font-black shrink-0">
+                        ${isFriend ? 'Hủy' : 'Kết bạn'}
+                    </button>
+                `;
+                container.appendChild(div);
+            }
+
+            if (count === 0) {
+                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-10 font-bold">Hộp bạn bè trống trơn...</p>`;
+            }
+        }
+
+        function toggleFriendLocal(uid) {
+            if(!userData.friends) userData.friends = {};
+            if (userData.friends[uid]) {
+                delete userData.friends[uid];
+                alert("Đã hủy kết bạn!");
+            } else {
+                userData.friends[uid] = true;
+                alert("Đã kết bạn thành công! Hãy bấm vào tên bạn ấy để nhắn tin riêng.");
+            }
+            updateUI();
+        }
+
+        function toggleFriend(uid) {
+            if(!userData.friends) userData.friends = {};
+            if (userData.friends[uid]) {
+                delete userData.friends[uid];
+                alert("Đã hủy kết bạn.");
+            } else {
+                userData.friends[uid] = true;
+                alert("Đã gửi kết nối kết bạn bầy ong thành công!");
+            }
+            saveToServer();
+        }
+
+        let globalMessagesList = [];
+        function listenToChatMessages() {
+            if (isGuest) return;
+            // RULE 1 compliant path for public lobby chat
+            db.ref(`artifacts/${appId}/public/data/lobbyChat`).limitToLast(50).on("value", snapshot => {
+                if (activePrivateChatPartner) return; 
+                globalMessagesList = [];
+                if (snapshot.exists()) {
+                    snapshot.forEach(child => {
+                        globalMessagesList.push(child.val());
+                    });
+                }
+                renderChatHistory();
+            });
+        }
+
+        function startPrivateChat(partnerUid, partnerName) {
+            const isFriend = userData.friends && userData.friends[partnerUid];
+            if (!isFriend && !isGuest) {
+                return alert("⚠️ Bạn chỉ có thể nhắn tin riêng sau khi hai người đã kết bạn với nhau!");
+            }
+
+            activePrivateChatPartner = partnerUid;
+            document.getElementById('chat-header-title').innerText = `💬 Nhắn riêng: ${partnerName}`;
+            document.getElementById('chat-header-subtitle').innerText = "Trực tuyến • Cuộc trò chuyện mật ngọt bảo mật";
+            document.getElementById('btn-back-to-lobby').classList.remove('hidden');
+
+            if (isGuest) {
+                renderGuestPrivateChat();
+                return;
+            }
+
+            const roomNode = currentUser.uid < partnerUid ? `${currentUser.uid}_${partnerUid}` : `${partnerUid}_${currentUser.uid}`;
+            db.ref(`artifacts/${appId}/public/data/privateChat/${roomNode}`).off(); 
+            db.ref(`artifacts/${appId}/public/data/privateChat/${roomNode}`).limitToLast(30).on("value", snapshot => {
+                globalMessagesList = [];
+                if (snapshot.exists()) {
+                    snapshot.forEach(child => {
+                        globalMessagesList.push(child.val());
+                    });
+                }
+                renderChatHistory();
+            });
+        }
+
+        function openGlobalLobby() {
+            activePrivateChatPartner = null;
+            document.getElementById('chat-header-title').innerText = "💬 Sảnh Trò Chuyện Tổ Ong";
+            document.getElementById('chat-header-subtitle').innerText = "Kênh giao lưu chung cho tất cả các Ong Thợ";
+            document.getElementById('btn-back-to-lobby').classList.add('hidden');
+            
+            if (isGuest) {
+                globalMessagesList = [
+                    { senderName: "Hệ Thống", text: "Chào mừng bầy ong thợ đã đến sảnh trò chuyện công cộng!" }
+                ];
+                renderChatHistory();
+                return;
+            }
+            listenToChatMessages();
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input-text');
+            const text = input.value.trim();
+            if (!text) return;
+
+            input.value = "";
+
+            if (isGuest) {
+                globalMessagesList.push({ senderName: "Bạn (Guest)", text: text });
+                renderChatHistory();
+                
+                setTimeout(() => {
+                    const virtualAnswers = [
+                        "Bzzz! Bạn có trồng nhiều hoa hôm nay không?",
+                        "Cố gắng cày cuốc thói quen 21 ngày nha!",
+                        "Âm thanh lofi của web nghe dễ chịu thật đấy!",
+                        "Tớ đang tập trung đập cánh 25 phút đây!"
+                    ];
+                    const randReply = virtualAnswers[Math.floor(Math.random() * virtualAnswers.length)];
+                    const sender = activePrivateChatPartner ? "Đồng Đội Thảo Luận" : "Ong Mật Chăm Chỉ 🍯";
+                    globalMessagesList.push({ senderName: sender, text: randReply });
+                    renderChatHistory();
+                }, 1000);
+                return;
+            }
+
+            const senderName = userData.nickname || currentUser.email.split('@')[0];
+            const messagePayload = {
+                senderUid: currentUser.uid,
+                senderName: senderName,
+                text: text,
+                timestamp: Date.now()
+            };
+
+            if (activePrivateChatPartner) {
+                const roomNode = currentUser.uid < activePrivateChatPartner ? `${currentUser.uid}_${activePrivateChatPartner}` : `${activePrivateChatPartner}_${currentUser.uid}`;
+                db.ref(`artifacts/${appId}/public/data/privateChat/${roomNode}`).push(messagePayload);
+            } else {
+                db.ref(`artifacts/${appId}/public/data/lobbyChat`).push(messagePayload);
+            }
+        }
+
+        function handleChatKeyPress(event) {
+            if(event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+
+        function renderChatHistory() {
+            const box = document.getElementById('chat-messages-box');
+            if(!box) return;
+            box.innerHTML = "";
+
+            globalMessagesList.forEach(msg => {
+                const isMe = (!isGuest && currentUser && msg.senderUid === currentUser.uid) || (isGuest && msg.senderName.includes("Bạn"));
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `flex flex-col max-w-[80%] ${isMe ? 'self-end items-end ml-auto' : 'self-start items-start mr-auto'}`;
+                msgDiv.innerHTML = `
+                    <span class="text-[9px] text-gray-400 font-bold mb-0.5">${msg.senderName}</span>
+                    <div class="p-2.5 rounded-2xl text-xs font-semibold ${isMe ? 'bg-amber-400 text-gray-900 rounded-tr-none' : 'bg-white border text-gray-700 rounded-tl-none'} shadow-sm">
+                        ${msg.text}
+                    </div>
+                `;
+                box.appendChild(msgDiv);
+            });
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function renderGuestPrivateChat() {
+            globalMessagesList = [
+                { senderName: "Bầy Bạn", text: "Chào bạn đồng hành! Cùng nhau thi đua tích cực học tập nhé!" }
+            ];
+            renderChatHistory();
+        }
+
+        function switchGroupSubTab(tab) {
+            activeGroupSubTab = tab;
+            document.querySelectorAll('.group-sub-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.group-sub-content').forEach(el => el.classList.remove('block'));
+            
+            document.getElementById(`sub-page-${tab}`).classList.remove('hidden');
+            document.getElementById(`sub-page-${tab}`).classList.add('block');
+
+            document.getElementById('sub-tab-rooms').className = `flex-1 py-2 text-xs font-black rounded-xl ${tab==='rooms'?'bg-amber-400 text-gray-900':'text-gray-600 hover:bg-amber-50'} transition cursor-pointer`;
+            document.getElementById('sub-tab-leaderboard').className = `flex-1 py-2 text-xs font-black rounded-xl ${tab==='leaderboard'?'bg-amber-400 text-gray-900':'text-gray-600 hover:bg-amber-50'} transition cursor-pointer`;
+            document.getElementById('sub-tab-chat').className = `flex-1 py-2 text-xs font-black rounded-xl ${tab==='chat'?'bg-amber-400 text-gray-900':'text-gray-600 hover:bg-amber-50'} transition cursor-pointer`;
+        }
+
+        // ĐẤU TRƯỜNG THỬ THÁCH HỆ THỐNG
+        function renderChallengesArena() {
+            const container = document.getElementById('challenges-arena-container');
+            if(!container) return;
+            container.innerHTML = "";
+
+            customChallengesData.forEach(quest => {
+                const isCurrent = userData.activeChallengeId === quest.id;
+                
+                let dColor = "bg-green-100 text-green-800";
+                if(quest.difficulty === "Khó") dColor = "bg-red-100 text-red-800";
+                else if(quest.difficulty === "Vừa") dColor = "bg-yellow-100 text-yellow-800";
+
+                const cardDiv = document.createElement('div');
+                cardDiv.className = `p-4 bg-white border-2 rounded-2xl flex flex-col justify-between transition shadow-sm ${isCurrent ? 'border-orange-500 bg-amber-50/50 shadow-md ring-2 ring-orange-200' : 'border-gray-100'}`;
+                
+                cardDiv.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-black px-2 py-0.5 rounded-lg ${dColor}">${quest.difficulty}</span>
+                            <span class="text-xs font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-xl border border-amber-200">+${quest.reward} XP</span>
+                        </div>
+                        <h4 class="font-black text-sm text-gray-800">${quest.name}</h4>
+                        <p class="text-[11px] text-gray-500 mt-1 leading-relaxed">${quest.desc}</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t">
+                        ${isCurrent ? `
+                            <button onclick="claimQuestReward('${quest.id}', ${quest.reward})" class="w-full bg-green-500 hover:bg-green-600 text-white font-black py-1.5 rounded-xl text-xs shadow cursor-pointer transition">
+                                <i class="fa-solid fa-circle-check"></i> Xác nhận hoàn thành & Nhận XP
+                            </button>
+                        ` : `
+                            <button onclick="acceptQuest('${quest.id}')" ${userData.activeChallengeId ? 'disabled class="w-full bg-gray-100 text-gray-400 font-bold py-1.5 rounded-xl text-xs cursor-not-allowed"' : 'class="w-full bg-amber-400 hover:bg-amber-500 text-gray-900 font-black py-1.5 rounded-xl text-xs cursor-pointer shadow transition"'} >
+                                ${userData.activeChallengeId ? 'Đang có thử thách' : 'Nhận Thử Thách'}
+                            </button>
+                        `}
+                    </div>
+                `;
+                container.appendChild(cardDiv);
+            });
+        }
+
+        // TỰ ĐỊNH NGHĨA VÀ GỬI THÁCH ĐẤU PvP BẠN BÈ THỜI GIAN THỰC
+        function sendPvPChallenge() {
+            const name = document.getElementById('pvp-quest-name').value.trim();
+            const desc = document.getElementById('pvp-quest-desc').value.trim();
+            const targetId = document.getElementById('pvp-quest-target-id').value.trim();
+            const reward = parseInt(document.getElementById('pvp-quest-reward').value) || 30;
+
+            if (!name || !desc || !targetId) {
+                return alert("⚠️ Vui lòng nhập đầy đủ Tên, Mô tả thử thách và Mã ID đối thủ thách đấu!");
+            }
+
+            if (isGuest) {
+                alert(`🎯 Chế độ Khách: Giả lập gửi lời thách đấu "${name}" tới chú ong ${targetId} thành công!`);
+                document.getElementById('pvp-quest-name').value = "";
+                document.getElementById('pvp-quest-desc').value = "";
+                document.getElementById('pvp-quest-target-id').value = "";
+                return;
+            }
+
+            // Gửi thử thách PvP lên Realtime Database (RULE 1 Strict Paths)
+            const challengePayload = {
+                challengeId: "pvp_" + Date.now(),
+                senderUid: currentUser.uid,
+                senderNickname: userData.nickname || currentUser.email.split('@')[0],
+                name: name,
+                desc: desc,
+                reward: reward,
+                status: "pending" // pending / accepted / completed
+            };
+
+            // Tìm đối thủ trong database public list
+            db.ref(`artifacts/${appId}/public/data/users`).once("value").then(snapshot => {
+                if (snapshot.exists()) {
+                    const allUsers = snapshot.val();
+                    let matchedUid = null;
+                    for (let uid in allUsers) {
+                        if (uid.substring(0, 8) === targetId) {
+                            matchedUid = uid;
+                            break;
+                        }
+                    }
+
+                    if (!matchedUid) {
+                        return alert("❌ Lỗi: Không tìm thấy Ong đối thủ có 8 chữ số ID tương ứng!");
+                    }
+
+                    db.ref(`artifacts/${appId}/public/data/challenges/${matchedUid}/${challengePayload.challengeId}`).set(challengePayload)
+                        .then(() => {
+                            alert("⚔️ Đã gửi lời khiêu chiến quyết liệt lên tổ ong của đồng đội thành công!");
+                            document.getElementById('pvp-quest-name').value = "";
+                            document.getElementById('pvp-quest-desc').value = "";
+                            document.getElementById('pvp-quest-target-id').value = "";
+                        });
+                }
+            });
+        }
+
+        // LẮNG NGHE THÁCH ĐẤU PvP ĐƯỢC GỬI ĐẾN BẠN
+        function listenToPvPChallenges() {
+            if (isGuest) return;
+            // RULE 1 Strict Paths
+            db.ref(`artifacts/${appId}/public/data/challenges/${currentUser.uid}`).on("value", snapshot => {
+                const container = document.getElementById('pvp-received-quests-container');
+                if (!container) return;
+                container.innerHTML = "";
+
+                if (!snapshot.exists()) {
+                    container.innerHTML = `<p class="text-center text-xs text-gray-400 py-6 font-bold">Chưa có lời mời thách đấu cá nhân nào.</p>`;
+                    return;
+                }
+
+                const challenges = snapshot.val();
+                for (let cid in challenges) {
+                    const challenge = challenges[cid];
+                    
+                    const card = document.createElement('div');
+                    card.className = "p-3 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl flex flex-col justify-between shadow-sm text-left";
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-[9px] bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded-lg font-black"><i class="fa-solid fa-swords"></i> LỜI KHIÊU CHIẾN</span>
+                                <h4 class="font-black text-xs text-gray-800 mt-1">${challenge.name}</h4>
+                                <p class="text-[10px] text-gray-500 leading-relaxed">${challenge.desc}</p>
+                                <p class="text-[9px] text-gray-400 font-bold mt-1">Từ: ${challenge.senderNickname}</p>
+                            </div>
+                            <span class="text-xs font-black text-amber-600 bg-white border px-2 py-0.5 rounded-xl shrink-0">+${challenge.reward} XP</span>
+                        </div>
+                        <div class="mt-2 flex gap-2 border-t pt-2">
+                            ${challenge.status === 'pending' ? `
+                                <button onclick="acceptPvPChallenge('${cid}')" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-black py-1 rounded-xl text-[10px] shadow cursor-pointer">Chấp nhận thách đấu</button>
+                                <button onclick="rejectPvPChallenge('${cid}')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded-xl text-[10px] cursor-pointer">Từ chối</button>
+                            ` : `
+                                <button onclick="claimPvPChallengeReward('${cid}', ${challenge.reward})" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-black py-1 rounded-xl text-[10px] shadow cursor-pointer">✓ Báo hoàn thành & Lĩnh thưởng</button>
+                            `}
+                        </div>
+                    `;
+                    container.appendChild(card);
+                }
+            });
+        }
+
+        function acceptPvPChallenge(cid) {
+            db.ref(`artifacts/${appId}/public/data/challenges/${currentUser.uid}/${cid}`).update({ status: "accepted" })
+                .then(() => alert("⚔️ Bạn đã chấp nhận lời thách đấu! Hãy hoàn thành mục tiêu để húp trọn điểm mật ngọt!"));
+        }
+
+        function rejectPvPChallenge(cid) {
+            db.ref(`artifacts/${appId}/public/data/challenges/${currentUser.uid}/${cid}`).remove()
+                .then(() => alert("Đã từ chối lời thách đấu."));
+        }
+
+        function claimPvPChallengeReward(cid, reward) {
+            db.ref(`artifacts/${appId}/public/data/challenges/${currentUser.uid}/${cid}`).remove()
+                .then(() => {
+                    addXP(reward);
+                    alert(`🎉 XUẤT SẮC! Chúc mừng bạn đã chinh phục và hạ gục đối thủ, nhận nóng +${reward} XP!`);
+                });
+        }
+
+        function acceptQuest(questId) {
+            userData.activeChallengeId = questId;
+            saveToServer();
+            alert(`🏆 Bạn đã chính thức nhận Thử thách: "${customChallengesData.find(q=>q.id===questId).name}"!`);
+        }
+
+        function checkAndCompleteQuest(questId) {
+            if(userData.activeChallengeId === questId) {
+                alert("🎉 Tuyệt vời! Bạn vừa hoàn tất thử thách tổ ong! Đừng quên vào trang 'Giải trí' để lĩnh thưởng XP nhé.");
+            }
+        }
+
+        function claimQuestReward(questId, reward) {
+            if (questId === 'quest_easy') {
+                const doneCount = userData.plan && userData.plan.days ? userData.plan.days.filter(d=>d.done).length : 0;
+                if (doneCount < 1) {
+                    return alert("⚠️ Thử thách chưa hoàn thành! Hãy tích dấu xanh hoàn thành ít nhất 1 nhiệm vụ trước nhé.");
+                }
+            } else if (questId === 'quest_medium') {
+                if (!userData.badges || !userData.badges.pomodoro) {
+                    return alert("⚠️ Thử thách chưa hoàn thành! Hãy gieo hạt và học đếm ngược Pomodoro hoàn thành ít nhất 1 lần nhé.");
+                }
+            } else if (questId === 'quest_hard') {
+                const highPriorityDone = userData.plan && userData.plan.days ? userData.plan.days.filter(d=>d.done && d.priority === "Cao").length : 0;
+                if (highPriorityDone < 3) {
+                    return alert("⚠️ Thử thách chưa hoàn thành! Hãy hoàn tất tối thiểu 3 công việc ưu tiên Cao trong ngày trước.");
+                }
+            }
+
+            userData.activeChallengeId = "";
+            addXP(reward);
+            alert(`🎉 CHÚC MỪNG! Bạn đã chinh phục thành công thử thách, nhận trọn vẹn +${reward} XP mật ngọt!`);
+        }
+
         function checkGardenWithered() {
             if (!userData.plan || !userData.plan.days || userData.plan.days.length === 0) return;
             const now = Date.now();
@@ -1384,7 +2125,6 @@
             }
         }
 
-        // GIEO CÂY BẮT BUỘC TRƯỚC KHI BẮT ĐẦU HỌC
         function plantNewItem() {
             const now = Date.now();
             const oneDayMs = 24 * 60 * 60 * 1000;
@@ -1402,19 +2142,6 @@
             userData.lastPlantedTimestamp = now;
             addXP(10);
             alert("🌱 Trồng thêm cây xanh thành công!");
-        }
-
-        // TƯƠNG TÁC THÚ CƯNG
-        function interactWithPet() {
-            const petBubble = document.getElementById('pet-bubble');
-            const choices = petCheeringQuotes[userData.petType || "🐱"] || ["Cố lên bầy ong thợ!"];
-            const randomQuote = choices[Math.floor(Math.random() * choices.length)];
-            
-            petBubble.innerText = randomQuote;
-            petBubble.style.opacity = "1";
-            playRelaxingSound('bip');
-
-            setTimeout(() => { petBubble.style.opacity = "0"; }, 3500);
         }
 
         function savePetName() {
@@ -1466,11 +2193,14 @@
                         stopContinuousSound();
                         playRelaxingSound('bip');
                         
-                        // GIEO MẦM CÂY ĐÃ CHỌN TRƯỚC PHIÊN HỌC THÀNH CÔNG
                         const selectedSeed = document.getElementById('timer-select-seed').value;
                         if (!userData.gardenItems) userData.gardenItems = [];
                         userData.gardenItems.push(selectedSeed);
                         userData.lastPlantedTimestamp = Date.now();
+
+                        if(userData.activeChallengeId === 'quest_medium') {
+                            checkAndCompleteQuest('quest_medium');
+                        }
 
                         alert(`⏱️ Chúc mừng! Kết thúc thời gian tập trung, bạn nhận +15 XP và gieo mầm thành công mầm ${selectedSeed} vào nông trại!`);
                         addXP(15);
@@ -1491,7 +2221,6 @@
             document.getElementById('timer-display').innerText = `${m}:${s}`;
         }
 
-        // HỆ THỐNG ÂM THANH WEBAUDIO PHÁT LOOPS CHUẨN XUYÊN SUỐT PHIÊN TẬP TRUNG
         function startContinuousSound() {
             const sourceType = document.getElementById('audio-source-type').value;
 
@@ -1505,7 +2234,6 @@
                 return;
             }
 
-            // Web Audio API Synthesizer
             try {
                 if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 stopContinuousSound();
@@ -1571,7 +2299,6 @@
             } catch (e) { console.log(e); }
         }
 
-        // HỒ SƠ & BẢO MẬT PHÒNG HỌC NHÓM
         function joinStudyRoom() {
             const rID = document.getElementById('room-id-input').value.trim();
             if(!rID) return alert("Vui lòng nhập ID phòng nhóm!");
@@ -1609,18 +2336,15 @@
             }, 1200);
         }
 
-        // TRỢ LÝ ONG AI LƯU TRỮ LỊCH SỬ CHAT
         function askAI() {
             const val = document.getElementById('ai-input').value.trim();
             if(!val) return;
             
             if(!userData.aiChatHistory) userData.aiChatHistory = [];
             
-            // Thêm tin nhắn người dùng vào lịch sử
             userData.aiChatHistory.push({ sender: 'user', text: val });
             document.getElementById('ai-input').value = "";
             
-            // Tạo phản hồi ngẫu nhiên từ trợ lý Ong AI thông thái
             const aiResponses = [
                 "Bzzz... Theo sơ đồ mật ngọt, bạn nên hoàn thành các kế hoạch ưu tiên Cao trước để tránh bị đói thú cưng nhé!",
                 "Cùng đập cánh học tập thói quen 21 ngày thôi! Bạn có cần tôi lập sẵn thời gian biểu không?",
@@ -1662,7 +2386,6 @@
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        // LƯU TRỮ NHẬT KÝ CẢM XÚC & VẼ BIỂU ĐỒ STATS DẠNG CỘT SVG
         function saveJournal() {
             const feeling = document.getElementById('journal-feeling').value.trim();
             const stars = parseInt(document.getElementById('journal-stars').value) || 5;
@@ -1690,14 +2413,11 @@
                 return;
             }
 
-            // Lấy tối đa 7 nhật ký gần nhất để vẽ biểu đồ
             const lastJournals = journals.slice(-7);
             
             lastJournals.forEach(item => {
                 const colDiv = document.createElement('div');
                 colDiv.className = "flex flex-col items-center justify-end h-full w-8 group relative";
-                
-                // Chiều cao cột tương ứng với số sao (tối đa h-24 tương ứng 5 sao)
                 const pctHeight = (item.stars / 5) * 100;
                 
                 colDiv.innerHTML = `
@@ -1711,7 +2431,6 @@
             });
         }
 
-        // LƯU LÁ THƯ FUTURE ME CÓ ĐẶT LỊCH GỬI
         function saveFutureLetter() {
             const text = document.getElementById('future-letter').value.trim();
             const delaySelect = document.getElementById('future-time-delay').value;
@@ -1739,7 +2458,6 @@
             alert(`📩 Lá thư tương lai đã được niêm phong! Hệ thống sẽ mở và hiển thị lại cho bạn vào ngày: ${deliveryDate}`);
         }
 
-        // Toggle date input if custom is selected
         document.getElementById('future-time-delay').addEventListener('change', function(e) {
             const customDateInput = document.getElementById('future-custom-date');
             if (e.target.value === 'custom') {
@@ -1768,7 +2486,6 @@
         function closeAvatarModal() { document.getElementById('avatar-modal').classList.add('hidden'); }
         function changeAvatar(emoji) { userData.avatar = emoji; userData.avatarUrl = ""; saveToServer(); closeAvatarModal(); }
 
-        // BÀI TẬP HÍT THỞ XẢ STRESS
         function startBreathing() {
             const area = document.getElementById('breathing-area');
             const btn = document.getElementById('breath-btn');
