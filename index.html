@@ -1968,6 +1968,1940 @@ window.onload = initGame;
 
 ```
 
+                    animation: {
+
+                        'bounce-slow': 'bounce 3s infinite',
+
+                        'attack-right': 'attackRight 0.3s ease-in-out',
+
+                        'attack-left': 'attackLeft 0.3s ease-in-out',
+
+                        'shake': 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both',
+
+                        'heal': 'healUp 1s ease-out forwards',
+
+                    },
+
+                    keyframes: {
+
+                        attackRight: {
+
+                            '0%, 100%': { transform: 'translateX(0)' },
+
+                            '50%': { transform: 'translateX(50px) scale(1.1)' },
+
+                        },
+
+                        attackLeft: {
+
+                            '0%, 100%': { transform: 'translateX(0)' },
+
+                            '50%': { transform: 'translateX(-50px) scale(1.1)' },
+
+                        },
+
+                        shake: {
+
+                            '10%, 90%': { transform: 'translate3d(-2px, 0, 0)' },
+
+                            '20%, 80%': { transform: 'translate3d(4px, 0, 0)' },
+
+                            '30%, 50%, 70%': { transform: 'translate3d(-6px, 0, 0)' },
+
+                            '40%, 60%': { transform: 'translate3d(6px, 0, 0)' }
+
+                        },
+
+                        healUp: {
+
+                            '0%': { opacity: 0, transform: 'translateY(0)' },
+
+                            '50%': { opacity: 1, transform: 'translateY(-20px)' },
+
+                            '100%': { opacity: 0, transform: 'translateY(-40px)' },
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    </script>
+
+    <style>
+
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+        body { font-family: 'Nunito', sans-serif; user-select: none; }
+
+        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); }
+
+        .dark .glass-panel { background: rgba(31, 41, 55, 0.85); border-color: rgba(75, 85, 99, 0.4); }
+
+       
+
+        /* Custom Scrollbar */
+
+        ::-webkit-scrollbar { width: 6px; }
+
+        ::-webkit-scrollbar-track { background: transparent; }
+
+        ::-webkit-scrollbar-thumb { background: #fbbf24; border-radius: 10px; }
+
+       
+
+        .screen { display: none; animation: fadeIn 0.3s ease; }
+
+        .screen.active { display: flex; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+       
+
+        .btn-game { transition: all 0.2s; }
+
+        .btn-game:active { transform: scale(0.95); }
+
+       
+
+        .damage-text { position: absolute; font-weight: bold; font-size: 24px; color: #ef4444; text-shadow: 1px 1px 0 #fff; pointer-events: none; animation: healUp 1s ease-out forwards; z-index: 50; }
+
+        .heal-text { position: absolute; font-weight: bold; font-size: 24px; color: #22c55e; text-shadow: 1px 1px 0 #fff; pointer-events: none; animation: healUp 1s ease-out forwards; z-index: 50; }
+
+    </style>
+
+</head>
+
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen flex flex-col transition-colors duration-300">
+
+
+    <!-- Top Navigation / Stats Bar -->
+
+    <header class="glass-panel border-b border-honey-200 shadow-sm sticky top-0 z-40">
+
+        <div class="max-w-4xl mx-auto px-4 py-2 flex justify-between items-center">
+
+            <div class="flex items-center gap-3 cursor-pointer" onclick="showScreen('home')">
+
+                <div class="text-3xl relative">🐝<span class="absolute -bottom-1 -right-1 text-xs bg-red-500 text-white rounded-full px-1 border-2 border-white dark:border-gray-800" id="header-level">1</span></div>
+
+                <div class="hidden sm:block font-bold text-lg text-honey-600 dark:text-honey-400">BeeQuest</div>
+
+            </div>
+
+           
+
+            <div class="flex gap-4 items-center text-sm font-semibold">
+
+                <div class="flex flex-col items-center text-red-500">
+
+                    <span><i class="fa-solid fa-heart"></i> <span id="header-hp">100/100</span></span>
+
+                </div>
+
+                <div class="flex flex-col items-center text-blue-500">
+
+                    <span><i class="fa-solid fa-bolt"></i> <span id="header-energy">50/50</span></span>
+
+                </div>
+
+                <div class="flex flex-col items-center text-honey-500">
+
+                    <span><i class="fa-solid fa-coins"></i> <span id="header-coins">0</span></span>
+
+                </div>
+
+                <button onclick="toggleDarkMode()" class="text-gray-500 hover:text-honey-500 p-2"><i class="fa-solid fa-moon" id="theme-icon"></i></button>
+
+                <button onclick="toggleSound()" class="text-gray-500 hover:text-honey-500 p-2"><i class="fa-solid fa-volume-up" id="sound-icon"></i></button>
+
+            </div>
+
+        </div>
+
+        <!-- EXP Bar -->
+
+        <div class="w-full h-1.5 bg-gray-200 dark:bg-gray-700">
+
+            <div id="header-exp-bar" class="h-full bg-honey-400 transition-all duration-500" style="width: 0%"></div>
+
+        </div>
+
+    </header>
+
+
+    <!-- Main Content Area -->
+
+    <main class="flex-grow flex items-center justify-center p-4 relative overflow-hidden">
+
+       
+
+        <!-- HOME SCREEN -->
+
+        <div id="screen-home" class="screen active flex-col items-center justify-center w-full max-w-lg text-center gap-6">
+
+            <div class="relative w-40 h-40 flex items-center justify-center bg-gradient-to-br from-honey-100 to-honey-400 dark:from-gray-700 dark:to-gray-800 rounded-full shadow-lg border-4 border-white dark:border-gray-600 animate-bounce-slow">
+
+                <span class="text-7xl">🐝</span>
+
+                <div class="absolute -bottom-3 bg-medblue-500 text-white px-4 py-1 rounded-full text-sm font-bold shadow-md" id="home-title">Sinh viên năm nhất</div>
+
+            </div>
+
+           
+
+            <div>
+
+                <h1 class="text-3xl font-extrabold text-gray-800 dark:text-white mb-2">BeeDoc</h1>
+
+                <p class="text-gray-500 dark:text-gray-400 text-sm">Hành trình trở thành Bác sĩ Huyền Thoại</p>
+
+            </div>
+
+
+            <div class="grid grid-cols-2 gap-4 w-full">
+
+                <button onclick="showScreen('map')" class="btn-game col-span-2 bg-gradient-to-r from-medblue-500 to-medblue-700 text-white py-4 rounded-xl font-bold shadow-md hover:shadow-lg text-lg flex items-center justify-center gap-2">
+
+                    <i class="fa-solid fa-play"></i> Bắt đầu hành trình
+
+                </button>
+
+                <button onclick="showScreen('profile')" class="btn-game bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 py-3 rounded-xl font-bold text-gray-700 dark:text-gray-200 shadow-sm flex items-center justify-center gap-2">
+
+                    <i class="fa-solid fa-user-doctor text-medblue-500"></i> Hồ sơ
+
+                </button>
+
+                <button onclick="showScreen('collection')" class="btn-game bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 py-3 rounded-xl font-bold text-gray-700 dark:text-gray-200 shadow-sm flex items-center justify-center gap-2">
+
+                    <i class="fa-solid fa-book-medical text-honey-500"></i> Sổ tay
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- WORLD MAP SCREEN -->
+
+        <div id="screen-map" class="screen flex-col w-full max-w-2xl h-full">
+
+            <div class="flex justify-between items-center mb-6">
+
+                <h2 class="text-2xl font-bold text-medblue-700 dark:text-medblue-400"><i class="fa-solid fa-map-location-dot"></i> Bản Đồ Thế Giới</h2>
+
+                <button onclick="showScreen('home')" class="text-gray-500 hover:text-gray-800 dark:hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+
+            </div>
+
+           
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto pb-10" id="map-container">
+
+                <!-- Zones rendered by JS -->
+
+            </div>
+
+        </div>
+
+
+        <!-- ZONE DETAIL SCREEN -->
+
+        <div id="screen-zone" class="screen flex-col w-full max-w-xl h-full">
+
+            <div class="flex items-center gap-3 mb-6">
+
+                <button onclick="showScreen('map')" class="text-gray-500 hover:text-gray-800 dark:hover:text-white text-xl"><i class="fa-solid fa-arrow-left"></i></button>
+
+                <h2 class="text-2xl font-bold text-medblue-700 dark:text-medblue-400" id="zone-title">Khu vực</h2>
+
+            </div>
+
+            <div class="bg-blue-50 dark:bg-gray-800 p-4 rounded-xl mb-6 text-sm text-gray-600 dark:text-gray-300 border border-blue-100 dark:border-gray-700">
+
+                <i class="fa-solid fa-circle-info text-blue-500"></i> Tiêu diệt quái vật để nhận EXP và thu thập kiến thức. Quái boss yêu cầu trả lời đúng nhiều câu liên tiếp.
+
+            </div>
+
+            <div class="flex flex-col gap-3" id="monster-list">
+
+                <!-- Monsters rendered by JS -->
+
+            </div>
+
+        </div>
+
+
+        <!-- COMBAT SCREEN -->
+
+        <div id="screen-combat" class="screen flex-col w-full max-w-3xl h-full justify-between">
+
+            <!-- Combat Arena -->
+
+            <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-inner border-4 border-gray-200 dark:border-gray-700 overflow-hidden h-64 sm:h-80 flex items-end justify-between p-4 mb-4 bg-cover bg-center" id="combat-bg">
+
+                <!-- Background Overlay -->
+
+                <div class="absolute inset-0 bg-black bg-opacity-20 z-0"></div>
+
+               
+
+                <!-- Player Side -->
+
+                <div class="relative z-10 flex flex-col items-center w-1/3">
+
+                    <div class="bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded mb-2 font-bold w-full text-center truncate">BeeDoc</div>
+
+                    <div class="w-full bg-gray-700 rounded-full h-2.5 mb-2 border border-white">
+
+                        <div id="combat-player-hp-bar" class="bg-red-500 h-2.5 rounded-full transition-all duration-300" style="width: 100%"></div>
+
+                    </div>
+
+                    <div class="text-7xl drop-shadow-lg" id="combat-player">🐝</div>
+
+                </div>
+
+
+                <!-- VS Badge -->
+
+                <div class="relative z-10 text-3xl font-black text-yellow-400 italic drop-shadow-md">VS</div>
+
+
+                <!-- Enemy Side -->
+
+                <div class="relative z-10 flex flex-col items-center w-1/3">
+
+                    <div class="bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded mb-2 font-bold w-full text-center truncate" id="combat-enemy-name">Monster</div>
+
+                    <div class="w-full bg-gray-700 rounded-full h-2.5 mb-2 border border-white">
+
+                        <div id="combat-enemy-hp-bar" class="bg-red-500 h-2.5 rounded-full transition-all duration-300" style="width: 100%"></div>
+
+                    </div>
+
+                    <div class="text-7xl drop-shadow-lg" id="combat-enemy">🦠</div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Question & Actions Area -->
+
+            <div class="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-md p-4 sm:p-6 border border-gray-100 dark:border-gray-700">
+
+               
+
+                <div id="question-container" class="flex-grow flex flex-col justify-center">
+
+                    <div class="flex justify-between text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">
+
+                        <span id="question-subject">Môn học</span>
+
+                        <span>Lượt của bạn</span>
+
+                    </div>
+
+                    <h3 class="text-lg sm:text-xl font-bold mb-4 text-gray-800 dark:text-gray-100" id="question-text">Đang tải câu hỏi...</h3>
+
+                   
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-auto" id="answers-container">
+
+                        <!-- Buttons rendered by JS -->
+
+                    </div>
+
+                   
+
+                    <!-- Action Skills -->
+
+                    <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 flex gap-2 overflow-x-auto pb-2" id="skills-container">
+
+                        <!-- Skills rendered by JS -->
+
+                    </div>
+
+                </div>
+
+
+                <!-- Explanation / Result Modal (Overlay within combat area) -->
+
+                <div id="combat-result" class="hidden flex-col justify-center items-center text-center py-4">
+
+                    <div id="result-icon" class="text-5xl mb-2">✅</div>
+
+                    <h3 id="result-title" class="text-xl font-bold mb-2">Chính xác!</h3>
+
+                    <div class="bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 p-3 rounded-lg text-sm w-full mb-4 text-left border border-blue-200 dark:border-blue-800" id="result-explanation">
+
+                        Giải thích...
+
+                    </div>
+
+                    <button onclick="nextCombatTurn()" id="btn-next-turn" class="btn-game w-full bg-medblue-500 text-white py-3 rounded-xl font-bold shadow-md">Tiếp tục tấn công</button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PROFILE SCREEN -->
+
+        <div id="screen-profile" class="screen flex-col w-full max-w-lg h-full">
+
+            <div class="flex justify-between items-center mb-6">
+
+                <h2 class="text-2xl font-bold"><i class="fa-solid fa-user-doctor text-medblue-500"></i> Hồ Sơ Bác Sĩ</h2>
+
+                <button onclick="showScreen('home')" class="text-gray-500 hover:text-gray-800 dark:hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+
+            </div>
+
+           
+
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mb-4 flex items-center gap-4">
+
+                <div class="text-6xl">🐝</div>
+
+                <div class="flex-grow">
+
+                    <h3 class="text-xl font-bold" id="profile-name">BeeDoc</h3>
+
+                    <div class="text-honey-600 dark:text-honey-400 font-semibold text-sm mb-2" id="profile-title">Sinh viên năm nhất</div>
+
+                    <div class="flex justify-between text-xs text-gray-500 mb-1">
+
+                        <span>Cấp <span id="profile-level">1</span></span>
+
+                        <span><span id="profile-exp">0</span>/<span id="profile-maxexp">100</span> EXP</span>
+
+                    </div>
+
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+
+                        <div id="profile-exp-bar" class="bg-honey-400 h-2 rounded-full" style="width: 0%"></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="grid grid-cols-2 gap-4 mb-6">
+
+                <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-xl border border-red-100 dark:border-red-900/30 text-center">
+
+                    <div class="text-red-500 text-xl mb-1"><i class="fa-solid fa-heart"></i></div>
+
+                    <div class="text-2xl font-bold text-gray-800 dark:text-gray-100" id="profile-stat-hp">100</div>
+
+                    <div class="text-xs text-gray-500">Max HP</div>
+
+                </div>
+
+                <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-900/30 text-center">
+
+                    <div class="text-blue-500 text-xl mb-1"><i class="fa-solid fa-bolt"></i></div>
+
+                    <div class="text-2xl font-bold text-gray-800 dark:text-gray-100" id="profile-stat-energy">50</div>
+
+                    <div class="text-xs text-gray-500">Max Năng lượng</div>
+
+                </div>
+
+            </div>
+
+
+            <h3 class="font-bold text-lg mb-3">Kỹ năng đã mở khóa</h3>
+
+            <div class="grid grid-cols-1 gap-2 overflow-y-auto" id="profile-skills">
+
+                <!-- Skills JS -->
+
+            </div>
+
+           
+
+            <div class="mt-6 text-center">
+
+                <button onclick="resetGame()" class="text-sm text-red-500 underline">Xóa dữ liệu & Chơi lại từ đầu</button>
+
+            </div>
+
+        </div>
+
+
+        <!-- COLLECTION SCREEN -->
+
+        <div id="screen-collection" class="screen flex-col w-full max-w-2xl h-full">
+
+            <div class="flex justify-between items-center mb-6">
+
+                <h2 class="text-2xl font-bold"><i class="fa-solid fa-book-medical text-honey-500"></i> Sổ Tay Bệnh Lý</h2>
+
+                <button onclick="showScreen('home')" class="text-gray-500 hover:text-gray-800 dark:hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+
+            </div>
+
+           
+
+            <div class="flex gap-2 overflow-x-auto pb-2 mb-4 no-scrollbar" id="collection-filters">
+
+                <button class="px-4 py-1 bg-medblue-500 text-white rounded-full text-sm font-bold whitespace-nowrap">Tất cả</button>
+
+                <button class="px-4 py-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full text-sm font-bold whitespace-nowrap">Giải phẫu</button>
+
+                <button class="px-4 py-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full text-sm font-bold whitespace-nowrap">Lâm sàng</button>
+
+            </div>
+
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto pb-10" id="collection-list">
+
+                <!-- Cards JS -->
+
+            </div>
+
+        </div>
+
+
+    </main>
+
+
+    <!-- Modal Overlay for Level Up / Rewards -->
+
+    <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden flex-items-center justify-center p-4">
+
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full p-6 text-center transform scale-95 transition-transform duration-300 shadow-2xl border-4 border-honey-400" id="modal-content">
+
+            <div class="text-6xl mb-4" id="modal-icon">🎉</div>
+
+            <h2 class="text-2xl font-black text-honey-500 mb-2" id="modal-title">Lên Cấp!</h2>
+
+            <p class="text-gray-600 dark:text-gray-300 mb-4" id="modal-desc">Bạn đã đạt cấp độ mới.</p>
+
+            <div id="modal-rewards" class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg mb-6 text-sm text-left font-semibold">
+
+                <!-- Rewards -->
+
+            </div>
+
+            <button onclick="closeModal()" class="btn-game w-full bg-honey-500 hover:bg-honey-600 text-white py-3 rounded-xl font-bold shadow">Tuyệt vời!</button>
+
+        </div>
+
+    </div>
+
+
+<script>
+
+/* =========================================
+
+   DATABASE & CONFIGURATION
+
+========================================= */
+
+
+const ZONES = [
+
+    { id: 'zone1', name: 'Thung lũng Giải phẫu', levelReq: 1, icon: 'fa-bone', color: 'from-gray-400 to-gray-600', subject: 'Anatomy' },
+
+    { id: 'zone2', name: 'Rừng Sinh lý', levelReq: 5, icon: 'fa-lungs', color: 'from-green-400 to-green-600', subject: 'Physiology' },
+
+    { id: 'zone3', name: 'Thành phố Bệnh học', levelReq: 10, icon: 'fa-virus', color: 'from-purple-400 to-purple-600', subject: 'Pathology' },
+
+    { id: 'zone4', name: 'Học viện Dược lý', levelReq: 15, icon: 'fa-pills', color: 'from-teal-400 to-teal-600', subject: 'Pharmacology' },
+
+    { id: 'zone5', name: 'Lâu đài Lâm sàng', levelReq: 20, icon: 'fa-stethoscope', color: 'from-blue-500 to-blue-700', subject: 'Clinical' },
+
+    { id: 'zone6', name: 'Đấu trường OSCE', levelReq: 25, icon: 'fa-hospital', color: 'from-red-500 to-red-700', subject: 'OSCE', isBossZone: true }
+
+];
+
+
+const MONSTERS = [
+
+    // Anatomy
+
+    { id: 'm_bone', zoneId: 'zone1', name: 'Skeleton Bone', icon: '💀', hp: 30, questionsToKill: 2, exp: 20, drops: ['card_bone'] },
+
+    { id: 'm_muscle', zoneId: 'zone1', name: 'Muscle Beast', icon: '💪', hp: 45, questionsToKill: 3, exp: 30, drops: [] },
+
+    { id: 'm_nerve', zoneId: 'zone1', name: 'Nerve Shadow', icon: '🧠', hp: 60, questionsToKill: 4, exp: 50, isBoss: true, drops: ['card_cns'] },
+
+    // Physiology
+
+    { id: 'm_heart', zoneId: 'zone2', name: 'Heart Spirit', icon: '🫀', hp: 50, questionsToKill: 3, exp: 40, drops: ['card_heart'] },
+
+    { id: 'm_lung', zoneId: 'zone2', name: 'Lung Monster', icon: '🫁', hp: 60, questionsToKill: 3, exp: 45, drops: [] },
+
+    { id: 'm_kidney', zoneId: 'zone2', name: 'Kidney Guardian', icon: '🩸', hp: 90, questionsToKill: 5, exp: 80, isBoss: true, drops: ['card_kidney'] },
+
+    // Pathology
+
+    { id: 'm_inflam', zoneId: 'zone3', name: 'Inflammation Demon', icon: '🔥', hp: 70, questionsToKill: 3, exp: 50, drops: [] },
+
+    { id: 'm_pneumonia', zoneId: 'zone3', name: 'Pneumonia Beast', icon: '🦠', hp: 80, questionsToKill: 4, exp: 60, drops: ['card_pneumonia'] },
+
+    { id: 'm_diabetes', zoneId: 'zone3', name: 'Diabetes King', icon: '🍩', hp: 120, questionsToKill: 6, exp: 120, isBoss: true, drops: ['card_diabetes'] },
+
+    // Pharmacology
+
+    { id: 'm_toxin', zoneId: 'zone4', name: 'Toxic Slime', icon: '🧪', hp: 90, questionsToKill: 4, exp: 70, drops: [] },
+
+    { id: 'm_resist', zoneId: 'zone4', name: 'Resistant Bug', icon: '🐛', hp: 100, questionsToKill: 4, exp: 80, drops: ['card_antibiotic'] },
+
+    // Clinical
+
+    { id: 'm_nstemi', zoneId: 'zone5', name: 'NSTEMI Lord', icon: '💔', hp: 120, questionsToKill: 5, exp: 100, drops: ['card_nstemi'] },
+
+    { id: 'm_stroke', zoneId: 'zone5', name: 'Stroke Reaper', icon: '⚡', hp: 150, questionsToKill: 6, exp: 150, isBoss: true, drops: ['card_stroke'] },
+
+    // OSCE
+
+    { id: 'm_titan', zoneId: 'zone6', name: 'Medical Titan', icon: '👹', hp: 300, questionsToKill: 10, exp: 500, isBoss: true, drops: ['card_titan'] }
+
+];
+
+
+const SKILLS = [
+
+    { id: 's_basic', name: 'Chẩn đoán cơ bản', level: 1, type: 'attack', power: 1.0, cost: 0, icon: 'fa-hand-pointer' },
+
+    { id: 's_quick', name: 'Chẩn đoán nhanh', level: 5, type: 'attack', power: 1.5, cost: 5, icon: 'fa-bolt' },
+
+    { id: 's_ecg', name: 'ECG Strike', level: 10, type: 'attack', power: 2.0, cost: 10, icon: 'fa-heart-pulse' },
+
+    { id: 's_heal', name: 'Cấp cứu (Hồi máu)', level: 15, type: 'heal', power: 0.5, cost: 15, icon: 'fa-kit-medical' },
+
+    { id: 's_troponin', name: 'Troponin Blast', level: 20, type: 'attack', power: 3.0, cost: 20, icon: 'fa-vial' },
+
+];
+
+
+const KNOWLEDGE_CARDS = {
+
+    'card_bone': { name: 'Xương đùi', type: 'Giải phẫu', content: 'Xương dài nhất và chắc nhất cơ thể người.', trick: 'Đùi to gánh team.' },
+
+    'card_cns': { name: 'Hệ thần kinh trung ương', type: 'Giải phẫu', content: 'Gồm não và tủy sống. Các màng não: cứng, nhện, nuôi (từ ngoài vào trong).', trick: 'Cứng - Nhện - Nuôi' },
+
+    'card_heart': { name: 'Chu chuyển tim', type: 'Sinh lý', content: 'Kéo dài khoảng 0.8s (Nhịp 75 l/p). Tâm nhĩ thu 0.1s, Tâm thất thu 0.3s, Tâm trương toàn bộ 0.4s.', trick: '1-3-4' },
+
+    'card_kidney': { name: 'Nephron', type: 'Sinh lý', content: 'Đơn vị chức năng của thận. Gồm cầu thận và ống thận.', trick: 'Lọc ở cầu, tái hấp thu ở ống.' },
+
+    'card_pneumonia': { name: 'Viêm phổi cộng đồng (CAP)', type: 'Bệnh học', content: 'Tác nhân hay gặp nhất là Streptococcus pneumoniae.', trick: 'Phế cầu khuẩn là trùm CAP.' },
+
+    'card_diabetes': { name: 'Đái tháo đường Tuýp 2', type: 'Bệnh học', content: 'Kháng insulin. Tiêu chuẩn chẩn đoán: HbA1c >= 6.5%, Glucose đói >= 7.0 mmol/L.', trick: 'Sáu rưỡi - Bảy phẩy' },
+
+    'card_antibiotic': { name: 'Penicillin', type: 'Dược lý', content: 'Nhóm Beta-lactam. Ức chế tổng hợp vách tế bào vi khuẩn.', trick: 'Phá tường thành vi khuẩn.' },
+
+    'card_nstemi': { name: 'NSTEMI', type: 'Lâm sàng', content: 'Nhồi máu cơ tim không ST chênh lên. Dấu ấn sinh học (Troponin/CK-MB) dương tính.', trick: 'Đau ngực + Men tim TĂNG + ST KHÔNG chênh.' },
+
+    'card_stroke': { name: 'Đột quỵ não', type: 'Lâm sàng', content: 'Nguyên tắc FAST: Face (Mặt), Arm (Tay), Speech (Nói), Time (Thời gian).', trick: 'Thời gian là não.' },
+
+    'card_titan': { name: 'Y Đức', type: 'Huyền thoại', content: 'Primum non nocere - Trước tiên là không làm hại người bệnh.', trick: 'Trái tim người thầy thuốc.' }
+
+};
+
+
+// --- QUESTION DATABASE (Expanded to 60 medical questions) ---
+
+const QUESTION_BANK = [
+
+    // === ANATOMY (10 Questions) ===
+
+    { q: 'Xương nào dài nhất trong cơ thể người?', options: ['Xương chày', 'Xương đùi', 'Xương cánh tay', 'Xương mác'], ans: 1, exp: 'Xương đùi là xương dài và chắc khỏe nhất cơ thể.', subj: 'Anatomy' },
+
+    { q: 'Phổi phải có bao nhiêu thùy?', options: ['2 thùy', '3 thùy', '4 thùy', '1 thùy'], ans: 1, exp: 'Phổi phải có 3 thùy (trên, giữa, dưới) được ngăn cách bởi rãnh chếch và rãnh ngang.', subj: 'Anatomy' },
+
+    { q: 'Van hai lá nằm ở vị trí nào trong tim?', options: ['Giữa nhĩ phải và thất phải', 'Giữa nhĩ trái và thất trái', 'Tại gốc động mạch chủ', 'Tại gốc động mạch phổi'], ans: 1, exp: 'Van hai lá ngăn cách tâm nhĩ trái và tâm thất trái, cho phép máu chảy một chiều từ nhĩ xuống thất.', subj: 'Anatomy' },
+
+    { q: 'Cơ hoành được chi phối bởi dây thần kinh nào?', options: ['Thần kinh hoành (C3-C5)', 'Thần kinh phế vị', 'Thần kinh liên sườn', 'Thần kinh giao cảm ngực'], ans: 0, exp: 'Thần kinh hoành xuất phát từ các nhánh cổ C3, C4, C5 là nguồn chi phối vận động chính cho cơ hoành.', subj: 'Anatomy' },
+
+    { q: 'Động mạch nào cung cấp máu chính cho vùng mặt?', options: ['Động mạch hàm', 'Động mạch thái dương nông', 'Động mạch mặt', 'Động mạch mắt'], ans: 2, exp: 'Động mạch mặt là một nhánh của động mạch cảnh ngoài, chịu trách nhiệm cấp máu chính cho các cơ và mô vùng mặt.', subj: 'Anatomy' },
+
+    { q: 'Thùy nào của đại não chịu trách nhiệm chính về chức năng thị giác?', options: ['Thùy trán', 'Thùy thái dương', 'Thùy đỉnh', 'Thùy chẩm'], ans: 3, exp: 'Thùy chẩm nằm ở phía sau đại não, chứa vỏ não thị giác sơ cấp để xử lý thông tin hình ảnh.', subj: 'Anatomy' },
+
+    { q: 'Ống mật chủ được hợp thành từ hai ống nào?', options: ['Ống gan chung và ống túi mật', 'Ống gan trái và ống gan phải', 'Ống túi mật và ống tụy chính', 'Ống gan chung và ống tụy chính'], ans: 0, exp: 'Ống gan chung kết hợp với ống túi mật tạo thành ống mật chủ đổ vào tá tràng tại bóng Vater.', subj: 'Anatomy' },
+
+    { q: 'Thần kinh nào đi qua ống cổ tay và dễ bị chèn ép nhất?', options: ['Thần kinh trụ', 'Thần kinh giữa', 'Thần kinh quay', 'Thần kinh cơ bì'], ans: 1, exp: 'Thần kinh giữa đi qua ống cổ tay cùng các gân cơ gấp, khi bị chèn ép gây ra Hội chứng ống cổ tay.', subj: 'Anatomy' },
+
+    { q: 'Xương nào sau đây thuộc nhóm xương dẹt?', options: ['Xương đùi', 'Xương cổ tay', 'Xương bả vai', 'Xương đốt sống'], ans: 2, exp: 'Xương bả vai (xương vai) là xương dẹt, mỏng, nằm ở phía sau trên của lồng ngực.', subj: 'Anatomy' },
+
+    { q: 'Động mạch vành trái (LCA) xuất phát từ đâu?', options: ['Xoang động mạch chủ trái', 'Thất trái', 'Động mạch phổi', 'Xoang tĩnh mạch vành'], ans: 0, exp: 'Động mạch vành trái xuất phát từ xoang động mạch chủ ngay phía trên lá van động mạch chủ trái.', subj: 'Anatomy' },
+
+
+    // === PHYSIOLOGY (10 Questions) ===
+
+    { q: 'Chức năng chính của hồng cầu là gì?', options: ['Bảo vệ cơ thể', 'Đông máu', 'Vận chuyển O2 và CO2', 'Tạo kháng thể'], ans: 2, exp: 'Hồng cầu chứa hemoglobin giúp vận chuyển oxy từ phổi đến mô và mang CO2 ngược lại.', subj: 'Physiology' },
+
+    { q: 'Hormone nào do tế bào beta tuyến tụy tiết ra giúp hạ đường huyết?', options: ['Glucagon', 'Insulin', 'Adrenaline', 'Cortisol'], ans: 1, exp: 'Insulin kích thích tế bào hấp thu glucose từ máu, chuyển hóa thành glycogen dự trữ làm hạ đường huyết.', subj: 'Physiology' },
+
+    { q: 'Nhóm máu nào là nhóm máu chuyên cho (Universal Donor)?', options: ['Nhóm máu A', 'Nhóm máu B', 'Nhóm máu AB', 'Nhóm máu O'], ans: 3, exp: 'Nhóm máu O không có kháng nguyên A và B trên bề mặt hồng cầu, tránh phản ứng ngưng kết khi truyền cho nhóm máu khác.', subj: 'Physiology' },
+
+    { q: 'Áp suất keo của máu chủ yếu do chất nào quyết định?', options: ['Albumin', 'Globulin', 'Fibrinogen', 'Natri Clorua'], ans: 0, exp: 'Albumin chiếm tỷ lệ lớn nhất trong protein huyết tương và là yếu tố chính tạo ra áp suất keo để giữ nước trong lòng mạch.', subj: 'Physiology' },
+
+    { q: 'Chất dẫn truyền thần kinh chính tại synap thần kinh - cơ là?', options: ['Noradrenaline', 'Acetylcholine', 'Dopamine', 'Serotonin'], ans: 1, exp: 'Acetylcholine (ACh) được giải phóng từ cúc tận cùng thần kinh vận động để kích hoạt receptor thụ cảm cơ vân.', subj: 'Physiology' },
+
+    { q: 'Chu kỳ tim bình thường kéo dài bao nhiêu giây ở tần số tim 75 lần/phút?', options: ['0.5 giây', '0.6 giây', '0.8 giây', '1.0 giây'], ans: 2, exp: 'Một chu kỳ tim tiêu chuẩn kéo dài 0.8s, gồm tâm nhĩ thu (0.1s), tâm thất thu (0.3s) và tâm trương toàn bộ (0.4s).', subj: 'Physiology' },
+
+    { q: 'Hormone nào kích thích tủy xương tăng cường sản sinh hồng cầu?', options: ['Erythropoietin (EPO)', 'Thrombopoietin', 'Aldosterone', 'Thyroxine'], ans: 0, exp: 'Erythropoietin được sản xuất chủ yếu ở thận khi có tình trạng thiếu oxy mô, kích thích tủy xương tạo hồng cầu.', subj: 'Physiology' },
+
+    { q: 'Bộ phận nào của Nephron chịu trách nhiệm chính cho việc tái hấp thu glucose?', options: ['Cầu thận', 'Ống lượn gần', 'Quai Henle', 'Ống lượn xa'], ans: 1, exp: 'Ống lượn gần tái hấp thu hoàn toàn (100%) lượng glucose được lọc qua cầu thận nhờ chất vận chuyển tích cực SGLT2 (ở điều kiện sinh lý bình thường).', subj: 'Physiology' },
+
+    { q: 'Khí phế thũng làm giảm chủ yếu chỉ số nào trong hô hấp tế bào?', options: ['Tần số thở', 'Thể tích khí lưu thông', 'Diện tích bề mặt khuếch tán khí', 'Áp suất phế nang'], ans: 2, exp: 'Khí phế thũng phá hủy vách các phế nang, làm mất các mao mạch phổi và giảm nghiêm trọng diện tích bề mặt trao đổi khí.', subj: 'Physiology' },
+
+    { q: 'Chất diện hoạt (Surfactant) ở phế nang được bài tiết bởi tế bào nào?', options: ['Tế bào phế nang tuýp I', 'Tế bào phế nang tuýp II', 'Đại thực bào phế nang', 'Tế bào biểu mô phế quản'], ans: 1, exp: 'Tế bào phế nang tuýp II tổng hợp và bài tiết surfactant giúp giảm sức căng bề mặt phế nang, ngăn xẹp phổi khi thở ra.', subj: 'Physiology' },
+
+
+    // === PATHOLOGY (10 Questions) ===
+
+    { q: 'Vị trí đau điển hình ban đầu của Viêm ruột thừa cấp?', options: ['Thượng vị hoặc quanh rốn', 'Hố chậu phải', 'Hạ sườn phải', 'Hố chậu trái'], ans: 0, exp: 'Cơn đau ruột thừa thường khởi phát âm ỉ ở thượng vị hoặc quanh rốn, sau đó vài giờ mới khu trú rõ rệt ở hố chậu phải.', subj: 'Pathology' },
+
+    { q: 'Tác nhân vi sinh vật phổ biến nhất gây loét dạ dày - tá tràng là?', options: ['Escherichia coli', 'Staphylococcus aureus', 'Helicobacter pylori', 'Salmonella'], ans: 2, exp: 'Vi khuẩn HP tiết men urease hủy hoại lớp chất nhầy bảo vệ niêm mạc dạ dày, là nguyên nhân hàng đầu gây viêm loét.', subj: 'Pathology' },
+
+    { q: 'Biến đổi tế bào biểu mô tuyến thực quản sang biểu mô lát tầng hoặc ngược lại do kích thích mạn tính gọi là gì?', options: ['Dị sản', 'Nghịch sản', 'Phì đại', 'Teo đét'], ans: 0, exp: 'Dị sản (Metaplasia) là sự biến đổi thích nghi từ một loại tế bào biểu mô biệt hóa này sang một loại biểu mô biệt hóa khác.', subj: 'Pathology' },
+
+    { q: 'Đặc điểm tế bào học đặc trưng nhất của phản ứng viêm cấp tính là gì?', options: ['Sự hiện diện của Lympho bào', 'Sự thâm nhiễm chủ yếu của Bạch cầu trung tính', 'Sự xuất hiện của Tương bào', 'Xơ hóa tổ chức liên kết'], ans: 1, exp: 'Bạch cầu đa nhân trung tính (Neutrophils) là dòng tế bào phản ứng đầu tiên và chiếm ưu thế trong các tổn thương viêm cấp.', subj: 'Pathology' },
+
+    { q: 'Đặc điểm nào dưới đây phân biệt rõ nhất giữa u lành và u ác tính?', options: ['Kích thước của khối u', 'Tốc độ tăng trưởng', 'Khả năng xâm lấn và di căn', 'Mức độ hoại tử trung tâm'], ans: 2, exp: 'Xâm lấn mô xung quanh và di căn xa là hai tiêu chuẩn vàng tuyệt đối khẳng định một khối u là ác tính.', subj: 'Pathology' },
+
+    { q: 'Tổn thương cơ bản trong bệnh lý xơ vữa động mạch bắt đầu từ lớp nào?', options: ['Lớp nội mạc', 'Lớp áo giữa', 'Lớp áo ngoài', 'Lớp cơ trơn'], ans: 0, exp: 'Tổn thương khởi đầu bằng sự rối loạn chức năng tế bào nội mạc, cho phép LDL-cholesterol thấm qua và bị oxy hóa.', subj: 'Pathology' },
+
+    { q: 'Tiêu chuẩn vàng về cận lâm sàng để chẩn đoán Hội chứng thận hư là?', options: ['Protein niệu 24 giờ > 3.5g', 'Albumin máu < 30g/L', 'Cholesterol máu tăng cao', 'Phù toàn thân'], ans: 0, exp: 'Protein niệu vượt ngưỡng 3.5g/24h/1.73m2 da là tiêu chuẩn tiên quyết xác định Hội chứng thận hư.', subj: 'Pathology' },
+
+    { q: 'Hiện tượng "gan hóa đỏ" và "gan hóa xám" là đặc trưng của bệnh lý nào?', options: ['Lao phổi', 'Viêm phổi thùy', 'Phù phổi cấp', 'Xơ gan tim'], ans: 1, exp: 'Viêm phổi thùy do phế cầu trải qua các giai đoạn: Sung huyết, gan hóa đỏ (phế nang đầy hồng cầu, tơ huyết) và gan hóa xám.', subj: 'Pathology' },
+
+    { q: 'Nguyên nhân hàng đầu gây xơ gan tại Việt Nam hiện nay là?', options: ['Virus viêm gan B và C', 'Nhiễm độc hóa chất', 'Ứ mật kéo dài', 'Suy dinh dưỡng'], ans: 0, exp: 'Viêm gan virus B (HBV) và C (HCV) mạn tính cùng với lạm dụng rượu bia là những nguyên nhân phổ biến nhất gây xơ gan tại Việt Nam.', subj: 'Pathology' },
+
+    { q: 'Sự thiếu hụt yếu tố đông máu số VIII gây ra bệnh lý di truyền nào?', options: ['Hemophilia B', 'Hemophilia A', 'Hội chứng Von Willebrand', 'Bệnh Thalassemia'], ans: 1, exp: 'Hemophilia A là bệnh lý rối loạn đông máu di truyền liên kết nhiễm sắc thể X do thiếu hụt yếu tố VIII.', subj: 'Pathology' },
+
+
+    // === PHARMACOLOGY (10 Questions) ===
+
+    { q: 'Thuốc giải độc đặc hiệu khi ngộ độc Paracetamol liều cao là?', options: ['Naloxone', 'Flumazenil', 'N-acetylcysteine (NAC)', 'Atropine'], ans: 2, exp: 'NAC cung cấp nhóm sulfhydryl (-SH) giúp phục hồi nồng độ glutathione ở gan nhằm trung hòa chất độc NAPQI.', subj: 'Pharmacology' },
+
+    { q: 'Tác dụng phụ ho khan do dùng thuốc ức chế men chuyển (ACEi) liên quan chất nào?', options: ['Histamine', 'Bradykinin', 'Angiotensin II', 'Prostaglandin'], ans: 1, exp: 'Men chuyển phân hủy bradykinin. Khi ức chế men này, bradykinin tích tụ ở phổi gây phản xạ ho khan dai dẳng.', subj: 'Pharmacology' },
+
+    { q: 'Thuốc kháng sinh nào sau đây thuộc nhóm Aminoglycoside?', options: ['Amikacin', 'Clarithromycin', 'Ciprofloxacin', 'Ceftriaxone'], ans: 0, exp: 'Amikacin, Gentamicin, Tobramycin là các kháng sinh nhóm Aminoglycoside chuyên trị vi khuẩn Gram âm hiếu khí.', subj: 'Pharmacology' },
+
+    { q: 'Cơ chế tác dụng chống kết tập tiểu cầu của Aspirin liều thấp (81-100mg) là gì?', options: ['Ức chế receptor ADP', 'Ức chế glycoprotein IIb/IIIa', 'Ức chế không thuận nghịch COX-1', 'Kích hoạt Plasminogen'], ans: 2, exp: 'Aspirin liều thấp acylate hóa không thuận nghịch enzyme COX-1 của tiểu cầu, ngăn cản tổng hợp Thromboxane A2.', subj: 'Pharmacology' },
+
+    { q: 'Thuốc kháng histamine H2 nào hay được dùng điều trị loét dạ dày - tá tràng?', options: ['Omeprazole', 'Cimetidine', 'Lansoprazole', 'Sucralfate'], ans: 1, exp: 'Cimetidine, Ranitidine, Famotidine cạnh tranh với histamine tại receptor H2 ở tế bào thành dạ dày làm giảm bài tiết acid dịch vị.', subj: 'Pharmacology' },
+
+    { q: 'Thuốc nào sau đây thuộc nhóm lợi tiểu quai (tác dụng mạnh)?', options: ['Spironolactone', 'Furosemide', 'Hydrochlorothiazide', 'Acetazolamide'], ans: 1, exp: 'Furosemide ức chế hệ đồng vận chuyển Na+/K+/2Cl- ở nhánh lên dày quai Henle, có tác dụng lợi tiểu mạnh và nhanh.', subj: 'Pharmacology' },
+
+    { q: 'Thuốc hạ áp nhóm chẹn kênh canxi phân nhóm dihydropyridine (DHP) là?', options: ['Amlodipine', 'Verapamil', 'Diltiazem', 'Propranolol'], ans: 0, exp: 'Amlodipine, Nifedipine là chẹn kênh canxi nhóm DHP tác dụng ưu thế trên cơ trơn mạch máu gây giãn mạch hạ áp.', subj: 'Pharmacology' },
+
+    { q: 'Cơ chế diệt khuẩn của phân nhóm kháng sinh Beta-lactam là gì?', options: ['Ức chế tổng hợp protein', 'Ức chế nhân đôi ADN', 'Ức chế tổng hợp vách tế bào', 'Gây rò rỉ màng tế bào'], ans: 2, exp: 'Beta-lactam gắn vào PBP (Penicillin-Binding Proteins), ức chế tạo lưới peptidoglycan khiến vách tế bào vi khuẩn không tổng hợp được.', subj: 'Pharmacology' },
+
+    { q: 'Để cắt cơn hen phế quản cấp tính trên lâm sàng, thuốc nào ưu tiên số 1?', options: ['Salmeterol (LABA)', 'Salbutamol (SABA)', 'Fluticasone (ICS)', 'Ipratropium'], ans: 1, exp: 'Salbutamol là chất cường beta-2 adrenergic tác dụng ngắn (SABA), gây giãn cơ trơn phế quản nhanh chóng chỉ sau vài phút.', subj: 'Pharmacology' },
+
+    { q: 'Thuốc chống đông đường uống thế hệ mới (NOAC) ức chế trực tiếp yếu tố Xa là?', options: ['Rivaroxaban', 'Dabigatran', 'Warfarin', 'Heparin'], ans: 0, exp: 'Rivaroxaban, Apixaban là các thuốc chống đông đường uống trực tiếp (DOAC) tác động chọn lọc lên yếu tố Xa.', subj: 'Pharmacology' },
+
+
+    // === CLINICAL (10 Questions) ===
+
+    { q: 'CK-MB bắt đầu tăng trong máu sau nhồi máu cơ tim cấp khoảng bao lâu?', options: ['1–2 giờ', '3–12 giờ', '24–48 giờ', '72 giờ'], ans: 1, exp: 'CK-MB tăng sau 3-12h, đạt đỉnh ở 24h và trở về bình thường sau 48-72h kể từ lúc đau ngực.', subj: 'Clinical' },
+
+    { q: 'Đặc điểm đau ngực điển hình của Cơn đau thắt ngực ổn định là gì?', options: ['Đau nhói như dao đâm khi hít sâu', 'Đau đè ép sau xương ức xuất hiện khi gắng sức', 'Đau kéo dài liên tục trên 24 giờ', 'Đau tăng lên khi ấn vào thành ngực'], ans: 1, exp: 'Cơn đau thắt ngực ổn định điển hình xuất hiện khi gắng sức hoặc stress, giảm khi nghỉ ngơi hoặc dùng Nitroglycerin dưới lưỡi.', subj: 'Clinical' },
+
+    { q: 'Mức đường huyết đói (sau nhịn ăn ít nhất 8h) tối thiểu để chẩn đoán Đái tháo đường là?', options: ['5.6 mmol/L', '6.5 mmol/L', '7.0 mmol/L', '11.1 mmol/L'], ans: 2, exp: 'Đường huyết đói >= 7.0 mmol/L (126 mg/dL) đo ít nhất 2 lần ở các ngày khác nhau là tiêu chuẩn chẩn đoán ĐTĐ.', subj: 'Clinical' },
+
+    { q: 'Dấu hiệu Kehr (đau chói lan lên vai trái) gợi ý tổn thương vỡ cơ quan nào?', options: ['Vỡ lách', 'Vỡ gan', 'Thủng dạ dày', 'Tắc ruột'], ans: 0, exp: 'Máu tụ dưới hoành trái do vỡ lách kích thích thần kinh hoành, gây đau quy chiếu lên vùng vai trái (Dấu hiệu Kehr).', subj: 'Clinical' },
+
+    { q: 'Tam chứng Beck trong cấp cứu tràn dịch màng tim gây ép tim cấp gồm?', options: ['Đau ngực, ho khan, khó thở', 'Tĩnh mạch cổ nổi, tiếng tim mờ xa xăm, huyết áp tụt', 'Sốt cao, rét run, lách to', 'Phù chân, cổ trướng, gan to'], ans: 1, exp: 'Tam chứng Beck phản ánh tình trạng cung lượng tim suy giảm cấp tính do tim bị chèn ép không thể đổ đầy máu.', subj: 'Clinical' },
+
+    { q: 'Xét nghiệm chẩn đoán hình ảnh tiêu chuẩn vàng để xác định Nhồi máu phổi là?', options: ['X-quang ngực thẳng', 'Siêu âm tim qua thành ngực', 'Chụp cắt lớp vi tính động mạch phổi (CTPA)', 'Điện tâm đồ 12 chuyển đạo'], ans: 2, exp: 'CTPA cho phép quan sát trực tiếp huyết khối gây tắc nghẽn trong lòng các nhánh động mạch phổi.', subj: 'Clinical' },
+
+    { q: 'Triệu chứng run vẫy tay (Asterixis) thường gặp trong bệnh cảnh lâm sàng nào?', options: ['Hội chứng suy tủy', 'Bệnh não gan (suy gan nặng)', 'Nhồi máu não diện rộng', 'Suy tuyến giáp'], ans: 1, exp: 'Asterixis xảy ra do tích tụ amoniac (NH3) và các chất độc thần kinh trong suy gan mạn tính gây rối loạn vận động.', subj: 'Clinical' },
+
+    { q: 'Thang điểm Glasgow (GCS) tối thiểu đánh giá hôn mê là bao nhiêu?', options: ['0 điểm', '3 điểm', '1 điểm', '5 điểm'], ans: 1, exp: 'Thang điểm GCS đánh giá 3 đáp ứng: Mắt (E1-4), Lời nói (V1-5), Vận động (M1-6). Thấp nhất là 3 điểm, cao nhất là 15 điểm.', subj: 'Clinical' },
+
+    { q: 'Triệu chứng thần kinh khu trú khởi phát đột ngột tự hồi phục hoàn toàn dưới 24h là?', options: ['Đột quỵ chảy máu não', 'Đột quỵ nhồi máu não', 'Cơn thiếu máu não cục bộ thoáng qua (TIA)', 'Xuất huyết dưới nhện'], ans: 2, exp: 'TIA đặc trưng bởi sự suy giảm thần kinh tạm thời do thiếu máu cục bộ khu trú mà không để lại tổn thương nhồi máu vĩnh viễn trên MRI/CT.', subj: 'Clinical' },
+
+    { q: 'Biến chứng tim mạch cấp tính nguy hiểm nhất của tăng kali máu (>6.5 mmol/L) là?', options: ['Rung thất và ngưng tuần hoàn', 'Ngoại tâm thu nhĩ', 'Block nhánh phải hoàn toàn', 'Cơn nhịp nhanh trên thất'], ans: 0, exp: 'Tăng Kali máu làm thay đổi điện thế màng tế bào cơ tim, dễ dẫn đến xoắn đỉnh, rung thất và ngừng tim ở tư thế tâm trương.', subj: 'Clinical' },
+
+
+    // === OSCE (20 Questions - Clinical skills & OSCE procedures) ===
+
+    { q: 'Trong cấp cứu ngừng tuần hoàn (CPR) cơ bản, tỷ lệ ép tim/thổi ngạt ở người lớn là?', options: ['15 : 2', '30 : 2', '30 : 1', '15 : 1'], ans: 1, exp: 'Theo khuyến cáo AHA, tỷ lệ ép tim và thổi ngạt chuẩn cho người lớn là 30 lần ép tim xen kẽ 2 lần thổi ngạt.', subj: 'OSCE' },
+
+    { q: 'Tần số ép tim ngoài lồng ngực chuẩn trong hồi sức tim phổi (CPR) là bao nhiêu?', options: ['60 - 80 lần/phút', '80 - 100 lần/phút', '100 - 120 lần/phút', '120 - 140 lần/phút'], ans: 2, exp: 'Cần duy trì tốc độ ép tim từ 100 đến 120 lần/phút để đảm bảo tưới máu não và vành tối ưu.', subj: 'OSCE' },
+
+    { q: 'Quy trình rửa tay thường quy của Bộ Y tế gồm mấy bước?', options: ['6 bước', '5 bước', '7 bước', '8 bước'], ans: 0, exp: 'Quy trình rửa tay thường quy tiêu chuẩn gồm 6 bước thực hiện trong tối thiểu 30 giây.', subj: 'OSCE' },
+
+    { q: 'Khi đo huyết áp bằng huyết áp kế cơ, tốc độ xả van áp lực túi hơi chuẩn là bao nhiêu?', options: ['1-2 mmHg/giây', '2-3 mmHg/giây', '5-10 mmHg/giây', 'Xả càng nhanh càng tốt'], ans: 1, exp: 'Xả chậm với tốc độ 2-3 mmHg mỗi giây giúp xác định chính xác tiếng đập Korotkoff thứ I (huyết áp tâm thu) và thứ V (huyết áp tâm trương).', subj: 'OSCE' },
+
+    { q: 'Khi khám dấu hiệu "Cổ cứng", tư thế của bệnh nhân và kỹ thuật viên thế nào?', options: ['Bệnh nhân nằm ngửa, người khám nâng nhẹ đầu bệnh nhân gập vào ngực', 'Bệnh nhân nằm nghiêng, người khám ấn cằm bệnh nhân', 'Bệnh nhân ngồi thẳng, người khám xoay đầu bệnh nhân sang hai bên', 'Bệnh nhân nằm sấp, người khám đẩy vai'], ans: 0, exp: 'Bệnh nhân nằm ngửa thẳng chân. Người khám đặt tay sau chẩm nâng nhẹ đầu gập vào ngực; dấu hiệu dương tính khi cằm không chạm được ức và cơ gáy co cứng kháng cự.', subj: 'OSCE' },
+
+    { q: 'Để đánh giá đúng phản xạ ánh sáng của đồng tử, kỹ thuật chiếu đèn pin như thế nào?', options: ['Chiếu trực diện từ trên trán xuống', 'Chiếu thẳng từ trước mắt vào đồng tử', 'Chiếu từ phía ngoài thái dương quét dần vào trong đồng tử', 'Chiếu từ dưới cằm lên'], ans: 2, exp: 'Chiếu đèn từ phía ngoài thái dương quét vào giúp tránh kích thích võng mạc đột ngột từ trước mặt và đánh giá chính xác phản xạ co đồng tử.', subj: 'OSCE' },
+
+    { q: 'Trong kỹ thuật đặt thông tiểu nam, tư thế dương vật lúc bắt đầu luồn ống thông nên là?', options: ['Nằm xuôi dọc theo đùi', 'Hướng thẳng vuông góc 90 độ so với thành bụng', 'Nghiêng sang một bên 45 độ', 'Gập sát vào thành bụng'], ans: 1, exp: 'Dựng dương vật thẳng đứng 90 độ giúp làm thẳng nếp gấp niệu đạo màng trước khi đưa ống thông vào dễ dàng hơn.', subj: 'OSCE' },
+
+    { q: 'Quy tắc vô khuẩn quan trọng nhất khi mặc áo mổ vô khuẩn là?', options: ['Chỉ được chạm vào mặt trong của áo khi mặc', 'Tay phải luồn qua ống tay áo trước', 'Nhờ người phụ mổ buộc dây áo từ phía trước', 'Cúi thấp người khi mặc áo'], ans: 0, exp: 'Mặt ngoài áo là vùng vô khuẩn tuyệt đối. Do đó khi tự mặc, phẫu thuật viên chỉ được phép chạm tay vào mặt trong của áo.', subj: 'OSCE' },
+
+    { q: 'Khi chọc dò dịch màng phổi, hướng kim chọc luôn sát với vị trí nào để tránh tai biến?', options: ['Bờ dưới xương sườn trên', 'Bờ trên xương sườn dưới của khoang liên sườn tương ứng', 'Ngay chính giữa khoang liên sườn', 'Sát cột sống lưng'], ans: 1, exp: 'Bó mạch thần kinh liên sườn chạy dọc sát bờ dưới xương sườn trên. Chọc sát bờ trên xương sườn dưới giúp tránh làm tổn thương mạch máu này.', subj: 'OSCE' },
+
+    { q: 'Vị trí nghe tim chuẩn để đánh giá tiếng thổi của hẹp van động mạch chủ là?', options: ['Khoang liên sườn V đường trung đòn trái', 'Khoang liên sườn II cạnh ức trái', 'Khoang liên sườn II cạnh ức phải', 'Khoang liên sườn IV cạnh ức trái'], ans: 2, exp: 'Ổ van động mạch chủ nằm ở khoang liên sườn II cạnh bờ phải xương ức (ổ liên sườn II phải).', subj: 'OSCE' },
+
+    { q: 'Dấu hiệu Babinski dương tính được biểu hiện bằng vận động nào của các ngón chân?', options: ['Tất cả các ngón chân cụp lại', 'Ngón cái duỗi ngửa, các ngón khác xòe ra như nan quạt', 'Ngón cái cụp xuống, các ngón khác duỗi ra', 'Bàn chân tự động xoay trong'], ans: 1, exp: 'Babinski dương tính chỉ ra tổn thương bó tháp (đường vận động trung ương), biểu hiện bằng ngón cái cụp ngược lên và xòe các ngón khác.', subj: 'OSCE' },
+
+    { q: 'Khi tiến hành đặt nội khí quản, vị trí đặt lưỡi đèn soi thanh quản MacIntosh (lưỡi cong) là?', options: ['Dưới nắp thanh môn', 'Trong rãnh nắp thanh môn (vallecula)', 'Gốc lưỡi', 'Sát dây thanh âm'], ans: 1, exp: 'Lưỡi cong MacIntosh được đặt vào rãnh nắp thanh môn để gián tiếp nâng nắp thanh môn lên bộc lộ đường thở.', subj: 'OSCE' },
+
+    { q: 'Thao tác đầu tiên cần thực hiện ngay khi tiếp cận hiện trường có nạn nhân bất tỉnh là?', options: ['Bắt mạch cảnh', 'Đánh giá độ an toàn của hiện trường', 'Thổi ngạt cho nạn nhân', 'Gọi xe cấp cứu 115'], ans: 1, exp: 'An toàn hiện trường là nguyên tắc cốt lõi trước khi tiếp cận nạn nhân để tránh người cứu hộ gặp tai nạn nguy hiểm tiếp theo.', subj: 'OSCE' },
+
+    { q: 'Khi khám cổ trướng, nghiệm pháp gõ đục vùng thấp được thực hiện như thế nào?', options: ['Gõ từ rốn ra xung quanh ở tư thế nằm ngửa rồi chuyển bệnh nhân nằm nghiêng gõ lại', 'Gõ dọc xương ức', 'Chỉ gõ vùng hông ở tư thế đứng', 'Ấn mạnh vùng thượng vị'], ans: 0, exp: 'Khi nằm nghiêng dịch tự do sẽ dồn xuống vùng thấp, vùng đục di chuyển theo tư thế giúp phân biệt tràn dịch tự do màng bụng.', subj: 'OSCE' },
+
+    { q: 'Trong kỹ thuật tiêm tĩnh mạch, góc đâm kim so với mặt da thường là bao nhiêu độ?', options: ['10 - 15 độ', '15 - 30 độ', '45 độ', '90 độ'], ans: 1, exp: 'Góc 15 - 30 độ giúp kim dễ dàng tiếp cận lòng mạch mà không đâm xuyên qua thành sau tĩnh mạch.', subj: 'OSCE' },
+
+    { q: 'Tư thế nằm chuẩn của bệnh nhân khi tiến hành chọc dò dịch não tủy là?', options: ['Nằm ngửa đầu cao', 'Nằm nghiêng, lưng cong tròn tối đa, hai đầu gối sát bụng', 'Nằm sấp phẳng', 'Nằm nghiêng thẳng lưng'], ans: 1, exp: 'Tư thế tôm cong giúp các khoảng liên đốt sống thắt lưng giãn rộng tối đa, tạo điều kiện đưa kim chọc dò vào dễ dàng.', subj: 'OSCE' },
+
+    { q: 'Thứ tự đúng khi thực hiện khám bụng trên lâm sàng là gì?', options: ['Nhìn, Sờ, Gõ, Nghe', 'Nhìn, Nghe, Gõ, Sờ', 'Sờ, Gõ, Nhìn, Nghe', 'Nhìn, Gõ, Sờ, Nghe'], options: ['Nhìn, Sờ, Gõ, Nghe', 'Nhìn, Nghe, Gõ, Sờ', 'Sờ, Gõ, Nhìn, Nghe', 'Gõ, Nghe, Sờ, Nhìn'], ans: 1, exp: 'Trong khám bụng, bước Nghe phải được thực hiện trước Gõ và Sờ để tránh kích thích làm thay đổi nhu động ruột sinh lý.', subj: 'OSCE' },
+
+    { q: 'Khi chuẩn bị phẫu trường, hướng sát khuẩn da chuẩn cho người bệnh là?', options: ['Từ ngoài vào trong tâm vết mổ', 'Từ trong tâm vết mổ lan rộng ra phía ngoài theo hình xoắn ốc', 'Sát khuẩn dọc từ trên xuống dưới', 'Chỉ cần bôi dung dịch ngẫu nhiên'], ans: 1, exp: 'Sát khuẩn từ trong ra ngoài ngăn ngừa đưa vi khuẩn từ vùng da bẩn xung quanh ngược vào vùng rạch mổ vô khuẩn.', subj: 'OSCE' },
+
+    { q: 'Trong quy trình khám giác mạc, kích thích dây thần kinh nào để đánh giá phản xạ giác mạc?', options: ['Dây thần kinh II (Thị giác)', 'Dây thần kinh V (Sinh ba - nhánh mắt V1)', 'Dây thần kinh VII (Mặt)', 'Dây thần kinh III (Vận nhãn)'], ans: 1, exp: 'Nhánh mắt V1 của dây thần kinh V chịu trách nhiệm cảm giác giác mạc (đường hướng tâm), dây VII chịu trách nhiệm vận động nhắm mắt (đường ly tâm).', subj: 'OSCE' },
+
+    { q: 'Thử nghiệm sút bóng (Ballance test) hoặc nghiệm pháp chạm mũi chỉ ngón tay dùng để đánh giá cơ quan nào?', options: ['Tiền đình', 'Tiểu não', 'Vỏ não vận động', 'Hành tủy'], ans: 1, exp: 'Các nghiệm pháp chỉ ngón tay, gót chân chạm xương chày nhằm đánh giá hội chứng thất điều tiểu não.', subj: 'OSCE' }
+
+];
+
+
+/* =========================================
+
+   GAME STATE & LOGIC
+
+========================================= */
+
+
+let gameState = {
+
+    level: 1,
+
+    exp: 0,
+
+    hp: 100,
+
+    energy: 50,
+
+    coins: 0,
+
+    honey: 0,
+
+    unlockedZones: ['zone1'],
+
+    unlockedCards: [],
+
+    settings: { darkMode: false, sound: true }
+
+};
+
+
+let currentCombat = null; // Holds active battle state
+
+let audioCtx = null; // For simple synth sounds
+
+
+const TITLES = [
+
+    { max: 4, name: 'Sinh viên năm nhất' },
+
+    { max: 9, name: 'Tiền lâm sàng' },
+
+    { max: 19, name: 'Lâm sàng' },
+
+    { max: 29, name: 'Bác sĩ nội trú' },
+
+    { max: 999, name: 'Chuyên gia' }
+
+];
+
+
+function initGame() {
+
+    const saved = localStorage.getItem('beequest_save');
+
+    if (saved) {
+
+        gameState = JSON.parse(saved);
+
+        // Ensure properties exist for backward compatibility if we update game
+
+        if(!gameState.settings) gameState.settings = { darkMode: false, sound: true };
+
+    }
+
+   
+
+    applyTheme();
+
+    updateHeaderStats();
+
+    buildWorldMap();
+
+}
+
+
+function saveGame() {
+
+    localStorage.setItem('beequest_save', JSON.stringify(gameState));
+
+    updateHeaderStats();
+
+}
+
+
+function resetGame() {
+
+    if(confirm('Bạn có chắc muốn xóa toàn bộ quá trình học tập?')){
+
+        localStorage.removeItem('beequest_save');
+
+        location.reload();
+
+    }
+
+}
+
+
+function getTitle(lvl) {
+
+    return TITLES.find(t => lvl <= t.max).name;
+
+}
+
+
+function getMaxHp() { return 100 + (gameState.level - 1) * 10; }
+
+function getMaxEnergy() { return 50 + (gameState.level - 1) * 5; }
+
+function getExpRequired() { return gameState.level * 100; }
+
+
+function updateHeaderStats() {
+
+    document.getElementById('header-level').innerText = gameState.level;
+
+    document.getElementById('header-hp').innerText = `${gameState.hp}/${getMaxHp()}`;
+
+    document.getElementById('header-energy').innerText = `${gameState.energy}/${getMaxEnergy()}`;
+
+    document.getElementById('header-coins').innerText = gameState.coins;
+
+   
+
+    const expPercent = (gameState.exp / getExpRequired()) * 100;
+
+    document.getElementById('header-exp-bar').style.width = `${Math.min(expPercent, 100)}%`;
+
+   
+
+    // Update Home titles if on home
+
+    document.getElementById('home-title').innerText = getTitle(gameState.level);
+
+}
+
+
+// --- NAVIGATION ---
+
+function showScreen(screenId) {
+
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+
+    document.getElementById(`screen-${screenId}`).classList.add('active');
+
+   
+
+    if(screenId === 'profile') buildProfile();
+
+    if(screenId === 'collection') buildCollection();
+
+    if(screenId === 'map') buildWorldMap();
+
+}
+
+
+// --- UI BUILDERS ---
+
+function buildWorldMap() {
+
+    const container = document.getElementById('map-container');
+
+    container.innerHTML = '';
+
+   
+
+    ZONES.forEach(zone => {
+
+        const isUnlocked = gameState.level >= zone.levelReq || gameState.unlockedZones.includes(zone.id);
+
+        if (isUnlocked && !gameState.unlockedZones.includes(zone.id)) {
+
+            gameState.unlockedZones.push(zone.id);
+
+            saveGame();
+
+        }
+
+
+        const btn = document.createElement('div');
+
+        btn.className = `p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col items-center text-center gap-2
+
+            ${isUnlocked ? `bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-medblue-500`
+
+                         : `bg-gray-100 dark:bg-gray-800/50 border-gray-300 dark:border-gray-700 opacity-60 cursor-not-allowed`}`;
+
+       
+
+        btn.innerHTML = `
+
+            <div class="w-14 h-14 rounded-full flex items-center justify-center text-white bg-gradient-to-br ${isUnlocked ? zone.color : 'from-gray-400 to-gray-500'} text-2xl shadow-inner">
+
+                <i class="fa-solid ${zone.icon}"></i>
+
+            </div>
+
+            <h3 class="font-bold text-gray-800 dark:text-gray-100">${zone.name}</h3>
+
+            ${!isUnlocked ? `<div class="text-xs text-red-500 font-bold"><i class="fa-solid fa-lock"></i> Mở khóa Cấp ${zone.levelReq}</div>` : ''}
+
+        `;
+
+       
+
+        if (isUnlocked) {
+
+            btn.onclick = () => openZone(zone);
+
+        }
+
+        container.appendChild(btn);
+
+    });
+
+}
+
+
+function openZone(zone) {
+
+    document.getElementById('zone-title').innerText = zone.name;
+
+    const container = document.getElementById('monster-list');
+
+    container.innerHTML = '';
+
+   
+
+    const zoneMonsters = MONSTERS.filter(m => m.zoneId === zone.id);
+
+    zoneMonsters.forEach(m => {
+
+        const div = document.createElement('div');
+
+        div.className = `flex justify-between items-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 ${m.isBoss ? 'border-red-300 dark:border-red-900 bg-red-50 dark:bg-red-900/10' : ''}`;
+
+       
+
+        div.innerHTML = `
+
+            <div class="flex items-center gap-4">
+
+                <div class="text-4xl w-12 text-center drop-shadow-sm">${m.icon}</div>
+
+                <div>
+
+                    <h4 class="font-bold text-gray-800 dark:text-white flex items-center gap-2">
+
+                        ${m.name} ${m.isBoss ? '<span class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full uppercase">Boss</span>' : ''}
+
+                    </h4>
+
+                    <div class="text-xs text-gray-500">Máu: ${m.hp} | EXP: ${m.exp}</div>
+
+                </div>
+
+            </div>
+
+            <button onclick="startCombat('${m.id}')" class="btn-game bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 p-3 rounded-xl hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
+
+                <i class="fa-solid fa-khanda"></i>
+
+            </button>
+
+        `;
+
+        container.appendChild(div);
+
+    });
+
+   
+
+    showScreen('zone');
+
+}
+
+
+function buildProfile() {
+
+    document.getElementById('profile-level').innerText = gameState.level;
+
+    document.getElementById('profile-title').innerText = getTitle(gameState.level);
+
+    document.getElementById('profile-stat-hp').innerText = getMaxHp();
+
+    document.getElementById('profile-stat-energy').innerText = getMaxEnergy();
+
+    document.getElementById('profile-exp').innerText = gameState.exp;
+
+    document.getElementById('profile-maxexp').innerText = getExpRequired();
+
+    document.getElementById('profile-exp-bar').style.width = `${Math.min((gameState.exp / getExpRequired()) * 100, 100)}%`;
+
+
+    const skillsContainer = document.getElementById('profile-skills');
+
+    skillsContainer.innerHTML = '';
+
+   
+
+    SKILLS.forEach(s => {
+
+        const unlocked = gameState.level >= s.level;
+
+        skillsContainer.innerHTML += `
+
+            <div class="flex items-center gap-3 p-3 rounded-lg ${unlocked ? 'bg-blue-50 dark:bg-gray-700 border border-blue-100 dark:border-gray-600' : 'bg-gray-100 dark:bg-gray-800 opacity-50'}">
+
+                <div class="w-10 h-10 rounded-full flex items-center justify-center ${unlocked ? 'bg-medblue-500 text-white' : 'bg-gray-300 text-gray-500'}">
+
+                    <i class="fa-solid ${s.icon}"></i>
+
+                </div>
+
+                <div class="flex-grow">
+
+                    <div class="font-bold text-sm ${unlocked ? 'text-gray-800 dark:text-white' : 'text-gray-500'}">${s.name}</div>
+
+                    <div class="text-[10px] text-gray-500">${unlocked ? (s.type === 'heal' ? 'Hồi phục HP' : 'Gây sát thương') : `Mở khóa cấp ${s.level}`}</div>
+
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+}
+
+
+function buildCollection() {
+
+    const list = document.getElementById('collection-list');
+
+    list.innerHTML = '';
+
+   
+
+    if(gameState.unlockedCards.length === 0) {
+
+        list.innerHTML = `<div class="col-span-2 text-center text-gray-500 py-10">Chưa thu thập được kiến thức nào. Hãy đánh bại quái vật!</div>`;
+
+        return;
+
+    }
+
+
+    gameState.unlockedCards.forEach(cardId => {
+
+        const card = KNOWLEDGE_CARDS[cardId];
+
+        if(!card) return;
+
+       
+
+        list.innerHTML += `
+
+            <div class="bg-white dark:bg-gray-800 border-2 border-honey-200 dark:border-honey-900 rounded-xl p-4 shadow-sm relative overflow-hidden">
+
+                <div class="absolute -right-4 -top-4 text-honey-100 dark:text-gray-700 opacity-30 text-6xl"><i class="fa-solid fa-book"></i></div>
+
+                <div class="relative z-10">
+
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-honey-600 dark:text-honey-400 bg-honey-100 dark:bg-honey-900/30 px-2 py-0.5 rounded-full mb-2 inline-block">${card.type}</span>
+
+                    <h3 class="font-bold text-lg text-gray-800 dark:text-gray-100 mb-2 leading-tight">${card.name}</h3>
+
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">${card.content}</p>
+
+                    <div class="bg-blue-50 dark:bg-blue-900/20 p-2 rounded text-xs border border-blue-100 dark:border-blue-900/30">
+
+                        <span class="font-bold text-blue-700 dark:text-blue-400"><i class="fa-solid fa-lightbulb"></i> Mẹo:</span> ${card.trick}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+}
+
+
+// --- COMBAT LOGIC ---
+
+
+function startCombat(monsterId) {
+
+    const m = MONSTERS.find(x => x.id === monsterId);
+
+   
+
+    // Check Energy
+
+    if(gameState.energy < 5) {
+
+        alert("Bạn không đủ năng lượng! Chờ một chút hoặc làm nhiệm vụ để hồi phục.");
+
+        return;
+
+    }
+
+    gameState.energy -= 5;
+
+    saveGame();
+
+
+    currentCombat = {
+
+        monster: m,
+
+        mMaxHp: m.hp,
+
+        mHp: m.hp,
+
+        qTotal: m.questionsToKill,
+
+        dmgPerCorrect: Math.ceil(m.hp / m.questionsToKill),
+
+        selectedSkill: SKILLS[0] // default
+
+    };
+
+
+    // Setup UI
+
+    document.getElementById('combat-enemy-name').innerText = m.name;
+
+    document.getElementById('combat-enemy').innerText = m.icon;
+
+    updateCombatHpBars();
+
+   
+
+    // Setup background based on zone
+
+    const zone = ZONES.find(z => z.id === m.zoneId);
+
+    const bgDiv = document.getElementById('combat-bg');
+
+    bgDiv.className = `relative rounded-2xl shadow-inner border-4 border-gray-200 dark:border-gray-700 overflow-hidden h-64 sm:h-80 flex items-end justify-between p-4 mb-4 bg-gradient-to-b ${zone.color}`;
+
+
+    showScreen('combat');
+
+    loadCombatTurn();
+
+}
+
+
+function updateCombatHpBars() {
+
+    const pPercent = Math.max(0, (gameState.hp / getMaxHp()) * 100);
+
+    const mPercent = Math.max(0, (currentCombat.mHp / currentCombat.mMaxHp) * 100);
+
+   
+
+    document.getElementById('combat-player-hp-bar').style.width = `${pPercent}%`;
+
+    document.getElementById('combat-enemy-hp-bar').style.width = `${mPercent}%`;
+
+    updateHeaderStats();
+
+}
+
+
+function loadCombatTurn() {
+
+    document.getElementById('question-container').style.display = 'flex';
+
+    document.getElementById('combat-result').classList.add('hidden');
+
+    document.getElementById('combat-result').classList.remove('flex');
+
+
+    // Load available skills
+
+    const skillDiv = document.getElementById('skills-container');
+
+    skillDiv.innerHTML = '';
+
+    SKILLS.forEach(s => {
+
+        if(gameState.level >= s.level) {
+
+            const isSelected = currentCombat.selectedSkill.id === s.id;
+
+            const btn = document.createElement('button');
+
+            btn.className = `px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-colors flex items-center gap-1 border
+
+                ${isSelected ? 'bg-honey-500 text-white border-honey-600 shadow-md' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600'}`;
+
+            btn.innerHTML = `<i class="fa-solid ${s.icon}"></i> ${s.name}`;
+
+            btn.onclick = () => {
+
+                currentCombat.selectedSkill = s;
+
+                loadCombatTurn(); // re-render selection
+
+            };
+
+            skillDiv.appendChild(btn);
+
+        }
+
+    });
+
+
+    // Fetch random question based on zone subject
+
+    const zoneInfo = ZONES.find(z => z.id === currentCombat.monster.zoneId);
+
+    let pool = QUESTION_BANK.filter(q => q.subj === zoneInfo.subject);
+
+    if(pool.length === 0) pool = QUESTION_BANK; // Fallback
+
+   
+
+    const q = pool[Math.floor(Math.random() * pool.length)];
+
+    currentCombat.currentQ = q;
+
+
+    document.getElementById('question-subject').innerText = `Môn: ${q.subj}`;
+
+    document.getElementById('question-text').innerText = q.q;
+
+   
+
+    const ansContainer = document.getElementById('answers-container');
+
+    ansContainer.innerHTML = '';
+
+   
+
+    q.options.forEach((opt, idx) => {
+
+        const btn = document.createElement('button');
+
+        btn.className = "btn-game text-left bg-blue-50 hover:bg-blue-100 dark:bg-gray-700 dark:hover:bg-gray-600 border border-blue-200 dark:border-gray-600 p-3 rounded-xl font-semibold text-gray-800 dark:text-gray-200 text-sm sm:text-base";
+
+        btn.innerHTML = `<span class="inline-block w-6 h-6 bg-white dark:bg-gray-800 rounded text-center leading-6 text-medblue-500 mr-2 shadow-sm font-bold">${String.fromCharCode(65+idx)}</span> ${opt}`;
+
+        btn.onclick = () => handleAnswer(idx);
+
+        ansContainer.appendChild(btn);
+
+    });
+
+}
+
+
+function createFloatingText(targetId, text, isHeal = false) {
+
+    const target = document.getElementById(targetId);
+
+    const rect = target.getBoundingClientRect();
+
+    const span = document.createElement('span');
+
+    span.className = isHeal ? 'heal-text' : 'damage-text';
+
+    span.innerText = text;
+
+    // Position near the target but randomly offset slightly
+
+    span.style.left = `${target.offsetLeft + (Math.random() * 20 - 10)}px`;
+
+    span.style.top = `${target.offsetTop - 20}px`;
+
+    target.parentNode.appendChild(span);
+
+    setTimeout(() => span.remove(), 1000);
+
+}
+
+
+function handleAnswer(idx) {
+
+    const q = currentCombat.currentQ;
+
+    const isCorrect = (idx === q.ans);
+
+    const playerEl = document.getElementById('combat-player');
+
+    const enemyEl = document.getElementById('combat-enemy');
+
+
+    document.getElementById('question-container').style.display = 'none';
+
+    const resultDiv = document.getElementById('combat-result');
+
+    resultDiv.classList.remove('hidden');
+
+    resultDiv.classList.add('flex');
+
+   
+
+    document.getElementById('result-explanation').innerText = q.exp;
+
+
+    if (isCorrect) {
+
+        playSound('correct');
+
+        document.getElementById('result-icon').innerText = '🎯';
+
+        document.getElementById('result-icon').className = 'text-5xl mb-2 text-green-500';
+
+        document.getElementById('result-title').innerText = 'Chính xác!';
+
+        document.getElementById('result-title').className = 'text-xl font-bold mb-2 text-green-600 dark:text-green-400';
+
+       
+
+        // Execute Skill
+
+        const skill = currentCombat.selectedSkill;
+
+       
+
+        if (skill.type === 'attack') {
+
+            playerEl.classList.add('animate-attack-right');
+
+            setTimeout(() => { playerEl.classList.remove('animate-attack-right'); }, 300);
+
+           
+
+            setTimeout(() => {
+
+                enemyEl.classList.add('animate-shake');
+
+                playSound('hit');
+
+                const dmg = Math.floor(currentCombat.dmgPerCorrect * skill.power);
+
+                createFloatingText('combat-enemy', `-${dmg}`);
+
+                currentCombat.mHp -= dmg;
+
+                updateCombatHpBars();
+
+                setTimeout(() => { enemyEl.classList.remove('animate-shake'); }, 400);
+
+            }, 150);
+
+        } else if (skill.type === 'heal') {
+
+            playerEl.classList.add('animate-bounce-slow');
+
+            playSound('heal');
+
+            const healAmt = Math.floor(getMaxHp() * skill.power);
+
+            createFloatingText('combat-player', `+${healAmt}`, true);
+
+            gameState.hp = Math.min(getMaxHp(), gameState.hp + healAmt);
+
+            updateCombatHpBars();
+
+            setTimeout(() => { playerEl.classList.remove('animate-bounce-slow'); }, 1000);
+
+        }
+
+       
+
+    } else {
+
+        playSound('wrong');
+
+        document.getElementById('result-icon').innerText = '❌';
+
+        document.getElementById('result-icon').className = 'text-5xl mb-2 text-red-500';
+
+        document.getElementById('result-title').innerText = 'Sai rồi!';
+
+        document.getElementById('result-title').className = 'text-xl font-bold mb-2 text-red-600 dark:text-red-400';
+
+       
+
+        // Enemy attacks
+
+        setTimeout(() => {
+
+            enemyEl.classList.add('animate-attack-left');
+
+            setTimeout(() => { enemyEl.classList.remove('animate-attack-left'); }, 300);
+
+           
+
+            setTimeout(() => {
+
+                playerEl.classList.add('animate-shake');
+
+                playSound('hit');
+
+                const dmg = Math.floor(getMaxHp() * 0.15); // 15% hp damage
+
+                createFloatingText('combat-player', `-${dmg}`);
+
+                gameState.hp -= dmg;
+
+                updateCombatHpBars();
+
+                setTimeout(() => { playerEl.classList.remove('animate-shake'); }, 400);
+
+            }, 150);
+
+        }, 500); // slight delay before enemy attacks
+
+    }
+
+}
+
+
+function nextCombatTurn() {
+
+    if (gameState.hp <= 0) {
+
+        // Lose
+
+        alert("Bạn đã kiệt sức! Hãy nghỉ ngơi và thử lại.");
+
+        gameState.hp = getMaxHp(); // revive
+
+        saveGame();
+
+        showScreen('zone');
+
+        return;
+
+    }
+
+
+    if (currentCombat.mHp <= 0) {
+
+        // Win
+
+        playSound('win');
+
+        const m = currentCombat.monster;
+
+        gameState.exp += m.exp;
+
+        gameState.coins += Math.floor(m.exp / 2);
+
+       
+
+        let rewardText = `Nhận ${m.exp} EXP và ${Math.floor(m.exp/2)} Xu.`;
+
+       
+
+        // Check drops
+
+        if(m.drops && m.drops.length > 0) {
+
+            m.drops.forEach(d => {
+
+                if(!gameState.unlockedCards.includes(d)) {
+
+                    gameState.unlockedCards.push(d);
+
+                    rewardText += `<br><span class="text-honey-500"> Mở khóa thẻ: ${KNOWLEDGE_CARDS[d].name}</span>`;
+
+                }
+
+            });
+
+        }
+
+       
+
+        checkLevelUp();
+
+        saveGame();
+
+       
+
+        // Show Victory Modal
+
+        document.getElementById('modal-icon').innerText = '🏆';
+
+        document.getElementById('modal-title').innerText = 'Chiến thắng!';
+
+        document.getElementById('modal-title').className = 'text-2xl font-black text-blue-500 mb-2';
+
+        document.getElementById('modal-desc').innerText = `Đã đánh bại ${m.name}`;
+
+        document.getElementById('modal-rewards').innerHTML = rewardText;
+
+        document.getElementById('modal-overlay').classList.remove('hidden');
+
+        document.getElementById('modal-overlay').classList.add('flex');
+
+       
+
+        // Custom close behavior for battle end
+
+        document.querySelector('#modal-overlay button').onclick = () => {
+
+            closeModal();
+
+            showScreen('zone'); // Return to map/zone
+
+            // Restore default modal action
+
+            document.querySelector('#modal-overlay button').onclick = closeModal;
+
+        };
+
+       
+
+        return;
+
+    }
+
+
+    loadCombatTurn();
+
+}
+
+
+function checkLevelUp() {
+
+    let leveledUp = false;
+
+    let oldTitle = getTitle(gameState.level);
+
+   
+
+    while(gameState.exp >= getExpRequired()) {
+
+        gameState.exp -= getExpRequired();
+
+        gameState.level++;
+
+        gameState.hp = getMaxHp();
+
+        gameState.energy = getMaxEnergy();
+
+        leveledUp = true;
+
+    }
+
+   
+
+    if(leveledUp) {
+
+        playSound('levelup');
+
+        let newTitle = getTitle(gameState.level);
+
+        let msg = `Máu tối đa tăng lên ${getMaxHp()}<br>Năng lượng tăng lên ${getMaxEnergy()}`;
+
+        if(oldTitle !== newTitle) {
+
+            msg += `<br><span class="text-medblue-500 font-bold mt-2 block">Danh hiệu mới: ${newTitle}</span>`;
+
+        }
+
+       
+
+        setTimeout(() => {
+
+            document.getElementById('modal-icon').innerText = '⭐';
+
+            document.getElementById('modal-title').innerText = `Lên Cấp ${gameState.level}!`;
+
+            document.getElementById('modal-title').className = 'text-2xl font-black text-honey-500 mb-2';
+
+            document.getElementById('modal-desc').innerText = 'Sức mạnh của bạn đã tăng lên!';
+
+            document.getElementById('modal-rewards').innerHTML = msg;
+
+            document.getElementById('modal-overlay').classList.remove('hidden');
+
+            document.getElementById('modal-overlay').classList.add('flex');
+
+        }, 500); // show slightly after battle win modal if both happen (battle win overwrites modal, so logic handles it)
+
+    }
+
+}
+
+
+function closeModal() {
+
+    document.getElementById('modal-overlay').classList.add('hidden');
+
+    document.getElementById('modal-overlay').classList.remove('flex');
+
+}
+
+
+// --- UTILS (THEME & AUDIO) ---
+
+
+function toggleDarkMode() {
+
+    gameState.settings.darkMode = !gameState.settings.darkMode;
+
+    applyTheme();
+
+    saveGame();
+
+}
+
+
+function applyTheme() {
+
+    if(gameState.settings.darkMode) {
+
+        document.documentElement.classList.add('dark');
+
+        document.getElementById('theme-icon').classList.replace('fa-moon', 'fa-sun');
+
+    } else {
+
+        document.documentElement.classList.remove('dark');
+
+        document.getElementById('theme-icon').classList.replace('fa-sun', 'fa-moon');
+
+    }
+
+}
+
+
+function toggleSound() {
+
+    gameState.settings.sound = !gameState.settings.sound;
+
+    const icon = document.getElementById('sound-icon');
+
+    if(gameState.settings.sound) {
+
+        icon.classList.replace('fa-volume-xmark', 'fa-volume-up');
+
+    } else {
+
+        icon.classList.replace('fa-volume-up', 'fa-volume-xmark');
+
+    }
+
+    saveGame();
+
+}
+
+
+// Very simple synth for retro SFX to avoid needing external audio files
+
+function playSound(type) {
+
+    if(!gameState.settings.sound) return;
+
+   
+
+    if(!audioCtx) {
+
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    }
+
+   
+
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+
+   
+
+    const osc = audioCtx.createOscillator();
+
+    const gainNode = audioCtx.createGain();
+
+   
+
+    osc.connect(gainNode);
+
+    gainNode.connect(audioCtx.destination);
+
+   
+
+    const now = audioCtx.currentTime;
+
+   
+
+    switch(type) {
+
+        case 'correct':
+
+            osc.type = 'sine';
+
+            osc.frequency.setValueAtTime(440, now);
+
+            osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
+
+            gainNode.gain.setValueAtTime(0.1, now);
+
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+
+            osc.start(now);
+
+            osc.stop(now + 0.2);
+
+            break;
+
+        case 'wrong':
+
+            osc.type = 'sawtooth';
+
+            osc.frequency.setValueAtTime(150, now);
+
+            osc.frequency.linearRampToValueAtTime(100, now + 0.2);
+
+            gainNode.gain.setValueAtTime(0.1, now);
+
+            gainNode.gain.linearRampToValueAtTime(0.01, now + 0.2);
+
+            osc.start(now);
+
+            osc.stop(now + 0.2);
+
+            break;
+
+        case 'hit':
+
+            osc.type = 'square';
+
+            osc.frequency.setValueAtTime(100, now);
+
+            osc.frequency.exponentialRampToValueAtTime(10, now + 0.1);
+
+            gainNode.gain.setValueAtTime(0.1, now);
+
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+
+            osc.start(now);
+
+            osc.stop(now + 0.1);
+
+            break;
+
+        case 'win':
+
+            osc.type = 'triangle';
+
+            osc.frequency.setValueAtTime(440, now);
+
+            osc.frequency.setValueAtTime(554, now + 0.1);
+
+            osc.frequency.setValueAtTime(659, now + 0.2);
+
+            osc.frequency.setValueAtTime(880, now + 0.3);
+
+            gainNode.gain.setValueAtTime(0.1, now);
+
+            gainNode.gain.linearRampToValueAtTime(0.01, now + 0.6);
+
+            osc.start(now);
+
+            osc.stop(now + 0.6);
+
+            break;
+
+        case 'heal':
+
+            osc.type = 'sine';
+
+            osc.frequency.setValueAtTime(300, now);
+
+            osc.frequency.linearRampToValueAtTime(600, now + 0.3);
+
+            gainNode.gain.setValueAtTime(0.1, now);
+
+            gainNode.gain.linearRampToValueAtTime(0.01, now + 0.3);
+
+            osc.start(now);
+
+            osc.stop(now + 0.3);
+
+            break;
+
+    }
+
+}
+
+
+// Auto Energy Recovery (1 point every 30 seconds)
+
+setInterval(() => {
+
+    if(gameState.energy < getMaxEnergy()) {
+
+        gameState.energy++;
+
+        updateHeaderStats();
+
+        // saveGame(); // Don't save every tick to save IO
+
+    }
+
+}, 30000);
+
+
+// Init
+
+window.onload = initGame;
+
+
+</script>
+
+</body>
+
+</html>
+
+
+```
+
         .dark .glass-panel { background: rgba(31, 41, 55, 0.85); border-color: rgba(75, 85, 99, 0.4); }
         
         /* Custom Scrollbar */
