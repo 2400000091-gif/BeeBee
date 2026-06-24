@@ -3,33 +3,45 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BeeBee – Học từng chút, tiến bộ mỗi ngày</title>
-    <!-- Tailwind CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BeeQuest: Medical Adventure 🐝</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Nunito', 'sans-serif'],
-                        display: ['Quicksand', 'sans-serif'],
-                    },
                     colors: {
-                        bee: {
-                            yellow: '#F9D034',
-                            dark: '#E4A834',
-                            brown: '#4A2E11',
-                            light: '#FFFDF9',
-                            bg: '#FDFBF7',
-                            border: '#F3EAD3'
+                        honey: { 100: '#fef3c7', 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' },
+                        medblue: { 100: '#dbeafe', 500: '#3b82f6', 700: '#1d4ed8', 900: '#1e3a8a' }
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 3s infinite',
+                        'attack-right': 'attackRight 0.3s ease-in-out',
+                        'attack-left': 'attackLeft 0.3s ease-in-out',
+                        'shake': 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both',
+                        'heal': 'healUp 1s ease-out forwards',
+                    },
+                    keyframes: {
+                        attackRight: {
+                            '0%, 100%': { transform: 'translateX(0)' },
+                            '50%': { transform: 'translateX(50px) scale(1.1)' },
+                        },
+                        attackLeft: {
+                            '0%, 100%': { transform: 'translateX(0)' },
+                            '50%': { transform: 'translateX(-50px) scale(1.1)' },
+                        },
+                        shake: {
+                            '10%, 90%': { transform: 'translate3d(-2px, 0, 0)' },
+                            '20%, 80%': { transform: 'translate3d(4px, 0, 0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-6px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(6px, 0, 0)' }
+                        },
+                        healUp: {
+                            '0%': { opacity: 0, transform: 'translateY(0)' },
+                            '50%': { opacity: 1, transform: 'translateY(-20px)' },
+                            '100%': { opacity: 0, transform: 'translateY(-40px)' },
                         }
                     }
                 }
@@ -37,1066 +49,913 @@
         }
     </script>
     <style>
-        body { background-color: theme('colors.bee.bg'); color: theme('colors.bee.brown'); }
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #F5EFE6; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #E4A834; border-radius: 4px; }
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+        body { font-family: 'Nunito', sans-serif; user-select: none; }
+        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); }
+        .dark .glass-panel { background: rgba(31, 41, 55, 0.85); border-color: rgba(75, 85, 99, 0.4); }
         
-        /* Animations */
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-12px) rotate(4deg); }
-        }
-        @keyframes wing {
-            0%, 100% { transform: scaleY(1) rotate(0deg); }
-            50% { transform: scaleY(0.4) rotate(15deg); }
-        }
-        .animate-float { animation: float 3s ease-in-out infinite; }
-        .wing-l { transform-origin: bottom right; animation: wing 0.1s infinite; }
-        .wing-r { transform-origin: bottom left; animation: wing 0.1s infinite; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #fbbf24; border-radius: 10px; }
         
-        .nav-active {
-            background-color: theme('colors.bee.yellow') !important;
-            color: theme('colors.bee.brown') !important;
-            font-weight: 800;
-            box-shadow: 0 4px 10px rgba(249, 208, 52, 0.3);
-        }
+        .screen { display: none; animation: fadeIn 0.3s ease; }
+        .screen.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .btn-game { transition: all 0.2s; }
+        .btn-game:active { transform: scale(0.95); }
+        
+        .damage-text { position: absolute; font-weight: bold; font-size: 24px; color: #ef4444; text-shadow: 1px 1px 0 #fff; pointer-events: none; animation: healUp 1s ease-out forwards; z-index: 50; }
+        .heal-text { position: absolute; font-weight: bold; font-size: 24px; color: #22c55e; text-shadow: 1px 1px 0 #fff; pointer-events: none; animation: healUp 1s ease-out forwards; z-index: 50; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col md:flex-row antialiased selection:bg-bee-yellow selection:text-bee-brown">
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen flex flex-col transition-colors duration-300">
 
-    <!-- DESKTOP SIDEBAR -->
-    <aside class="hidden md:flex flex-col w-72 bg-white border-r-2 border-bee-border p-6 shrink-0 justify-between sticky top-0 h-screen shadow-[4px_0_24px_rgba(243,234,211,0.4)]">
-        <div>
-            <!-- Logo -->
-            <div class="flex items-center gap-4 mb-10 cursor-pointer group" onclick="app.switchTab('home')">
-                <div class="relative w-14 h-14 flex items-center justify-center bg-bee-yellow rounded-2xl shadow-lg transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
-                    <span class="text-3xl">🐝</span>
-                </div>
-                <div>
-                    <h1 class="text-3xl font-display font-bold text-bee-dark">BeeBee</h1>
-                    <p class="text-[11px] text-stone-500 font-bold uppercase tracking-wider">Học từng chút một</p>
-                </div>
+    <!-- Top Navigation / Stats Bar -->
+    <header class="glass-panel border-b border-honey-200 shadow-sm sticky top-0 z-40">
+        <div class="max-w-4xl mx-auto px-4 py-2 flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="showScreen('home')">
+                <div class="text-3xl relative">🐝<span class="absolute -bottom-1 -right-1 text-xs bg-red-500 text-white rounded-full px-1 border-2 border-white dark:border-gray-800" id="header-level">1</span></div>
+                <div class="hidden sm:block font-bold text-lg text-honey-600 dark:text-honey-400">BeeQuest</div>
             </div>
-
-            <!-- Nav -->
-            <nav class="space-y-2.5">
-                <button onclick="app.switchTab('home')" id="nav-home" class="nav-item w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl font-bold text-stone-600 hover:bg-amber-50 hover:text-bee-brown transition-all text-left">
-                    <i class="fa-solid fa-house text-lg w-6 text-center"></i> Trang chủ
-                </button>
-                <button onclick="app.switchTab('tasks')" id="nav-tasks" class="nav-item w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl font-bold text-stone-600 hover:bg-amber-50 hover:text-bee-brown transition-all text-left">
-                    <i class="fa-solid fa-list-check text-lg w-6 text-center"></i> Việc cần làm
-                </button>
-                <button onclick="app.switchTab('pomodoro')" id="nav-pomodoro" class="nav-item w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl font-bold text-stone-600 hover:bg-amber-50 hover:text-bee-brown transition-all text-left relative">
-                    <i class="fa-solid fa-stopwatch text-lg w-6 text-center"></i> Pomodoro
-                    <span class="absolute right-3 top-1/2 -translate-y-1/2 w-2 h-2 bg-red-400 rounded-full animate-ping hidden" id="pomo-active-dot"></span>
-                </button>
-                <button onclick="app.switchTab('goals')" id="nav-goals" class="nav-item w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl font-bold text-stone-600 hover:bg-amber-50 hover:text-bee-brown transition-all text-left">
-                    <i class="fa-solid fa-bullseye text-lg w-6 text-center"></i> Mục tiêu SMART
-                </button>
-                <button onclick="app.switchTab('hive')" id="nav-hive" class="nav-item w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl font-bold text-stone-600 hover:bg-amber-50 hover:text-bee-brown transition-all text-left">
-                    <i class="fa-brands fa-hive text-lg w-6 text-center"></i> Tổ ong & Cây
-                </button>
-                <button onclick="app.switchTab('why')" id="nav-why" class="nav-item w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl font-bold text-stone-600 hover:bg-amber-50 hover:text-bee-brown transition-all text-left">
-                    <i class="fa-solid fa-magnifying-glass-chart text-lg w-6 text-center"></i> Tại sao trì hoãn?
-                </button>
-                <button onclick="app.switchTab('stats')" id="nav-stats" class="nav-item w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl font-bold text-stone-600 hover:bg-amber-50 hover:text-bee-brown transition-all text-left">
-                    <i class="fa-solid fa-chart-pie text-lg w-6 text-center"></i> Thống kê & Nhật ký
-                </button>
-            </nav>
-        </div>
-
-        <!-- Status Footer -->
-        <div class="bg-amber-50 p-5 rounded-3xl border-2 border-amber-100 text-center relative overflow-hidden">
-            <div class="absolute -right-4 -top-4 text-4xl opacity-10">🍯</div>
-            <div class="flex justify-center items-center gap-2 mb-2">
-                <i class="fa-solid fa-jar-honey text-amber-500 text-xl"></i>
-                <span class="font-black text-2xl text-amber-600 drop-shadow-sm" id="status-honey">0</span>
-            </div>
-            <div class="text-xs font-bold text-amber-800 uppercase tracking-widest mb-1">Giọt mật</div>
-            <div class="text-sm font-extrabold text-bee-brown bg-white py-1.5 rounded-xl border border-amber-200 mt-2" id="status-rank">Ong Mới Vào Nghề</div>
             
-            <!-- Hiển thị tài khoản cá nhân hóa -->
-            <div class="text-[10px] font-bold text-amber-600 mt-3 truncate bg-amber-100/50 py-1 px-2 rounded-lg" id="user-id-display">Đang đồng bộ...</div>
-        </div>
-    </aside>
-
-    <!-- MOBILE HEADER -->
-    <header class="md:hidden bg-white border-b-2 border-bee-border p-4 flex justify-between items-center sticky top-0 z-50">
-        <div class="flex items-center gap-3" onclick="app.switchTab('home')">
-            <div class="w-10 h-10 bg-bee-yellow rounded-xl flex items-center justify-center text-2xl">🐝</div>
-            <h1 class="text-2xl font-display font-bold text-bee-dark">BeeBee</h1>
-        </div>
-        <div class="flex items-center gap-3">
-            <div class="flex items-center gap-1.5 font-black text-amber-600 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200">
-                <i class="fa-solid fa-jar-honey"></i> <span id="mobile-honey">0</span>
+            <div class="flex gap-4 items-center text-sm font-semibold">
+                <div class="flex flex-col items-center text-red-500">
+                    <span><i class="fa-solid fa-heart"></i> <span id="header-hp">100/100</span></span>
+                </div>
+                <div class="flex flex-col items-center text-blue-500">
+                    <span><i class="fa-solid fa-bolt"></i> <span id="header-energy">50/50</span></span>
+                </div>
+                <div class="flex flex-col items-center text-honey-500">
+                    <span><i class="fa-solid fa-coins"></i> <span id="header-coins">0</span></span>
+                </div>
+                <button onclick="toggleDarkMode()" class="text-gray-500 hover:text-honey-500 p-2"><i class="fa-solid fa-moon" id="theme-icon"></i></button>
+                <button onclick="toggleSound()" class="text-gray-500 hover:text-honey-500 p-2"><i class="fa-solid fa-volume-up" id="sound-icon"></i></button>
             </div>
-            <button onclick="app.toggleMobileMenu()" class="text-bee-brown text-2xl p-1">
-                <i class="fa-solid fa-bars" id="mobile-menu-icon"></i>
-            </button>
+        </div>
+        <!-- EXP Bar -->
+        <div class="w-full h-1.5 bg-gray-200 dark:bg-gray-700">
+            <div id="header-exp-bar" class="h-full bg-honey-400 transition-all duration-500" style="width: 0%"></div>
         </div>
     </header>
 
-    <!-- MOBILE MENU -->
-    <div id="mobile-menu" class="hidden md:hidden fixed top-[74px] left-0 w-full h-[calc(100vh-74px)] bg-white/95 backdrop-blur-md z-40 p-4 overflow-y-auto space-y-2 border-b border-bee-border">
-        <button onclick="app.switchTab('home'); app.toggleMobileMenu()" class="w-full flex items-center gap-4 px-5 py-4 rounded-2xl font-bold text-stone-600 bg-amber-50/50 hover:bg-bee-yellow hover:text-bee-brown text-left text-lg"><i class="fa-solid fa-house w-8 text-center"></i> Trang chủ</button>
-        <button onclick="app.switchTab('tasks'); app.toggleMobileMenu()" class="w-full flex items-center gap-4 px-5 py-4 rounded-2xl font-bold text-stone-600 bg-amber-50/50 hover:bg-bee-yellow hover:text-bee-brown text-left text-lg"><i class="fa-solid fa-list-check w-8 text-center"></i> Việc cần làm</button>
-        <button onclick="app.switchTab('pomodoro'); app.toggleMobileMenu()" class="w-full flex items-center gap-4 px-5 py-4 rounded-2xl font-bold text-stone-600 bg-amber-50/50 hover:bg-bee-yellow hover:text-bee-brown text-left text-lg"><i class="fa-solid fa-stopwatch w-8 text-center"></i> Pomodoro</button>
-        <button onclick="app.switchTab('goals'); app.toggleMobileMenu()" class="w-full flex items-center gap-4 px-5 py-4 rounded-2xl font-bold text-stone-600 bg-amber-50/50 hover:bg-bee-yellow hover:text-bee-brown text-left text-lg"><i class="fa-solid fa-bullseye w-8 text-center"></i> Mục tiêu SMART</button>
-        <button onclick="app.switchTab('hive'); app.toggleMobileMenu()" class="w-full flex items-center gap-4 px-5 py-4 rounded-2xl font-bold text-stone-600 bg-amber-50/50 hover:bg-bee-yellow hover:text-bee-brown text-left text-lg"><i class="fa-brands fa-hive w-8 text-center"></i> Tổ ong & Cây</button>
-        <button onclick="app.switchTab('why'); app.toggleMobileMenu()" class="w-full flex items-center gap-4 px-5 py-4 rounded-2xl font-bold text-stone-600 bg-amber-50/50 hover:bg-bee-yellow hover:text-bee-brown text-left text-lg"><i class="fa-solid fa-magnifying-glass-chart w-8 text-center"></i> Tại sao trì hoãn?</button>
-        <button onclick="app.switchTab('stats'); app.toggleMobileMenu()" class="w-full flex items-center gap-4 px-5 py-4 rounded-2xl font-bold text-stone-600 bg-amber-50/50 hover:bg-bee-yellow hover:text-bee-brown text-left text-lg"><i class="fa-solid fa-chart-pie w-8 text-center"></i> Thống kê & Nhật ký</button>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <main class="flex-1 p-4 md:p-8 lg:p-10 overflow-y-auto w-full max-w-6xl mx-auto">
-
-        <!-- ================= HOME TAB ================= -->
-        <section id="tab-home" class="tab-content space-y-8 animate-fade-in">
-            <!-- Hero Banner -->
-            <div class="bg-gradient-to-br from-amber-100 to-[#FFFDF9] border-2 border-amber-200 rounded-[2rem] p-6 md:p-10 relative overflow-hidden shadow-sm flex flex-col md:flex-row items-center gap-8">
-                <!-- Mascot Animated SVG -->
-                <div class="relative w-40 h-40 shrink-0 animate-float">
-                    <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-xl">
-                        <ellipse cx="80" cy="70" rx="25" ry="40" fill="#E2F4FF" stroke="#4A2E11" stroke-width="4" class="wing-l" />
-                        <ellipse cx="130" cy="70" rx="25" ry="40" fill="#E2F4FF" stroke="#4A2E11" stroke-width="4" class="wing-r" />
-                        <ellipse cx="105" cy="120" rx="60" ry="50" fill="#F9D034" stroke="#4A2E11" stroke-width="6"/>
-                        <path d="M85,75 C95,95 95,145 85,165" fill="none" stroke="#4A2E11" stroke-width="7" stroke-linecap="round"/>
-                        <path d="M115,75 C125,95 125,145 115,165" fill="none" stroke="#4A2E11" stroke-width="7" stroke-linecap="round"/>
-                        <circle cx="75" cy="115" r="9" fill="#FF8A8A" opacity="0.7"/>
-                        <circle cx="135" cy="115" r="9" fill="#FF8A8A" opacity="0.7"/>
-                        <circle cx="85" cy="105" r="7" fill="#4A2E11"/>
-                        <circle cx="125" cy="105" r="7" fill="#4A2E11"/>
-                        <circle cx="83" cy="102" r="2.5" fill="white"/>
-                        <circle cx="123" cy="102" r="2.5" fill="white"/>
-                        <path d="M100,120 Q105,130 110,120" fill="none" stroke="#4A2E11" stroke-width="5" stroke-linecap="round"/>
-                        <polygon points="165,120 185,115 185,125" fill="#4A2E11" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-                <div class="text-center md:text-left z-10 flex-1 space-y-4">
-                    <span id="hero-greeting" class="bg-white border-2 border-bee-yellow text-bee-brown font-black text-xs px-4 py-1.5 rounded-full uppercase tracking-widest shadow-sm">Chào mừng trở lại!</span>
-                    <h2 class="text-3xl md:text-4xl font-display font-black text-bee-brown leading-tight">BeeBee – Học từng chút, tiến bộ mỗi ngày.</h2>
-                    <p class="text-stone-600 font-bold text-lg" id="slogan-display">"BeeBee – Bee productive, Bee happy. 🐝"</p>
-                    <div class="pt-4 flex flex-wrap justify-center md:justify-start gap-3">
-                        <button onclick="app.switchTab('pomodoro')" class="bg-bee-brown hover:bg-stone-800 text-white font-bold px-6 py-3 rounded-2xl shadow-lg transition-transform hover:-translate-y-1">
-                            <i class="fa-solid fa-stopwatch mr-2"></i> Bắt đầu phiên học
-                        </button>
-                        <button onclick="app.rotateSlogan()" class="bg-white hover:bg-amber-50 text-bee-brown border-2 border-bee-border font-bold px-6 py-3 rounded-2xl transition-colors">
-                            <i class="fa-solid fa-rotate mr-2"></i> Đổi slogan
-                        </button>
-                    </div>
-                </div>
+    <!-- Main Content Area -->
+    <main class="flex-grow flex items-center justify-center p-4 relative overflow-hidden">
+        
+        <!-- HOME SCREEN -->
+        <div id="screen-home" class="screen active flex-col items-center justify-center w-full max-w-lg text-center gap-6">
+            <div class="relative w-40 h-40 flex items-center justify-center bg-gradient-to-br from-honey-100 to-honey-400 dark:from-gray-700 dark:to-gray-800 rounded-full shadow-lg border-4 border-white dark:border-gray-600 animate-bounce-slow">
+                <span class="text-7xl">🐝</span>
+                <div class="absolute -bottom-3 bg-medblue-500 text-white px-4 py-1 rounded-full text-sm font-bold shadow-md" id="home-title">Sinh viên năm nhất</div>
+            </div>
+            
+            <div>
+                <h1 class="text-3xl font-extrabold text-gray-800 dark:text-white mb-2">BeeDoc</h1>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">Hành trình trở thành Bác sĩ Huyền Thoại</p>
             </div>
 
-            <!-- Quick Stats -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-white border-2 border-bee-border p-5 rounded-3xl flex flex-col items-center justify-center gap-2 shadow-sm">
-                    <div class="w-12 h-12 bg-red-100 text-red-500 rounded-2xl flex items-center justify-center text-2xl"><i class="fa-solid fa-fire"></i></div>
-                    <div class="text-center">
-                        <div class="text-2xl font-black text-stone-800" id="dash-streak">0 ngày</div>
-                        <div class="text-[10px] font-bold text-stone-500 uppercase tracking-wider">Chuỗi liên tiếp</div>
-                    </div>
-                </div>
-                <div class="bg-white border-2 border-bee-border p-5 rounded-3xl flex flex-col items-center justify-center gap-2 shadow-sm">
-                    <div class="w-12 h-12 bg-orange-100 text-orange-500 rounded-2xl flex items-center justify-center text-2xl"><i class="fa-solid fa-hourglass-half"></i></div>
-                    <div class="text-center">
-                        <div class="text-2xl font-black text-stone-800" id="dash-sessions">0</div>
-                        <div class="text-[10px] font-bold text-stone-500 uppercase tracking-wider">Phiên Pomodoro</div>
-                    </div>
-                </div>
-                <div class="bg-white border-2 border-bee-border p-5 rounded-3xl flex flex-col items-center justify-center gap-2 shadow-sm">
-                    <div class="w-12 h-12 bg-green-100 text-green-500 rounded-2xl flex items-center justify-center text-2xl"><i class="fa-solid fa-check-double"></i></div>
-                    <div class="text-center">
-                        <div class="text-2xl font-black text-stone-800" id="dash-tasks">0 / 0</div>
-                        <div class="text-[10px] font-bold text-stone-500 uppercase tracking-wider">Nhiệm vụ hôm nay</div>
-                    </div>
-                </div>
-                <div class="bg-white border-2 border-bee-border p-5 rounded-3xl flex flex-col items-center justify-center gap-2 shadow-sm">
-                    <div class="w-12 h-12 bg-indigo-100 text-indigo-500 rounded-2xl flex items-center justify-center text-2xl"><i class="fa-solid fa-medal"></i></div>
-                    <div class="text-center">
-                        <div class="text-2xl font-black text-stone-800" id="dash-badges">0 / 8</div>
-                        <div class="text-[10px] font-bold text-stone-500 uppercase tracking-wider">Huy hiệu mở khóa</div>
-                    </div>
-                </div>
+            <div class="grid grid-cols-2 gap-4 w-full">
+                <button onclick="showScreen('map')" class="btn-game col-span-2 bg-gradient-to-r from-medblue-500 to-medblue-700 text-white py-4 rounded-xl font-bold shadow-md hover:shadow-lg text-lg flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-play"></i> Bắt đầu hành trình
+                </button>
+                <button onclick="showScreen('profile')" class="btn-game bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 py-3 rounded-xl font-bold text-gray-700 dark:text-gray-200 shadow-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-user-doctor text-medblue-500"></i> Hồ sơ
+                </button>
+                <button onclick="showScreen('collection')" class="btn-game bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 py-3 rounded-xl font-bold text-gray-700 dark:text-gray-200 shadow-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-book-medical text-honey-500"></i> Sổ tay
+                </button>
             </div>
-        </section>
+        </div>
 
-        <!-- ================= TASKS TAB ================= -->
-        <section id="tab-tasks" class="tab-content hidden space-y-6">
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600 text-2xl"><i class="fa-solid fa-list-check"></i></div>
-                <div>
-                    <h2 class="text-2xl font-black text-stone-800">Quản lý nhiệm vụ (To-do List)</h2>
-                    <p class="text-sm font-bold text-stone-500">Hoàn thành để nhận mật ong nâng cấp tổ! (+10 🍯/việc)</p>
-                </div>
+        <!-- WORLD MAP SCREEN -->
+        <div id="screen-map" class="screen flex-col w-full max-w-2xl h-full">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-medblue-700 dark:text-medblue-400"><i class="fa-solid fa-map-location-dot"></i> Bản Đồ Thế Giới</h2>
+                <button onclick="showScreen('home')" class="text-gray-500 hover:text-gray-800 dark:hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-
-            <!-- Task Form -->
-            <div class="bg-white border-2 border-bee-border rounded-3xl p-5 shadow-sm">
-                <form id="task-form" onsubmit="app.addTask(event)" class="flex flex-col md:flex-row gap-4">
-                    <input type="text" id="task-input" placeholder="Bạn cần làm việc gì hôm nay? (Ví dụ: Đọc 20 trang sách)" required class="flex-1 bg-stone-50 border-2 border-stone-200 rounded-2xl px-5 py-3.5 text-base font-bold focus:outline-none focus:border-bee-yellow focus:bg-white transition-colors">
-                    <div class="flex gap-3">
-                        <select id="task-priority" class="bg-stone-50 border-2 border-stone-200 rounded-2xl px-4 py-3.5 text-sm font-bold focus:outline-none focus:border-bee-yellow cursor-pointer">
-                            <option value="high">🔴 Ưu tiên Cao</option>
-                            <option value="medium" selected>🟠 Trung bình</option>
-                            <option value="low">🟢 Thấp</option>
-                        </select>
-                        <button type="submit" class="bg-bee-yellow hover:bg-bee-dark text-bee-brown font-black px-6 py-3.5 rounded-2xl transition-colors shrink-0 flex items-center gap-2">
-                            <i class="fa-solid fa-plus"></i> Thêm
-                        </button>
-                    </div>
-                </form>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto pb-10" id="map-container">
+                <!-- Zones rendered by JS -->
             </div>
+        </div>
 
-            <!-- Task List -->
-            <div class="bg-white border-2 border-bee-border rounded-3xl overflow-hidden shadow-sm">
-                <div class="p-5 border-b border-stone-100 bg-stone-50 flex justify-between items-center">
-                    <span class="font-black text-stone-700">Danh sách việc hôm nay</span>
-                    <span class="text-xs font-black bg-stone-200 text-stone-600 px-3 py-1 rounded-full" id="task-count-badge">0</span>
-                </div>
-                <div id="task-list" class="divide-y divide-stone-100 flex flex-col min-h-[200px]">
-                    <!-- Tasks injected by JS -->
-                </div>
+        <!-- ZONE DETAIL SCREEN -->
+        <div id="screen-zone" class="screen flex-col w-full max-w-xl h-full">
+            <div class="flex items-center gap-3 mb-6">
+                <button onclick="showScreen('map')" class="text-gray-500 hover:text-gray-800 dark:hover:text-white text-xl"><i class="fa-solid fa-arrow-left"></i></button>
+                <h2 class="text-2xl font-bold text-medblue-700 dark:text-medblue-400" id="zone-title">Khu vực</h2>
             </div>
-        </section>
-
-        <!-- ================= POMODORO TAB ================= -->
-        <section id="tab-pomodoro" class="tab-content hidden space-y-8">
-            <div class="text-center max-w-lg mx-auto">
-                <div class="inline-flex items-center justify-center w-16 h-16 bg-red-50 text-red-500 rounded-3xl text-3xl mb-4 rotate-12"><i class="fa-solid fa-stopwatch"></i></div>
-                <h2 class="text-3xl font-black text-stone-800">Đồng hồ Pomodoro</h2>
-                <p class="text-base font-bold text-stone-500 mt-2">Học tập trung không xao nhãng và nhận thưởng xứng đáng.</p>
+            <div class="bg-blue-50 dark:bg-gray-800 p-4 rounded-xl mb-6 text-sm text-gray-600 dark:text-gray-300 border border-blue-100 dark:border-gray-700">
+                <i class="fa-solid fa-circle-info text-blue-500"></i> Tiêu diệt quái vật để nhận EXP và thu thập kiến thức. Quái boss yêu cầu trả lời đúng nhiều câu liên tiếp.
             </div>
+            <div class="flex flex-col gap-3" id="monster-list">
+                <!-- Monsters rendered by JS -->
+            </div>
+        </div>
 
-            <!-- Timer Card -->
-            <div class="bg-white border-2 border-bee-border rounded-[2.5rem] p-8 md:p-12 shadow-xl max-w-xl mx-auto relative overflow-hidden">
-                <!-- Modes -->
-                <div class="flex justify-center gap-3 mb-8 relative z-10">
-                    <button onclick="app.setTimerMode('study')" id="mode-study" class="px-6 py-2.5 rounded-full font-black text-sm transition-all bg-red-100 text-red-700 border-2 border-red-200 shadow-sm">Học tập (25p)</button>
-                    <button onclick="app.setTimerMode('break')" id="mode-break" class="px-6 py-2.5 rounded-full font-black text-sm transition-all bg-stone-100 text-stone-500 border-2 border-transparent hover:bg-stone-200">Nghỉ ngơi (5p)</button>
-                </div>
-
-                <!-- Clock Display -->
-                <div class="relative w-64 h-64 mx-auto flex items-center justify-center mb-10">
-                    <svg class="absolute inset-0 w-full h-full -rotate-90">
-                        <circle cx="128" cy="128" r="120" fill="none" stroke="#F5EFE6" stroke-width="12"></circle>
-                        <circle id="timer-progress" cx="128" cy="128" r="120" fill="none" stroke="#F9D034" stroke-width="12" stroke-linecap="round" stroke-dasharray="753.9" stroke-dashoffset="0" class="transition-all duration-1000 ease-linear"></circle>
-                    </svg>
-                    <div class="text-center z-10">
-                        <span id="timer-display" class="text-6xl font-black text-stone-800 tabular-nums tracking-tighter">25:00</span>
-                        <div id="timer-status-text" class="text-sm font-black text-amber-600 mt-1 uppercase tracking-widest">Sẵn sàng</div>
-                    </div>
-                </div>
-
-                <!-- Controls -->
-                <div class="flex justify-center gap-4 relative z-10">
-                    <button id="btn-timer-start" onclick="app.toggleTimer()" class="w-40 bg-bee-brown hover:bg-stone-800 text-white font-black px-6 py-4 rounded-2xl shadow-lg transition-transform hover:-translate-y-1 text-lg flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-play"></i> Bắt đầu
-                    </button>
-                    <button onclick="app.resetTimer()" class="bg-stone-100 hover:bg-stone-200 text-stone-600 font-black px-6 py-4 rounded-2xl transition-colors border-2 border-stone-200">
-                        <i class="fa-solid fa-arrow-rotate-left"></i>
-                    </button>
-                </div>
+        <!-- COMBAT SCREEN -->
+        <div id="screen-combat" class="screen flex-col w-full max-w-3xl h-full justify-between">
+            <!-- Combat Arena -->
+            <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-inner border-4 border-gray-200 dark:border-gray-700 overflow-hidden h-64 sm:h-80 flex items-end justify-between p-4 mb-4 bg-cover bg-center" id="combat-bg">
+                <!-- Background Overlay -->
+                <div class="absolute inset-0 bg-black bg-opacity-20 z-0"></div>
                 
-                <!-- Rewards summary -->
-                <div class="mt-8 pt-6 border-t-2 border-stone-100 flex justify-center gap-12">
-                    <div class="text-center">
-                        <div class="text-xs font-bold text-stone-400 uppercase tracking-wider mb-1">Phiên hoàn thành</div>
-                        <div class="text-2xl font-black text-stone-800" id="pomo-count-display">0</div>
+                <!-- Player Side -->
+                <div class="relative z-10 flex flex-col items-center w-1/3">
+                    <div class="bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded mb-2 font-bold w-full text-center truncate">BeeDoc</div>
+                    <div class="w-full bg-gray-700 rounded-full h-2.5 mb-2 border border-white">
+                        <div id="combat-player-hp-bar" class="bg-red-500 h-2.5 rounded-full transition-all duration-300" style="width: 100%"></div>
                     </div>
-                    <div class="text-center">
-                        <div class="text-xs font-bold text-stone-400 uppercase tracking-wider mb-1">Thưởng mật</div>
-                        <div class="text-2xl font-black text-amber-600" id="pomo-honey-display">+0 🍯</div>
+                    <div class="text-7xl drop-shadow-lg" id="combat-player">🐝</div>
+                </div>
+
+                <!-- VS Badge -->
+                <div class="relative z-10 text-3xl font-black text-yellow-400 italic drop-shadow-md">VS</div>
+
+                <!-- Enemy Side -->
+                <div class="relative z-10 flex flex-col items-center w-1/3">
+                    <div class="bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded mb-2 font-bold w-full text-center truncate" id="combat-enemy-name">Monster</div>
+                    <div class="w-full bg-gray-700 rounded-full h-2.5 mb-2 border border-white">
+                        <div id="combat-enemy-hp-bar" class="bg-red-500 h-2.5 rounded-full transition-all duration-300" style="width: 100%"></div>
                     </div>
+                    <div class="text-7xl drop-shadow-lg" id="combat-enemy">🦠</div>
                 </div>
             </div>
-        </section>
 
-        <!-- ================= GOALS TAB ================= -->
-        <section id="tab-goals" class="tab-content hidden space-y-6">
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 text-2xl"><i class="fa-solid fa-bullseye"></i></div>
-                <div>
-                    <h2 class="text-2xl font-black text-stone-800">Mục tiêu SMART</h2>
-                    <p class="text-sm font-bold text-stone-500">Cụ thể - Đo lường được - Khả thi - Thực tế - Có thời hạn.</p>
-                </div>
-            </div>
-
-            <div class="bg-white border-2 border-bee-border rounded-3xl p-6 shadow-sm">
-                <form onsubmit="app.addGoal(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-bold text-stone-500 uppercase mb-2">Tên mục tiêu</label>
-                        <input type="text" id="goal-input" placeholder="VD: Đạt IELTS 7.0 trước tháng 12" required class="w-full bg-stone-50 border-2 border-stone-200 rounded-2xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-bee-yellow">
+            <!-- Question & Actions Area -->
+            <div class="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-md p-4 sm:p-6 border border-gray-100 dark:border-gray-700">
+                
+                <div id="question-container" class="flex-grow flex flex-col justify-center">
+                    <div class="flex justify-between text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">
+                        <span id="question-subject">Môn học</span>
+                        <span>Lượt của bạn</span>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-stone-500 uppercase mb-2">Phân loại</label>
-                        <select id="goal-type" class="w-full bg-stone-50 border-2 border-stone-200 rounded-2xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-bee-yellow">
-                            <option value="short">⚡ Ngắn hạn (Tuần/Tháng)</option>
-                            <option value="long">🏆 Dài hạn (Năm/Kỳ học)</option>
-                        </select>
-                    </div>
-                    <div class="flex items-end">
-                        <button type="submit" class="w-full bg-bee-yellow hover:bg-bee-dark text-bee-brown font-black px-4 py-3 rounded-2xl transition-colors">
-                            <i class="fa-solid fa-plus mr-1"></i> Tạo mục tiêu
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="goals-list">
-                <!-- Goals injected by JS -->
-            </div>
-        </section>
-
-        <!-- ================= HIVE & TREE TAB ================= -->
-        <section id="tab-hive" class="tab-content hidden space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- HIVE SYSTEM -->
-                <div class="bg-white border-2 border-bee-border rounded-[2rem] p-6 shadow-sm flex flex-col relative overflow-hidden">
-                    <div class="absolute -right-6 -top-6 text-8xl opacity-5"><i class="fa-brands fa-hive"></i></div>
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600 text-xl"><i class="fa-brands fa-hive"></i></div>
-                        <h3 class="text-xl font-black text-stone-800">Hệ thống Tổ ong</h3>
-                    </div>
-                    <p class="text-sm font-bold text-stone-500 mb-6">Dùng mật ong hoàn thành task để xây dựng đế chế!</p>
+                    <h3 class="text-lg sm:text-xl font-bold mb-4 text-gray-800 dark:text-gray-100" id="question-text">Đang tải câu hỏi...</h3>
                     
-                    <div class="flex-1 flex flex-col items-center justify-center py-6 bg-amber-50/50 rounded-2xl border border-amber-100 mb-6">
-                        <div class="text-7xl mb-3 transform hover:scale-110 transition-transform" id="hive-icon">🍯</div>
-                        <h4 class="text-xl font-black text-amber-800" id="hive-title">Tổ Ong Sơ Khai</h4>
-                        <div class="text-xs font-bold text-amber-600 mt-1" id="hive-level">Cấp độ 1</div>
-                    </div>
-
-                    <div class="border-t-2 border-stone-100 pt-5">
-                        <div class="flex justify-between items-center text-sm font-black text-stone-700 mb-3">
-                            <span>Phí nâng cấp:</span>
-                            <span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-lg"><span id="hive-cost">50</span> 🍯</span>
-                        </div>
-                        <button onclick="app.upgradeHive()" id="btn-upgrade-hive" class="w-full bg-bee-yellow hover:bg-bee-dark text-bee-brown font-black py-4 rounded-2xl transition-colors flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-arrow-up-right-dots"></i> Nâng cấp ngay
-                        </button>
-                    </div>
-                </div>
-
-                <!-- TREE OF KNOWLEDGE -->
-                <div class="bg-white border-2 border-bee-border rounded-[2rem] p-6 shadow-sm flex flex-col relative overflow-hidden">
-                    <div class="absolute -right-6 -top-6 text-8xl opacity-5"><i class="fa-solid fa-tree"></i></div>
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center text-green-600 text-xl"><i class="fa-solid fa-seedling"></i></div>
-                        <h3 class="text-xl font-black text-stone-800">Cây tri thức</h3>
-                    </div>
-                    <p class="text-sm font-bold text-stone-500 mb-6">Học Pomodoro để tưới nước cho cây trưởng thành.</p>
-                    
-                    <div class="flex-1 flex flex-col items-center justify-center py-6 bg-green-50/50 rounded-2xl border border-green-100 mb-6">
-                        <div class="text-7xl mb-4 transform hover:scale-110 transition-transform" id="tree-icon">🌱</div>
-                        <h4 class="text-lg font-black text-green-800" id="tree-title">Mầm non nhú lộc</h4>
-                        
-                        <div class="w-full max-w-[200px] bg-stone-200 h-3 rounded-full mt-4 overflow-hidden border border-stone-300">
-                            <div id="tree-progress" class="bg-green-500 h-full transition-all duration-1000 ease-out" style="width: 0%"></div>
-                        </div>
-                        <div class="text-[11px] font-bold text-stone-500 mt-2" id="tree-desc">Cần thêm 1 phiên Pomodoro</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- BADGES -->
-            <div class="bg-white border-2 border-bee-border rounded-[2rem] p-6 shadow-sm">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center text-red-500 text-xl"><i class="fa-solid fa-medal"></i></div>
-                    <h3 class="text-xl font-black text-stone-800">Bộ sưu tập Huy hiệu</h3>
-                </div>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="badges-grid">
-                    <!-- Badges injected by JS -->
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= 5 WHYS TAB ================= -->
-        <section id="tab-why" class="tab-content hidden space-y-6">
-            <div class="bg-white border-2 border-bee-border rounded-[2.5rem] p-6 md:p-10 shadow-sm max-w-3xl mx-auto text-center">
-                <div class="w-16 h-16 bg-blue-100 text-blue-500 rounded-3xl flex items-center justify-center text-3xl mx-auto mb-4"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
-                <h2 class="text-3xl font-black text-stone-800">Tại sao tôi trì hoãn?</h2>
-                <p class="text-base font-bold text-stone-500 mt-2 mb-8">Phương pháp "5 Why" giúp bạn tìm ra gốc rễ của sự lười biếng bằng cách tự vấn 5 lần liên tiếp.</p>
-
-                <!-- Wizard -->
-                <div id="why-wizard" class="bg-stone-50 border-2 border-stone-200 rounded-3xl p-6 md:p-8 text-left relative">
-                    <div class="text-xs font-black text-blue-600 uppercase tracking-widest mb-3" id="why-step">Câu hỏi 1 / 5</div>
-                    <h3 class="text-xl font-black text-stone-800 mb-6" id="why-question">Tại sao bạn lại đang trì hoãn việc học ngay lúc này?</h3>
-                    
-                    <textarea id="why-input" rows="3" placeholder="Nhập câu trả lời thành thật của bạn..." class="w-full bg-white border-2 border-stone-200 rounded-2xl p-4 text-sm font-bold focus:outline-none focus:border-blue-400 mb-4 resize-none"></textarea>
-                    
-                    <button onclick="app.nextWhyStep()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-black py-4 rounded-2xl transition-colors shadow-md">
-                        Tiếp tục <i class="fa-solid fa-arrow-right ml-2"></i>
-                    </button>
-                </div>
-
-                <!-- Result -->
-                <div id="why-result" class="hidden text-left">
-                    <div class="bg-green-50 border-2 border-green-200 rounded-3xl p-6 md:p-8">
-                        <h3 class="text-xl font-black text-green-800 mb-4"><i class="fa-solid fa-stethoscope mr-2"></i> Chẩn đoán từ BeeBee:</h3>
-                        <div id="why-answers-list" class="space-y-3 mb-6"></div>
-                        <div class="bg-white rounded-2xl p-5 border border-green-200 shadow-sm">
-                            <div class="text-sm font-black text-amber-600 mb-2"><i class="fa-solid fa-lightbulb"></i> Lời khuyên dành cho bạn:</div>
-                            <p class="text-sm font-bold text-stone-700 leading-relaxed" id="why-advice">Dù nguyên nhân là gì, bước đầu tiên luôn là khó nhất. Hãy dùng quy tắc 5 phút: Chỉ cần hứa với bản thân sẽ làm việc này đúng 5 phút thôi. Bắt đầu ngay nhé!</p>
-                        </div>
-                    </div>
-                    <div class="text-center mt-6">
-                        <button onclick="app.resetWhy()" class="text-sm font-black text-stone-500 hover:text-stone-800 underline">Khám phá một vấn đề khác</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= STATS & DIARY TAB ================= -->
-        <section id="tab-stats" class="tab-content hidden space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Diary -->
-                <div class="bg-white border-2 border-bee-border rounded-[2rem] p-6 shadow-sm lg:col-span-1">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 bg-pink-100 rounded-xl flex items-center justify-center text-pink-500 text-xl"><i class="fa-solid fa-face-smile"></i></div>
-                        <h3 class="text-xl font-black text-stone-800">Nhật ký cảm xúc</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-auto" id="answers-container">
+                        <!-- Buttons rendered by JS -->
                     </div>
                     
-                    <form onsubmit="app.addDiary(event)" class="space-y-5">
-                        <div>
-                            <label class="block text-xs font-bold text-stone-500 uppercase mb-2">Tâm trạng</label>
-                            <div class="flex justify-between gap-2">
-                                <button type="button" onclick="app.selectMood('happy', this)" class="mood-btn flex-1 py-3 text-2xl bg-amber-100 border-2 border-amber-400 rounded-xl transition-all">😀</button>
-                                <button type="button" onclick="app.selectMood('neutral', this)" class="mood-btn flex-1 py-3 text-2xl bg-stone-50 border-2 border-stone-200 rounded-xl hover:bg-stone-100 transition-all">😐</button>
-                                <button type="button" onclick="app.selectMood('tired', this)" class="mood-btn flex-1 py-3 text-2xl bg-stone-50 border-2 border-stone-200 rounded-xl hover:bg-stone-100 transition-all">🥱</button>
-                                <button type="button" onclick="app.selectMood('stressed', this)" class="mood-btn flex-1 py-3 text-2xl bg-stone-50 border-2 border-stone-200 rounded-xl hover:bg-stone-100 transition-all">🤯</button>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <label class="block text-xs font-bold text-stone-500 uppercase">Mức độ tập trung</label>
-                                <span class="text-xs font-black text-amber-600" id="focus-val">3/5</span>
-                            </div>
-                            <input type="range" id="diary-focus" min="1" max="5" value="3" oninput="document.getElementById('focus-val').innerText=this.value+'/5'" class="w-full accent-bee-yellow">
-                        </div>
-                        <div>
-                            <input type="text" id="diary-note" placeholder="Ghi chú ngắn gọn (tùy chọn)..." class="w-full bg-stone-50 border-2 border-stone-200 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-bee-yellow">
-                        </div>
-                        <button type="submit" class="w-full bg-stone-800 hover:bg-black text-white font-black py-3 rounded-xl transition-colors">Lưu nhật ký</button>
-                    </form>
-
-                    <div class="mt-8">
-                        <h4 class="text-xs font-bold text-stone-500 uppercase mb-3">Lịch sử gần đây</h4>
-                        <div id="diary-list" class="space-y-2 max-h-48 overflow-y-auto pr-2">
-                            <!-- Injected by JS -->
-                        </div>
+                    <!-- Action Skills -->
+                    <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 flex gap-2 overflow-x-auto pb-2" id="skills-container">
+                        <!-- Skills rendered by JS -->
                     </div>
                 </div>
 
-                <!-- Stats Chart -->
-                <div class="bg-white border-2 border-bee-border rounded-[2rem] p-6 shadow-sm lg:col-span-2 flex flex-col">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center text-teal-600 text-xl"><i class="fa-solid fa-chart-column"></i></div>
-                        <h3 class="text-xl font-black text-stone-800">Thống kê hoạt động</h3>
+                <!-- Explanation / Result Modal (Overlay within combat area) -->
+                <div id="combat-result" class="hidden flex-col justify-center items-center text-center py-4">
+                    <div id="result-icon" class="text-5xl mb-2">✅</div>
+                    <h3 id="result-title" class="text-xl font-bold mb-2">Chính xác!</h3>
+                    <div class="bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 p-3 rounded-lg text-sm w-full mb-4 text-left border border-blue-200 dark:border-blue-800" id="result-explanation">
+                        Giải thích...
                     </div>
+                    <button onclick="nextCombatTurn()" id="btn-next-turn" class="btn-game w-full bg-medblue-500 text-white py-3 rounded-xl font-bold shadow-md">Tiếp tục tấn công</button>
+                </div>
+            </div>
+        </div>
 
-                    <!-- CSS Bar Chart -->
-                    <div class="flex-1 bg-stone-50 border border-stone-200 rounded-2xl p-5 flex flex-col justify-end min-h-[250px]">
-                        <div class="flex justify-between items-end h-48 gap-2 pb-2 border-b-2 border-stone-200 px-2" id="chart-container">
-                            <!-- Columns injected by JS -->
-                        </div>
+        <!-- PROFILE SCREEN -->
+        <div id="screen-profile" class="screen flex-col w-full max-w-lg h-full">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold"><i class="fa-solid fa-user-doctor text-medblue-500"></i> Hồ Sơ Bác Sĩ</h2>
+                <button onclick="showScreen('home')" class="text-gray-500 hover:text-gray-800 dark:hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mb-4 flex items-center gap-4">
+                <div class="text-6xl">🐝</div>
+                <div class="flex-grow">
+                    <h3 class="text-xl font-bold" id="profile-name">BeeDoc</h3>
+                    <div class="text-honey-600 dark:text-honey-400 font-semibold text-sm mb-2" id="profile-title">Sinh viên năm nhất</div>
+                    <div class="flex justify-between text-xs text-gray-500 mb-1">
+                        <span>Cấp <span id="profile-level">1</span></span>
+                        <span><span id="profile-exp">0</span>/<span id="profile-maxexp">100</span> EXP</span>
                     </div>
-
-                    <div class="grid grid-cols-2 gap-4 mt-4">
-                        <div class="bg-amber-50 rounded-2xl p-4 border border-amber-100 text-center">
-                            <div class="text-xs font-bold text-stone-500 uppercase mb-1">Tỷ lệ hoàn thành Task</div>
-                            <div class="text-2xl font-black text-bee-brown" id="stat-task-rate">0%</div>
-                        </div>
-                        <div class="bg-indigo-50 rounded-2xl p-4 border border-indigo-100 text-center">
-                            <div class="text-xs font-bold text-stone-500 uppercase mb-1">Mục tiêu đạt được</div>
-                            <div class="text-2xl font-black text-indigo-900" id="stat-goal-rate">0%</div>
-                        </div>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div id="profile-exp-bar" class="bg-honey-400 h-2 rounded-full" style="width: 0%"></div>
                     </div>
                 </div>
             </div>
-        </section>
+
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-xl border border-red-100 dark:border-red-900/30 text-center">
+                    <div class="text-red-500 text-xl mb-1"><i class="fa-solid fa-heart"></i></div>
+                    <div class="text-2xl font-bold text-gray-800 dark:text-gray-100" id="profile-stat-hp">100</div>
+                    <div class="text-xs text-gray-500">Max HP</div>
+                </div>
+                <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-900/30 text-center">
+                    <div class="text-blue-500 text-xl mb-1"><i class="fa-solid fa-bolt"></i></div>
+                    <div class="text-2xl font-bold text-gray-800 dark:text-gray-100" id="profile-stat-energy">50</div>
+                    <div class="text-xs text-gray-500">Max Năng lượng</div>
+                </div>
+            </div>
+
+            <h3 class="font-bold text-lg mb-3">Kỹ năng đã mở khóa</h3>
+            <div class="grid grid-cols-1 gap-2 overflow-y-auto" id="profile-skills">
+                <!-- Skills JS -->
+            </div>
+            
+            <div class="mt-6 text-center">
+                <button onclick="resetGame()" class="text-sm text-red-500 underline">Xóa dữ liệu & Chơi lại từ đầu</button>
+            </div>
+        </div>
+
+        <!-- COLLECTION SCREEN -->
+        <div id="screen-collection" class="screen flex-col w-full max-w-2xl h-full">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold"><i class="fa-solid fa-book-medical text-honey-500"></i> Sổ Tay Bệnh Lý</h2>
+                <button onclick="showScreen('home')" class="text-gray-500 hover:text-gray-800 dark:hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <div class="flex gap-2 overflow-x-auto pb-2 mb-4 no-scrollbar" id="collection-filters">
+                <button class="px-4 py-1 bg-medblue-500 text-white rounded-full text-sm font-bold whitespace-nowrap">Tất cả</button>
+                <button class="px-4 py-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full text-sm font-bold whitespace-nowrap">Giải phẫu</button>
+                <button class="px-4 py-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full text-sm font-bold whitespace-nowrap">Lâm sàng</button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto pb-10" id="collection-list">
+                <!-- Cards JS -->
+            </div>
+        </div>
+
     </main>
 
-    <!-- ỨNG DỤNG LÕI + TÍCH HỢP CLOUD FIREBASE -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <!-- Modal Overlay for Level Up / Rewards -->
+    <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden flex-items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full p-6 text-center transform scale-95 transition-transform duration-300 shadow-2xl border-4 border-honey-400" id="modal-content">
+            <div class="text-6xl mb-4" id="modal-icon">🎉</div>
+            <h2 class="text-2xl font-black text-honey-500 mb-2" id="modal-title">Lên Cấp!</h2>
+            <p class="text-gray-600 dark:text-gray-300 mb-4" id="modal-desc">Bạn đã đạt cấp độ mới.</p>
+            <div id="modal-rewards" class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg mb-6 text-sm text-left font-semibold">
+                <!-- Rewards -->
+            </div>
+            <button onclick="closeModal()" class="btn-game w-full bg-honey-500 hover:bg-honey-600 text-white py-3 rounded-xl font-bold shadow">Tuyệt vời!</button>
+        </div>
+    </div>
 
-        // Firebase Config (Fallback handled nếu không có key)
-        const firebaseConfigStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
-        const firebaseConfig = JSON.parse(firebaseConfigStr);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'beebee-default';
+<script>
+/* =========================================
+   DATABASE & CONFIGURATION
+========================================= */
+
+const ZONES = [
+    { id: 'zone1', name: 'Thung lũng Giải phẫu', levelReq: 1, icon: 'fa-bone', color: 'from-gray-400 to-gray-600', subject: 'Anatomy' },
+    { id: 'zone2', name: 'Rừng Sinh lý', levelReq: 5, icon: 'fa-lungs', color: 'from-green-400 to-green-600', subject: 'Physiology' },
+    { id: 'zone3', name: 'Thành phố Bệnh học', levelReq: 10, icon: 'fa-virus', color: 'from-purple-400 to-purple-600', subject: 'Pathology' },
+    { id: 'zone4', name: 'Học viện Dược lý', levelReq: 15, icon: 'fa-pills', color: 'from-teal-400 to-teal-600', subject: 'Pharmacology' },
+    { id: 'zone5', name: 'Lâu đài Lâm sàng', levelReq: 20, icon: 'fa-stethoscope', color: 'from-blue-500 to-blue-700', subject: 'Clinical' },
+    { id: 'zone6', name: 'Đấu trường OSCE', levelReq: 25, icon: 'fa-hospital', color: 'from-red-500 to-red-700', subject: 'OSCE', isBossZone: true }
+];
+
+const MONSTERS = [
+    // Anatomy
+    { id: 'm_bone', zoneId: 'zone1', name: 'Skeleton Bone', icon: '💀', hp: 30, questionsToKill: 2, exp: 20, drops: ['card_bone'] },
+    { id: 'm_muscle', zoneId: 'zone1', name: 'Muscle Beast', icon: '💪', hp: 45, questionsToKill: 3, exp: 30, drops: [] },
+    { id: 'm_nerve', zoneId: 'zone1', name: 'Nerve Shadow', icon: '🧠', hp: 60, questionsToKill: 4, exp: 50, isBoss: true, drops: ['card_cns'] },
+    // Physiology
+    { id: 'm_heart', zoneId: 'zone2', name: 'Heart Spirit', icon: '🫀', hp: 50, questionsToKill: 3, exp: 40, drops: ['card_heart'] },
+    { id: 'm_lung', zoneId: 'zone2', name: 'Lung Monster', icon: '🫁', hp: 60, questionsToKill: 3, exp: 45, drops: [] },
+    { id: 'm_kidney', zoneId: 'zone2', name: 'Kidney Guardian', icon: '🩸', hp: 90, questionsToKill: 5, exp: 80, isBoss: true, drops: ['card_kidney'] },
+    // Pathology
+    { id: 'm_inflam', zoneId: 'zone3', name: 'Inflammation Demon', icon: '🔥', hp: 70, questionsToKill: 3, exp: 50, drops: [] },
+    { id: 'm_pneumonia', zoneId: 'zone3', name: 'Pneumonia Beast', icon: '🦠', hp: 80, questionsToKill: 4, exp: 60, drops: ['card_pneumonia'] },
+    { id: 'm_diabetes', zoneId: 'zone3', name: 'Diabetes King', icon: '🍩', hp: 120, questionsToKill: 6, exp: 120, isBoss: true, drops: ['card_diabetes'] },
+    // Pharmacology
+    { id: 'm_toxin', zoneId: 'zone4', name: 'Toxic Slime', icon: '🧪', hp: 90, questionsToKill: 4, exp: 70, drops: [] },
+    { id: 'm_resist', zoneId: 'zone4', name: 'Resistant Bug', icon: '🐛', hp: 100, questionsToKill: 4, exp: 80, drops: ['card_antibiotic'] },
+    // Clinical
+    { id: 'm_nstemi', zoneId: 'zone5', name: 'NSTEMI Lord', icon: '💔', hp: 120, questionsToKill: 5, exp: 100, drops: ['card_nstemi'] },
+    { id: 'm_stroke', zoneId: 'zone5', name: 'Stroke Reaper', icon: '⚡', hp: 150, questionsToKill: 6, exp: 150, isBoss: true, drops: ['card_stroke'] },
+    // OSCE
+    { id: 'm_titan', zoneId: 'zone6', name: 'Medical Titan', icon: '👹', hp: 300, questionsToKill: 10, exp: 500, isBoss: true, drops: ['card_titan'] }
+];
+
+const SKILLS = [
+    { id: 's_basic', name: 'Chẩn đoán cơ bản', level: 1, type: 'attack', power: 1.0, cost: 0, icon: 'fa-hand-pointer' },
+    { id: 's_quick', name: 'Chẩn đoán nhanh', level: 5, type: 'attack', power: 1.5, cost: 5, icon: 'fa-bolt' },
+    { id: 's_ecg', name: 'ECG Strike', level: 10, type: 'attack', power: 2.0, cost: 10, icon: 'fa-heart-pulse' },
+    { id: 's_heal', name: 'Cấp cứu (Hồi máu)', level: 15, type: 'heal', power: 0.5, cost: 15, icon: 'fa-kit-medical' },
+    { id: 's_troponin', name: 'Troponin Blast', level: 20, type: 'attack', power: 3.0, cost: 20, icon: 'fa-vial' },
+];
+
+const KNOWLEDGE_CARDS = {
+    'card_bone': { name: 'Xương đùi', type: 'Giải phẫu', content: 'Xương dài nhất và chắc nhất cơ thể người.', trick: 'Đùi to gánh team.' },
+    'card_cns': { name: 'Hệ thần kinh trung ương', type: 'Giải phẫu', content: 'Gồm não và tủy sống. Các màng não: cứng, nhện, nuôi (từ ngoài vào trong).', trick: 'Cứng - Nhện - Nuôi' },
+    'card_heart': { name: 'Chu chuyển tim', type: 'Sinh lý', content: 'Kéo dài khoảng 0.8s (Nhịp 75 l/p). Tâm nhĩ thu 0.1s, Tâm thất thu 0.3s, Tâm trương toàn bộ 0.4s.', trick: '1-3-4' },
+    'card_kidney': { name: 'Nephron', type: 'Sinh lý', content: 'Đơn vị chức năng của thận. Gồm cầu thận và ống thận.', trick: 'Lọc ở cầu, tái hấp thu ở ống.' },
+    'card_pneumonia': { name: 'Viêm phổi cộng đồng (CAP)', type: 'Bệnh học', content: 'Tác nhân hay gặp nhất là Streptococcus pneumoniae.', trick: 'Phế cầu khuẩn là trùm CAP.' },
+    'card_diabetes': { name: 'Đái tháo đường Tuýp 2', type: 'Bệnh học', content: 'Kháng insulin. Tiêu chuẩn chẩn đoán: HbA1c >= 6.5%, Glucose đói >= 7.0 mmol/L.', trick: 'Sáu rưỡi - Bảy phẩy' },
+    'card_antibiotic': { name: 'Penicillin', type: 'Dược lý', content: 'Nhóm Beta-lactam. Ức chế tổng hợp vách tế bào vi khuẩn.', trick: 'Phá tường thành vi khuẩn.' },
+    'card_nstemi': { name: 'NSTEMI', type: 'Lâm sàng', content: 'Nhồi máu cơ tim không ST chênh lên. Dấu ấn sinh học (Troponin/CK-MB) dương tính.', trick: 'Đau ngực + Men tim TĂNG + ST KHÔNG chênh.' },
+    'card_stroke': { name: 'Đột quỵ não', type: 'Lâm sàng', content: 'Nguyên tắc FAST: Face (Mặt), Arm (Tay), Speech (Nói), Time (Thời gian).', trick: 'Thời gian là não.' },
+    'card_titan': { name: 'Y Đức', type: 'Huyền thoại', content: 'Primum non nocere - Trước tiên là không làm hại người bệnh.', trick: 'Trái tim người thầy thuốc.' }
+};
+
+// --- QUESTION DATABASE ---
+// In a real app, this would be fetched from a server or be a separate huge JSON file.
+const QUESTION_BANK = [
+    // Anatomy
+    { q: 'Xương nào dài nhất trong cơ thể người?', options: ['Xương chày', 'Xương đùi', 'Xương cánh tay', 'Xương mác'], ans: 1, exp: 'Xương đùi là xương dài và chắc khỏe nhất cơ thể.', subj: 'Anatomy' },
+    { q: 'Phổi phải có bao nhiêu thùy?', options: ['2', '3', '4', '1'], ans: 1, exp: 'Phổi phải có 3 thùy (trên, giữa, dưới), phổi trái có 2 thùy.', subj: 'Anatomy' },
+    { q: 'Van hai lá nằm ở đâu?', options: ['Giữa nhĩ phải và thất phải', 'Giữa nhĩ trái và thất trái', 'Động mạch chủ', 'Động mạch phổi'], ans: 1, exp: 'Van hai lá (van tăng mạc) nằm ngăn cách tâm nhĩ trái và tâm thất trái.', subj: 'Anatomy' },
+    // Physiology
+    { q: 'Chức năng chính của hồng cầu là gì?', options: ['Bảo vệ cơ thể', 'Đông máu', 'Vận chuyển O2 và CO2', 'Tạo kháng thể'], ans: 2, exp: 'Hồng cầu chứa hemoglobin giúp vận chuyển oxy từ phổi đến mô và mang CO2 ngược lại.', subj: 'Physiology' },
+    { q: 'Hormone nào do tuyến tụy tiết ra giúp hạ đường huyết?', options: ['Glucagon', 'Insulin', 'Adrenaline', 'Cortisol'], ans: 1, exp: 'Insulin giúp đưa glucose từ máu vào tế bào, làm giảm đường huyết.', subj: 'Physiology' },
+    { q: 'Nhóm máu nào là nhóm máu chuyên cho (Universal Donor)?', options: ['A', 'B', 'AB', 'O'], ans: 3, exp: 'Nhóm máu O không có kháng nguyên A và B trên hồng cầu nên có thể truyền cho mọi nhóm máu khác (xét hệ ABO).', subj: 'Physiology' },
+    // Pathology
+    { q: 'Vị trí đau điển hình của Viêm ruột thừa cấp?', options: ['Thượng vị', 'Hố chậu phải', 'Hạ sườn phải', 'Hố chậu trái'], ans: 1, exp: 'Đau thường khởi phát ở quanh rốn hoặc thượng vị, sau đó khu trú về hố chậu phải (Điểm MacBurney).', subj: 'Pathology' },
+    { q: 'Nguyên nhân phổ biến nhất gây loét dạ dày - tá tràng là?', options: ['Stress', 'Ăn cay', 'Vi khuẩn H. pylori', 'Rượu bia'], ans: 2, exp: 'Helicobacter pylori (HP) là nguyên nhân hàng đầu gây loêm loét dạ dày tá tràng.', subj: 'Pathology' },
+    // Pharmacology
+    { q: 'Thuốc giải độc đặc hiệu khi ngộ độc Paracetamol là?', options: ['Naloxone', 'Flumazenil', 'N-acetylcysteine (NAC)', 'Atropine'], ans: 2, exp: 'NAC giúp bổ sung glutathione, giải độc chất chuyển hóa NAPQI của paracetamol.', subj: 'Pharmacology' },
+    { q: 'Tác dụng phụ thường gặp nhất của thuốc ức chế men chuyển (ACEi) là?', options: ['Nhịp tim nhanh', 'Ho khan', 'Phù mạch', 'Suy thận cấp'], ans: 1, exp: 'Ho khan xảy ra ở 5-20% bệnh nhân dùng ACEi do tích tụ bradykinin ở đường hô hấp.', subj: 'Pharmacology' },
+    // Clinical
+    { q: 'CK-MB tăng sau nhồi máu cơ tim bao lâu?', options: ['1–2 giờ', '3–12 giờ', '24–48 giờ', '72 giờ'], ans: 1, exp: 'CK-MB thường bắt đầu tăng sau 3-12 giờ kể từ khi khởi phát nhồi máu cơ tim.', subj: 'Clinical' },
+    { q: 'Triệu chứng cơ năng điển hình của hội chứng vành cấp?', options: ['Khó thở khi nằm', 'Đau thắt ngực kiểu đè ép', 'Ho ra máu', 'Đau bụng thượng vị'], ans: 1, exp: 'Đau ngực kiểu đè nén, bóp nghẹt sau xương ức, lan lên hàm hoặc tay trái là dấu hiệu điển hình.', subj: 'Clinical' },
+    { q: 'Trong cấp cứu ngừng tuần hoàn (CPR), tỷ lệ ép tim/thổi ngạt ở người lớn là?', options: ['15:2', '30:2', '30:1', 'Continuous'], ans: 1, exp: 'Theo hướng dẫn của AHA, tỷ lệ ép tim và thổi ngạt cho người lớn là 30:2.', subj: 'OSCE' },
+];
+
+/* =========================================
+   GAME STATE & LOGIC
+========================================= */
+
+let gameState = {
+    level: 1,
+    exp: 0,
+    hp: 100,
+    energy: 50,
+    coins: 0,
+    honey: 0,
+    unlockedZones: ['zone1'],
+    unlockedCards: [],
+    settings: { darkMode: false, sound: true }
+};
+
+let currentCombat = null; // Holds active battle state
+let audioCtx = null; // For simple synth sounds
+
+const TITLES = [
+    { max: 4, name: 'Sinh viên năm nhất' },
+    { max: 9, name: 'Tiền lâm sàng' },
+    { max: 19, name: 'Lâm sàng' },
+    { max: 29, name: 'Bác sĩ nội trú' },
+    { max: 999, name: 'Chuyên gia' }
+];
+
+function initGame() {
+    const saved = localStorage.getItem('beequest_save');
+    if (saved) {
+        gameState = JSON.parse(saved);
+        // Ensure properties exist for backward compatibility if we update game
+        if(!gameState.settings) gameState.settings = { darkMode: false, sound: true };
+    }
+    
+    applyTheme();
+    updateHeaderStats();
+    buildWorldMap();
+}
+
+function saveGame() {
+    localStorage.setItem('beequest_save', JSON.stringify(gameState));
+    updateHeaderStats();
+}
+
+function resetGame() {
+    if(confirm('Bạn có chắc muốn xóa toàn bộ quá trình học tập?')){
+        localStorage.removeItem('beequest_save');
+        location.reload();
+    }
+}
+
+function getTitle(lvl) {
+    return TITLES.find(t => lvl <= t.max).name;
+}
+
+function getMaxHp() { return 100 + (gameState.level - 1) * 10; }
+function getMaxEnergy() { return 50 + (gameState.level - 1) * 5; }
+function getExpRequired() { return gameState.level * 100; }
+
+function updateHeaderStats() {
+    document.getElementById('header-level').innerText = gameState.level;
+    document.getElementById('header-hp').innerText = `${gameState.hp}/${getMaxHp()}`;
+    document.getElementById('header-energy').innerText = `${gameState.energy}/${getMaxEnergy()}`;
+    document.getElementById('header-coins').innerText = gameState.coins;
+    
+    const expPercent = (gameState.exp / getExpRequired()) * 100;
+    document.getElementById('header-exp-bar').style.width = `${Math.min(expPercent, 100)}%`;
+    
+    // Update Home titles if on home
+    document.getElementById('home-title').innerText = getTitle(gameState.level);
+}
+
+// --- NAVIGATION ---
+function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(`screen-${screenId}`).classList.add('active');
+    
+    if(screenId === 'profile') buildProfile();
+    if(screenId === 'collection') buildCollection();
+    if(screenId === 'map') buildWorldMap();
+}
+
+// --- UI BUILDERS ---
+function buildWorldMap() {
+    const container = document.getElementById('map-container');
+    container.innerHTML = '';
+    
+    ZONES.forEach(zone => {
+        const isUnlocked = gameState.level >= zone.levelReq || gameState.unlockedZones.includes(zone.id);
+        if (isUnlocked && !gameState.unlockedZones.includes(zone.id)) {
+            gameState.unlockedZones.push(zone.id);
+            saveGame();
+        }
+
+        const btn = document.createElement('div');
+        btn.className = `p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col items-center text-center gap-2 
+            ${isUnlocked ? `bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-medblue-500` 
+                         : `bg-gray-100 dark:bg-gray-800/50 border-gray-300 dark:border-gray-700 opacity-60 cursor-not-allowed`}`;
         
-        let db = null;
-        let auth = null;
-
-        if (Object.keys(firebaseConfig).length > 0) {
-            const fbApp = initializeApp(firebaseConfig);
-            auth = getAuth(fbApp);
-            db = getFirestore(fbApp);
+        btn.innerHTML = `
+            <div class="w-14 h-14 rounded-full flex items-center justify-center text-white bg-gradient-to-br ${isUnlocked ? zone.color : 'from-gray-400 to-gray-500'} text-2xl shadow-inner">
+                <i class="fa-solid ${zone.icon}"></i>
+            </div>
+            <h3 class="font-bold text-gray-800 dark:text-gray-100">${zone.name}</h3>
+            ${!isUnlocked ? `<div class="text-xs text-red-500 font-bold"><i class="fa-solid fa-lock"></i> Mở khóa Cấp ${zone.levelReq}</div>` : ''}
+        `;
+        
+        if (isUnlocked) {
+            btn.onclick = () => openZone(zone);
         }
+        container.appendChild(btn);
+    });
+}
 
-        // Web Audio API cho âm thanh Pomodoro
-        function playChime() {
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(523.25, ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(1046.50, ctx.currentTime + 0.5);
-                gain.gain.setValueAtTime(0, ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.1);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1);
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start(ctx.currentTime);
-                osc.stop(ctx.currentTime + 1);
-            } catch(e) { console.error("Audio block", e); }
-        }
+function openZone(zone) {
+    document.getElementById('zone-title').innerText = zone.name;
+    const container = document.getElementById('monster-list');
+    container.innerHTML = '';
+    
+    const zoneMonsters = MONSTERS.filter(m => m.zoneId === zone.id);
+    zoneMonsters.forEach(m => {
+        const div = document.createElement('div');
+        div.className = `flex justify-between items-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 ${m.isBoss ? 'border-red-300 dark:border-red-900 bg-red-50 dark:bg-red-900/10' : ''}`;
+        
+        div.innerHTML = `
+            <div class="flex items-center gap-4">
+                <div class="text-4xl w-12 text-center drop-shadow-sm">${m.icon}</div>
+                <div>
+                    <h4 class="font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                        ${m.name} ${m.isBoss ? '<span class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full uppercase">Boss</span>' : ''}
+                    </h4>
+                    <div class="text-xs text-gray-500">Máu: ${m.hp} | EXP: ${m.exp}</div>
+                </div>
+            </div>
+            <button onclick="startCombat('${m.id}')" class="btn-game bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 p-3 rounded-xl hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
+                <i class="fa-solid fa-khanda"></i>
+            </button>
+        `;
+        container.appendChild(div);
+    });
+    
+    showScreen('zone');
+}
 
-        // Đối tượng App toàn cục (Bắt buộc gán vào window để HTML nhìn thấy)
-        window.app = {
-            userId: null,
-            _initialized: false,
-            state: {
-                honey: 50,
-                streak: 1,
-                pomoCount: 0,
-                hiveLevel: 1,
-                tasks: [],
-                goals: [],
-                diaries: [],
-                mood: '😀',
-                whyAnswers: []
-            },
-            timer: {
-                interval: null,
-                timeLeft: 25 * 60,
-                isRunning: false,
-                mode: 'study',
-                totalStudyTime: 25 * 60,
-                totalBreakTime: 5 * 60
-            },
-            slogans: [
-                "BeeBee – Không trì hoãn, chỉ tiến bộ.",
-                "BeeBee – Chăm chỉ như ong, thành công mỗi ngày.",
-                "BeeBee – Biến việc học thành niềm vui.",
-                "BeeBee – Từng giọt mật nhỏ, từng bước tiến lớn.",
-                "BeeBee – Bee productive, Bee happy. 🐝"
-            ],
-            sloganIdx: 4,
-            whyQuestions: [
-                "Tại sao bạn lại đang trì hoãn việc này?",
-                "Tại sao nguyên nhân đó lại xảy ra với bạn?",
-                "Tại sao điều đó lại là rào cản lớn?",
-                "Tại sao bạn không tìm cách khắc phục ngay?",
-                "Tại sao thói quen này cứ lặp lại?"
-            ],
-            whyStep: 0,
+function buildProfile() {
+    document.getElementById('profile-level').innerText = gameState.level;
+    document.getElementById('profile-title').innerText = getTitle(gameState.level);
+    document.getElementById('profile-stat-hp').innerText = getMaxHp();
+    document.getElementById('profile-stat-energy').innerText = getMaxEnergy();
+    document.getElementById('profile-exp').innerText = gameState.exp;
+    document.getElementById('profile-maxexp').innerText = getExpRequired();
+    document.getElementById('profile-exp-bar').style.width = `${Math.min((gameState.exp / getExpRequired()) * 100, 100)}%`;
 
-            init() {
-                // Tải local ngay lập tức để có giao diện nhanh nhất
-                this.loadDataLocal();
-                this.switchTab('home');
-                this.updateUI();
+    const skillsContainer = document.getElementById('profile-skills');
+    skillsContainer.innerHTML = '';
+    
+    SKILLS.forEach(s => {
+        const unlocked = gameState.level >= s.level;
+        skillsContainer.innerHTML += `
+            <div class="flex items-center gap-3 p-3 rounded-lg ${unlocked ? 'bg-blue-50 dark:bg-gray-700 border border-blue-100 dark:border-gray-600' : 'bg-gray-100 dark:bg-gray-800 opacity-50'}">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center ${unlocked ? 'bg-medblue-500 text-white' : 'bg-gray-300 text-gray-500'}">
+                    <i class="fa-solid ${s.icon}"></i>
+                </div>
+                <div class="flex-grow">
+                    <div class="font-bold text-sm ${unlocked ? 'text-gray-800 dark:text-white' : 'text-gray-500'}">${s.name}</div>
+                    <div class="text-[10px] text-gray-500">${unlocked ? (s.type === 'heal' ? 'Hồi phục HP' : 'Gây sát thương') : `Mở khóa cấp ${s.level}`}</div>
+                </div>
+            </div>
+        `;
+    });
+}
 
-                // Xác thực Firebase và liên kết tài khoản
-                if (auth) {
-                    const authenticate = async () => {
-                        try {
-                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                                await signInWithCustomToken(auth, __initial_auth_token);
-                            } else {
-                                await signInAnonymously(auth);
-                            }
-                        } catch(e) { console.error("Lỗi Auth:", e); }
-                    };
-                    authenticate();
+function buildCollection() {
+    const list = document.getElementById('collection-list');
+    list.innerHTML = '';
+    
+    if(gameState.unlockedCards.length === 0) {
+        list.innerHTML = `<div class="col-span-2 text-center text-gray-500 py-10">Chưa thu thập được kiến thức nào. Hãy đánh bại quái vật!</div>`;
+        return;
+    }
 
-                    onAuthStateChanged(auth, (user) => {
-                        if (user) {
-                            this.userId = user.uid;
-                            // Cập nhật thẻ ID cá nhân hóa
-                            const idDisplay = document.getElementById('user-id-display');
-                            if(idDisplay) idDisplay.innerText = `ID: ${user.uid.substring(0, 6)}...`;
-                            const heroGreeting = document.getElementById('hero-greeting');
-                            if(heroGreeting) heroGreeting.innerText = `Chào ong thợ, ${user.uid.substring(0, 6)}!`;
-                            
-                            this.syncCloud(); // Bắt đầu lắng nghe Cloud
-                        }
-                    });
-                }
-            },
-
-            syncCloud() {
-                if (!this.userId || !db) return;
-                const docRef = doc(db, 'artifacts', appId, 'users', this.userId, 'appData', 'state');
-                
-                onSnapshot(docRef, (docSnap) => {
-                    if (docSnap.exists()) {
-                        // Nạp dữ liệu mây đè lên local nếu có
-                        this.state = { ...this.state, ...docSnap.data() };
-                        this.updateUI();
-                    } else {
-                        // Nếu mây trống (người mới), đưa dữ liệu hiện tại lên
-                        this.saveData();
-                    }
-                }, (error) => {
-                    console.error("Lỗi đồng bộ:", error);
-                });
-            },
-
-            loadDataLocal() {
-                const saved = localStorage.getItem('beebee_data');
-                if (saved) {
-                    try { this.state = { ...this.state, ...JSON.parse(saved) }; } 
-                    catch(e) { console.error(e); }
-                } else if (this.state.tasks.length === 0) {
-                    // Mặc định task chào mừng
-                    this.state.tasks.push({id: 1, text: 'Làm quen với ứng dụng BeeBee', priority: 'medium', done: true});
-                    this.state.honey += 10;
-                }
-            },
-
-            saveData() {
-                // Lưu vào Local Storage
-                localStorage.setItem('beebee_data', JSON.stringify(this.state));
-                
-                // Đồng bộ lên Cloud
-                if (this.userId && db) {
-                    const docRef = doc(db, 'artifacts', appId, 'users', this.userId, 'appData', 'state');
-                    setDoc(docRef, this.state, { merge: true }).catch(e => console.error(e));
-                }
-                this.updateUI();
-            },
-
-            // Navigation
-            switchTab(tabId) {
-                document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('nav-active'));
-                
-                document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-                
-                const navBtn = document.getElementById(`nav-${tabId}`);
-                if(navBtn) navBtn.classList.add('nav-active');
-            },
-
-            toggleMobileMenu() {
-                const menu = document.getElementById('mobile-menu');
-                const icon = document.getElementById('mobile-menu-icon');
-                if(menu.classList.contains('hidden')) {
-                    menu.classList.remove('hidden');
-                    icon.className = 'fa-solid fa-xmark';
-                } else {
-                    menu.classList.add('hidden');
-                    icon.className = 'fa-solid fa-bars';
-                }
-            },
-
-            rotateSlogan() {
-                this.sloganIdx = (this.sloganIdx + 1) % this.slogans.length;
-                document.getElementById('slogan-display').innerText = `"${this.slogans[this.sloganIdx]}"`;
-            },
-
-            // UI Updater
-            updateUI() {
-                document.getElementById('status-honey').innerText = this.state.honey;
-                document.getElementById('mobile-honey').innerText = this.state.honey;
-                document.getElementById('dash-streak').innerText = `${this.state.streak} ngày`;
-                document.getElementById('dash-sessions').innerText = this.state.pomoCount;
-                
-                const doneTasks = this.state.tasks.filter(t=>t.done).length;
-                document.getElementById('dash-tasks').innerText = `${doneTasks} / ${this.state.tasks.length}`;
-                
-                let rank = "Ong Mới Vào Nghề";
-                if(this.state.honey >= 150) rank = "Ong Thợ Chăm Chỉ";
-                if(this.state.honey >= 500) rank = "Chiến Binh Mật Ong";
-                if(this.state.honey >= 1000) rank = "Nữ Hoàng Ong 👑";
-                document.getElementById('status-rank').innerText = rank;
-
-                this.renderTasks();
-                this.renderGoals();
-                this.renderHive();
-                this.renderBadges();
-                this.renderStats();
-            },
-
-            // --- TASKS ---
-            addTask(e) {
-                e.preventDefault();
-                const input = document.getElementById('task-input');
-                const priority = document.getElementById('task-priority').value;
-                if(!input.value.trim()) return;
-                
-                this.state.tasks.unshift({
-                    id: Date.now(),
-                    text: input.value.trim(),
-                    priority: priority,
-                    done: false
-                });
-                input.value = '';
-                this.saveData();
-            },
-            toggleTask(id) {
-                const task = this.state.tasks.find(t => t.id === id);
-                if(task) {
-                    task.done = !task.done;
-                    if(task.done) this.state.honey += 10;
-                    else this.state.honey = Math.max(0, this.state.honey - 10);
-                    this.saveData();
-                }
-            },
-            deleteTask(id) {
-                this.state.tasks = this.state.tasks.filter(t => t.id !== id);
-                this.saveData();
-            },
-            renderTasks() {
-                const list = document.getElementById('task-list');
-                const badge = document.getElementById('task-count-badge');
-                
-                const pending = this.state.tasks.filter(t=>!t.done).length;
-                badge.innerText = `${pending} việc`;
-
-                if(this.state.tasks.length === 0) {
-                    list.innerHTML = `<div class="p-8 text-center text-stone-400 font-bold">Chưa có nhiệm vụ nào. Nhập ngay để bắt đầu!</div>`;
-                    return;
-                }
-
-                list.innerHTML = this.state.tasks.map(t => {
-                    const color = t.priority === 'high' ? 'bg-red-100 text-red-600' : t.priority === 'medium' ? 'bg-orange-100 text-orange-600' : 'bg-green-100 text-green-600';
-                    const lbl = t.priority === 'high' ? 'Cao' : t.priority === 'medium' ? 'TB' : 'Thấp';
-                    return `
-                        <div class="flex items-center justify-between p-5 hover:bg-stone-50 transition-colors group">
-                            <div class="flex items-center gap-4 flex-1">
-                                <div class="w-6 h-6 border-2 rounded-md flex items-center justify-center cursor-pointer transition-colors ${t.done ? 'bg-bee-yellow border-bee-yellow text-bee-brown' : 'border-stone-300'}" onclick="app.toggleTask(${t.id})">
-                                    ${t.done ? '<i class="fa-solid fa-check text-sm"></i>' : ''}
-                                </div>
-                                <span class="font-bold text-base ${t.done ? 'line-through text-stone-400' : 'text-stone-700'}">${t.text}</span>
-                                <span class="text-[10px] font-black uppercase px-2 py-1 rounded-md ${color}">${lbl}</span>
-                            </div>
-                            <button onclick="app.deleteTask(${t.id})" class="text-stone-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                    `;
-                }).join('');
-            },
-
-            // --- POMODORO ---
-            setTimerMode(mode) {
-                if(this.timer.isRunning) this.toggleTimer();
-                this.timer.mode = mode;
-                this.timer.timeLeft = mode === 'study' ? this.timer.totalStudyTime : this.timer.totalBreakTime;
-                
-                const btnStudy = document.getElementById('mode-study');
-                const btnBreak = document.getElementById('mode-break');
-                
-                if(mode === 'study') {
-                    btnStudy.className = "px-6 py-2.5 rounded-full font-black text-sm transition-all bg-red-100 text-red-700 border-2 border-red-200 shadow-sm";
-                    btnBreak.className = "px-6 py-2.5 rounded-full font-black text-sm transition-all bg-stone-100 text-stone-500 border-2 border-transparent hover:bg-stone-200";
-                    document.getElementById('timer-status-text').innerText = "Thời gian học";
-                    document.getElementById('timer-status-text').className = "text-sm font-black text-red-500 mt-1 uppercase tracking-widest";
-                    document.getElementById('timer-progress').setAttribute('stroke', '#ef4444');
-                } else {
-                    btnBreak.className = "px-6 py-2.5 rounded-full font-black text-sm transition-all bg-green-100 text-green-700 border-2 border-green-200 shadow-sm";
-                    btnStudy.className = "px-6 py-2.5 rounded-full font-black text-sm transition-all bg-stone-100 text-stone-500 border-2 border-transparent hover:bg-stone-200";
-                    document.getElementById('timer-status-text').innerText = "Nghỉ ngơi";
-                    document.getElementById('timer-status-text').className = "text-sm font-black text-green-500 mt-1 uppercase tracking-widest";
-                    document.getElementById('timer-progress').setAttribute('stroke', '#22c55e');
-                }
-                
-                this.updateTimerDisplay();
-            },
-            toggleTimer() {
-                const btn = document.getElementById('btn-timer-start');
-                const dot = document.getElementById('pomo-active-dot');
-                
-                if(this.timer.isRunning) {
-                    clearInterval(this.timer.interval);
-                    this.timer.isRunning = false;
-                    btn.innerHTML = '<i class="fa-solid fa-play"></i> Tiếp tục';
-                    btn.classList.remove('bg-red-500'); btn.classList.add('bg-bee-brown');
-                    dot.classList.add('hidden');
-                } else {
-                    this.timer.isRunning = true;
-                    btn.innerHTML = '<i class="fa-solid fa-pause"></i> Tạm dừng';
-                    btn.classList.remove('bg-bee-brown'); btn.classList.add('bg-red-500');
-                    dot.classList.remove('hidden');
-                    
-                    this.timer.interval = setInterval(() => {
-                        this.timer.timeLeft--;
-                        this.updateTimerDisplay();
-                        
-                        if(this.timer.timeLeft <= 0) {
-                            clearInterval(this.timer.interval);
-                            this.timer.isRunning = false;
-                            playChime();
-                            dot.classList.add('hidden');
-                            
-                            if(this.timer.mode === 'study') {
-                                this.state.pomoCount++;
-                                this.state.honey += 25;
-                                this.saveData();
-                                alert("🎉 Tuyệt vời! Bạn đã hoàn thành 25 phút tập trung. Hãy nghỉ ngơi 5 phút nhé.");
-                                this.setTimerMode('break');
-                            } else {
-                                alert("⏰ Đã hết thời gian nghỉ! Quay lại học thôi nào.");
-                                this.setTimerMode('study');
-                            }
-                        }
-                    }, 1000);
-                }
-            },
-            resetTimer() {
-                if(this.timer.isRunning) this.toggleTimer();
-                this.timer.timeLeft = this.timer.mode === 'study' ? this.timer.totalStudyTime : this.timer.totalBreakTime;
-                this.updateTimerDisplay();
-            },
-            updateTimerDisplay() {
-                const m = Math.floor(this.timer.timeLeft / 60).toString().padStart(2, '0');
-                const s = (this.timer.timeLeft % 60).toString().padStart(2, '0');
-                document.getElementById('timer-display').innerText = `${m}:${s}`;
-                
-                const total = this.timer.mode === 'study' ? this.timer.totalStudyTime : this.timer.totalBreakTime;
-                const percent = this.timer.timeLeft / total;
-                const offset = 753.9 - (percent * 753.9);
-                document.getElementById('timer-progress').style.strokeDashoffset = offset;
-
-                document.getElementById('pomo-count-display').innerText = this.state.pomoCount;
-                document.getElementById('pomo-honey-display').innerText = `+${this.state.pomoCount * 25} 🍯`;
-            },
-
-            // --- GOALS ---
-            addGoal(e) {
-                e.preventDefault();
-                const input = document.getElementById('goal-input');
-                const type = document.getElementById('goal-type').value;
-                if(!input.value.trim()) return;
-
-                this.state.goals.push({
-                    id: Date.now(),
-                    title: input.value.trim(),
-                    type: type,
-                    done: false
-                });
-                input.value = '';
-                this.saveData();
-            },
-            toggleGoal(id) {
-                const goal = this.state.goals.find(g => g.id === id);
-                if(goal) {
-                    goal.done = !goal.done;
-                    if(goal.done) this.state.honey += 50;
-                    else this.state.honey = Math.max(0, this.state.honey - 50);
-                    this.saveData();
-                }
-            },
-            deleteGoal(id) {
-                this.state.goals = this.state.goals.filter(g => g.id !== id);
-                this.saveData();
-            },
-            renderGoals() {
-                const list = document.getElementById('goals-list');
-                if(this.state.goals.length === 0) {
-                    list.innerHTML = `<div class="col-span-full bg-stone-50 rounded-2xl p-6 text-center text-stone-400 font-bold border-2 border-dashed border-stone-200">Hãy tạo mục tiêu SMART đầu tiên của bạn!</div>`;
-                    return;
-                }
-
-                list.innerHTML = this.state.goals.map(g => {
-                    const tag = g.type === 'long' ? '🏆 Dài hạn' : '⚡ Ngắn hạn';
-                    const tagClass = g.type === 'long' ? 'bg-indigo-100 text-indigo-700' : 'bg-amber-100 text-amber-700';
-                    return `
-                        <div class="bg-white border-2 border-stone-100 rounded-2xl p-5 shadow-sm flex flex-col gap-3">
-                            <div class="flex justify-between items-start">
-                                <span class="text-[10px] font-black uppercase px-2 py-1 rounded-md ${tagClass}">${tag}</span>
-                                <button onclick="app.deleteGoal(${g.id})" class="text-stone-300 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
-                            </div>
-                            <h4 class="font-bold text-stone-800 ${g.done ? 'line-through text-stone-400' : ''}">${g.title}</h4>
-                            <div class="mt-auto pt-2 flex justify-between items-center">
-                                <div class="w-2/3 bg-stone-100 h-2 rounded-full overflow-hidden">
-                                    <div class="h-full ${g.done ? 'bg-green-500 w-full' : 'bg-amber-400 w-1/4'}"></div>
-                                </div>
-                                <button onclick="app.toggleGoal(${g.id})" class="text-xs font-black px-3 py-1.5 rounded-lg border-2 ${g.done ? 'bg-green-50 border-green-200 text-green-600' : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50'}">
-                                    ${g.done ? 'Hoàn thành' : 'Đánh dấu xong'}
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            },
-
-            // --- HIVE & TREE ---
-            renderHive() {
-                const cost = this.state.hiveLevel * 50;
-                document.getElementById('hive-cost').innerText = cost;
-                
-                let title = "Tổ Ong Sơ Khai"; let icon = "🍯";
-                if(this.state.hiveLevel === 2) { title = "Tổ Ong Ấm Cúng"; icon = "🏠"; }
-                if(this.state.hiveLevel === 3) { title = "Pháo Đài Mật Ngọt"; icon = "🏰"; }
-                if(this.state.hiveLevel >= 4) { title = "Đế Chế Hoàng Gia"; icon = "👑"; }
-                
-                document.getElementById('hive-title').innerText = title;
-                document.getElementById('hive-icon').innerText = icon;
-                document.getElementById('hive-level').innerText = `Cấp độ ${this.state.hiveLevel}`;
-
-                const btn = document.getElementById('btn-upgrade-hive');
-                if(this.state.hiveLevel >= 4) {
-                    btn.disabled = true; btn.innerText = "Đã đạt cấp tối đa"; btn.classList.add('opacity-50');
-                } else if(this.state.honey < cost) {
-                    btn.disabled = true; btn.innerHTML = `Thiếu ${cost - this.state.honey} 🍯`; btn.classList.add('opacity-50');
-                } else {
-                    btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-arrow-up-right-dots"></i> Nâng cấp ngay`; btn.classList.remove('opacity-50');
-                }
-
-                let tTitle = "Mầm non nhú lộc"; let tIcon = "🌱"; let tPct = 10; let tDesc = "Cần thêm phiên Pomodoro";
-                if(this.state.pomoCount >= 2) { tTitle = "Cây non đâm chồi"; tIcon = "🌿"; tPct = 40; }
-                if(this.state.pomoCount >= 5) { tTitle = "Đại thụ sum suê"; tIcon = "🌳"; tPct = 70; }
-                if(this.state.pomoCount >= 10) { tTitle = "Nở rộ hoa quả"; tIcon = "🌸"; tPct = 100; tDesc = "Đã phát triển hoàn thiện!"; }
-
-                document.getElementById('tree-title').innerText = tTitle;
-                document.getElementById('tree-icon').innerText = tIcon;
-                document.getElementById('tree-progress').style.width = `${tPct}%`;
-                document.getElementById('tree-desc').innerText = tDesc;
-            },
-            upgradeHive() {
-                const cost = this.state.hiveLevel * 50;
-                if(this.state.honey >= cost && this.state.hiveLevel < 4) {
-                    this.state.honey -= cost;
-                    this.state.hiveLevel++;
-                    this.saveData();
-                    alert("🎉 Nâng cấp Tổ ong thành công!");
-                }
-            },
-
-            // --- 5 WHYS ---
-            nextWhyStep() {
-                const input = document.getElementById('why-input');
-                if(!input.value.trim()) return alert("Hãy nhập câu trả lời nhé!");
-                
-                this.state.whyAnswers.push(input.value.trim());
-                input.value = '';
-                this.whyStep++;
-
-                if(this.whyStep < 5) {
-                    document.getElementById('why-step').innerText = `Câu hỏi ${this.whyStep + 1} / 5`;
-                    document.getElementById('why-question').innerText = this.whyQuestions[this.whyStep];
-                } else {
-                    document.getElementById('why-wizard').classList.add('hidden');
-                    const res = document.getElementById('why-result');
-                    res.classList.remove('hidden');
-                    
-                    document.getElementById('why-answers-list').innerHTML = this.state.whyAnswers.map((ans, i) => `
-                        <div class="text-sm border-l-4 border-green-300 pl-3">
-                            <span class="font-black text-green-900">Why ${i+1}:</span> <span class="font-bold text-stone-600">${ans}</span>
-                        </div>
-                    `).join('');
-                }
-            },
-            resetWhy() {
-                this.state.whyAnswers = [];
-                this.whyStep = 0;
-                document.getElementById('why-wizard').classList.remove('hidden');
-                document.getElementById('why-result').classList.add('hidden');
-                document.getElementById('why-step').innerText = `Câu hỏi 1 / 5`;
-                document.getElementById('why-question').innerText = this.whyQuestions[0];
-            },
-
-            // --- STATS & DIARY ---
-            selectMood(mood, el) {
-                this.state.mood = el.innerText;
-                document.querySelectorAll('.mood-btn').forEach(btn => {
-                    btn.classList.remove('bg-amber-100', 'border-amber-400');
-                    btn.classList.add('bg-stone-50', 'border-stone-200');
-                });
-                el.classList.remove('bg-stone-50', 'border-stone-200');
-                el.classList.add('bg-amber-100', 'border-amber-400');
-            },
-            addDiary(e) {
-                e.preventDefault();
-                const focus = document.getElementById('diary-focus').value;
-                const note = document.getElementById('diary-note').value;
-                
-                this.state.diaries.unshift({
-                    date: new Date().toLocaleDateString('vi-VN'),
-                    mood: this.state.mood,
-                    focus: focus,
-                    note: note || 'Học tập bình thường.'
-                });
-                document.getElementById('diary-note').value = '';
-                this.saveData();
-            },
-            renderStats() {
-                const list = document.getElementById('diary-list');
-                if(this.state.diaries.length === 0) list.innerHTML = `<div class="text-xs text-stone-400">Chưa có ghi chép nào.</div>`;
-                else {
-                    list.innerHTML = this.state.diaries.map(d => `
-                        <div class="bg-stone-50 border border-stone-100 p-3 rounded-xl flex items-center gap-3">
-                            <div class="text-2xl">${d.mood}</div>
-                            <div>
-                                <div class="text-xs font-black text-stone-700">${d.note}</div>
-                                <div class="text-[10px] font-bold text-stone-400">${d.date} • Tập trung: ${d.focus}/5</div>
-                            </div>
-                        </div>
-                    `).join('');
-                }
-
-                const chart = document.getElementById('chart-container');
-                const days = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
-                const values = [1, 3, 2, 5, 4, 2, this.state.pomoCount];
-                
-                chart.innerHTML = values.map((val, i) => {
-                    const height = Math.min(val * 20 + 10, 160);
-                    const isToday = i === 6;
-                    return `
-                        <div class="flex flex-col items-center gap-2 group flex-1">
-                            <div class="w-full max-w-[30px] rounded-t-lg transition-all relative ${isToday ? 'bg-bee-dark' : 'bg-stone-300 group-hover:bg-amber-300'}" style="height: ${height}px">
-                                <span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-black bg-stone-800 text-white px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100">${val}</span>
-                            </div>
-                            <span class="text-[10px] font-bold ${isToday ? 'text-bee-dark' : 'text-stone-400'}">${days[i]}</span>
-                        </div>
-                    `;
-                }).join('');
-
-                const tRate = this.state.tasks.length ? Math.round((this.state.tasks.filter(t=>t.done).length / this.state.tasks.length)*100) : 0;
-                const gRate = this.state.goals.length ? Math.round((this.state.goals.filter(g=>g.done).length / this.state.goals.length)*100) : 0;
-                document.getElementById('stat-task-rate').innerText = `${tRate}%`;
-                document.getElementById('stat-goal-rate').innerText = `${gRate}%`;
-            },
-            renderBadges() {
-                const badges = [
-                    { id: 1, name: "Ong Mới Tới", icon: "🌱", cond: true },
-                    { id: 2, name: "Thợ Xây Tổ", icon: "🏠", cond: this.state.hiveLevel > 1 },
-                    { id: 3, name: "Kỷ Luật Sắt", icon: "⏱️", cond: this.state.pomoCount > 0 },
-                    { id: 4, name: "Vua Checklist", icon: "✅", cond: this.state.tasks.filter(t=>t.done).length >= 3 },
-                    { id: 5, name: "Cây Đại Thụ", icon: "🌳", cond: this.state.pomoCount >= 5 },
-                    { id: 6, name: "Siêu Tập Trung", icon: "🔥", cond: this.state.pomoCount >= 10 },
-                    { id: 7, name: "Mục Tiêu Vàng", icon: "🎯", cond: this.state.goals.filter(g=>g.done).length >= 1 },
-                    { id: 8, name: "Nữ Hoàng Ong", icon: "👑", cond: this.state.honey >= 500 }
-                ];
-                
-                const earned = badges.filter(b=>b.cond).length;
-                document.getElementById('dash-badges').innerText = `${earned} / 8`;
-
-                document.getElementById('badges-grid').innerHTML = badges.map(b => `
-                    <div class="border-2 rounded-2xl p-4 text-center transition-all ${b.cond ? 'bg-amber-50 border-amber-200' : 'bg-stone-50 border-stone-200 grayscale opacity-50'}">
-                        <div class="text-3xl mb-2">${b.icon}</div>
-                        <h4 class="text-xs font-black text-stone-800">${b.name}</h4>
-                        <div class="mt-2 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block ${b.cond ? 'bg-amber-200 text-amber-800' : 'bg-stone-200 text-stone-500'}">
-                            ${b.cond ? 'Đã mở' : 'Khóa'}
-                        </div>
+    gameState.unlockedCards.forEach(cardId => {
+        const card = KNOWLEDGE_CARDS[cardId];
+        if(!card) return;
+        
+        list.innerHTML += `
+            <div class="bg-white dark:bg-gray-800 border-2 border-honey-200 dark:border-honey-900 rounded-xl p-4 shadow-sm relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 text-honey-100 dark:text-gray-700 opacity-30 text-6xl"><i class="fa-solid fa-book"></i></div>
+                <div class="relative z-10">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-honey-600 dark:text-honey-400 bg-honey-100 dark:bg-honey-900/30 px-2 py-0.5 rounded-full mb-2 inline-block">${card.type}</span>
+                    <h3 class="font-bold text-lg text-gray-800 dark:text-gray-100 mb-2 leading-tight">${card.name}</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">${card.content}</p>
+                    <div class="bg-blue-50 dark:bg-blue-900/20 p-2 rounded text-xs border border-blue-100 dark:border-blue-900/30">
+                        <span class="font-bold text-blue-700 dark:text-blue-400"><i class="fa-solid fa-lightbulb"></i> Mẹo:</span> ${card.trick}
                     </div>
-                `).join('');
-            }
-        };
+                </div>
+            </div>
+        `;
+    });
+}
 
-        // Kích hoạt App sau khi tải xong trang
-        document.addEventListener('DOMContentLoaded', () => window.app.init());
-    </script>
+// --- COMBAT LOGIC ---
+
+function startCombat(monsterId) {
+    const m = MONSTERS.find(x => x.id === monsterId);
+    
+    // Check Energy
+    if(gameState.energy < 5) {
+        alert("Bạn không đủ năng lượng! Chờ một chút hoặc làm nhiệm vụ để hồi phục.");
+        return;
+    }
+    gameState.energy -= 5;
+    saveGame();
+
+    currentCombat = {
+        monster: m,
+        mMaxHp: m.hp,
+        mHp: m.hp,
+        qTotal: m.questionsToKill,
+        dmgPerCorrect: Math.ceil(m.hp / m.questionsToKill),
+        selectedSkill: SKILLS[0] // default
+    };
+
+    // Setup UI
+    document.getElementById('combat-enemy-name').innerText = m.name;
+    document.getElementById('combat-enemy').innerText = m.icon;
+    updateCombatHpBars();
+    
+    // Setup background based on zone
+    const zone = ZONES.find(z => z.id === m.zoneId);
+    const bgDiv = document.getElementById('combat-bg');
+    bgDiv.className = `relative rounded-2xl shadow-inner border-4 border-gray-200 dark:border-gray-700 overflow-hidden h-64 sm:h-80 flex items-end justify-between p-4 mb-4 bg-gradient-to-b ${zone.color}`;
+
+    showScreen('combat');
+    loadCombatTurn();
+}
+
+function updateCombatHpBars() {
+    const pPercent = Math.max(0, (gameState.hp / getMaxHp()) * 100);
+    const mPercent = Math.max(0, (currentCombat.mHp / currentCombat.mMaxHp) * 100);
+    
+    document.getElementById('combat-player-hp-bar').style.width = `${pPercent}%`;
+    document.getElementById('combat-enemy-hp-bar').style.width = `${mPercent}%`;
+    updateHeaderStats();
+}
+
+function loadCombatTurn() {
+    document.getElementById('question-container').style.display = 'flex';
+    document.getElementById('combat-result').classList.add('hidden');
+    document.getElementById('combat-result').classList.remove('flex');
+
+    // Load available skills
+    const skillDiv = document.getElementById('skills-container');
+    skillDiv.innerHTML = '';
+    SKILLS.forEach(s => {
+        if(gameState.level >= s.level) {
+            const isSelected = currentCombat.selectedSkill.id === s.id;
+            const btn = document.createElement('button');
+            btn.className = `px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-colors flex items-center gap-1 border
+                ${isSelected ? 'bg-honey-500 text-white border-honey-600 shadow-md' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600'}`;
+            btn.innerHTML = `<i class="fa-solid ${s.icon}"></i> ${s.name}`;
+            btn.onclick = () => {
+                currentCombat.selectedSkill = s;
+                loadCombatTurn(); // re-render selection
+            };
+            skillDiv.appendChild(btn);
+        }
+    });
+
+    // Fetch random question based on zone subject
+    const zoneInfo = ZONES.find(z => z.id === currentCombat.monster.zoneId);
+    let pool = QUESTION_BANK.filter(q => q.subj === zoneInfo.subject);
+    if(pool.length === 0) pool = QUESTION_BANK; // Fallback
+    
+    const q = pool[Math.floor(Math.random() * pool.length)];
+    currentCombat.currentQ = q;
+
+    document.getElementById('question-subject').innerText = `Môn: ${q.subj}`;
+    document.getElementById('question-text').innerText = q.q;
+    
+    const ansContainer = document.getElementById('answers-container');
+    ansContainer.innerHTML = '';
+    
+    q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "btn-game text-left bg-blue-50 hover:bg-blue-100 dark:bg-gray-700 dark:hover:bg-gray-600 border border-blue-200 dark:border-gray-600 p-3 rounded-xl font-semibold text-gray-800 dark:text-gray-200 text-sm sm:text-base";
+        btn.innerHTML = `<span class="inline-block w-6 h-6 bg-white dark:bg-gray-800 rounded text-center leading-6 text-medblue-500 mr-2 shadow-sm font-bold">${String.fromCharCode(65+idx)}</span> ${opt}`;
+        btn.onclick = () => handleAnswer(idx);
+        ansContainer.appendChild(btn);
+    });
+}
+
+function createFloatingText(targetId, text, isHeal = false) {
+    const target = document.getElementById(targetId);
+    const rect = target.getBoundingClientRect();
+    const span = document.createElement('span');
+    span.className = isHeal ? 'heal-text' : 'damage-text';
+    span.innerText = text;
+    // Position near the target but randomly offset slightly
+    span.style.left = `${target.offsetLeft + (Math.random() * 20 - 10)}px`;
+    span.style.top = `${target.offsetTop - 20}px`;
+    target.parentNode.appendChild(span);
+    setTimeout(() => span.remove(), 1000);
+}
+
+function handleAnswer(idx) {
+    const q = currentCombat.currentQ;
+    const isCorrect = (idx === q.ans);
+    const playerEl = document.getElementById('combat-player');
+    const enemyEl = document.getElementById('combat-enemy');
+
+    document.getElementById('question-container').style.display = 'none';
+    const resultDiv = document.getElementById('combat-result');
+    resultDiv.classList.remove('hidden');
+    resultDiv.classList.add('flex');
+    
+    document.getElementById('result-explanation').innerText = q.exp;
+
+    if (isCorrect) {
+        playSound('correct');
+        document.getElementById('result-icon').innerText = '🎯';
+        document.getElementById('result-icon').className = 'text-5xl mb-2 text-green-500';
+        document.getElementById('result-title').innerText = 'Chính xác!';
+        document.getElementById('result-title').className = 'text-xl font-bold mb-2 text-green-600 dark:text-green-400';
+        
+        // Execute Skill
+        const skill = currentCombat.selectedSkill;
+        
+        if (skill.type === 'attack') {
+            playerEl.classList.add('animate-attack-right');
+            setTimeout(() => { playerEl.classList.remove('animate-attack-right'); }, 300);
+            
+            setTimeout(() => {
+                enemyEl.classList.add('animate-shake');
+                playSound('hit');
+                const dmg = Math.floor(currentCombat.dmgPerCorrect * skill.power);
+                createFloatingText('combat-enemy', `-${dmg}`);
+                currentCombat.mHp -= dmg;
+                updateCombatHpBars();
+                setTimeout(() => { enemyEl.classList.remove('animate-shake'); }, 400);
+            }, 150);
+        } else if (skill.type === 'heal') {
+            playerEl.classList.add('animate-bounce-slow');
+            playSound('heal');
+            const healAmt = Math.floor(getMaxHp() * skill.power);
+            createFloatingText('combat-player', `+${healAmt}`, true);
+            gameState.hp = Math.min(getMaxHp(), gameState.hp + healAmt);
+            updateCombatHpBars();
+            setTimeout(() => { playerEl.classList.remove('animate-bounce-slow'); }, 1000);
+        }
+        
+    } else {
+        playSound('wrong');
+        document.getElementById('result-icon').innerText = '❌';
+        document.getElementById('result-icon').className = 'text-5xl mb-2 text-red-500';
+        document.getElementById('result-title').innerText = 'Sai rồi!';
+        document.getElementById('result-title').className = 'text-xl font-bold mb-2 text-red-600 dark:text-red-400';
+        
+        // Enemy attacks
+        setTimeout(() => {
+            enemyEl.classList.add('animate-attack-left');
+            setTimeout(() => { enemyEl.classList.remove('animate-attack-left'); }, 300);
+            
+            setTimeout(() => {
+                playerEl.classList.add('animate-shake');
+                playSound('hit');
+                const dmg = Math.floor(getMaxHp() * 0.15); // 15% hp damage
+                createFloatingText('combat-player', `-${dmg}`);
+                gameState.hp -= dmg;
+                updateCombatHpBars();
+                setTimeout(() => { playerEl.classList.remove('animate-shake'); }, 400);
+            }, 150);
+        }, 500); // slight delay before enemy attacks
+    }
+}
+
+function nextCombatTurn() {
+    if (gameState.hp <= 0) {
+        // Lose
+        alert("Bạn đã kiệt sức! Hãy nghỉ ngơi và thử lại.");
+        gameState.hp = getMaxHp(); // revive
+        saveGame();
+        showScreen('zone');
+        return;
+    }
+
+    if (currentCombat.mHp <= 0) {
+        // Win
+        playSound('win');
+        const m = currentCombat.monster;
+        gameState.exp += m.exp;
+        gameState.coins += Math.floor(m.exp / 2);
+        
+        let rewardText = `Nhận ${m.exp} EXP và ${Math.floor(m.exp/2)} Xu.`;
+        
+        // Check drops
+        if(m.drops && m.drops.length > 0) {
+            m.drops.forEach(d => {
+                if(!gameState.unlockedCards.includes(d)) {
+                    gameState.unlockedCards.push(d);
+                    rewardText += `<br><span class="text-honey-500"> Mở khóa thẻ: ${KNOWLEDGE_CARDS[d].name}</span>`;
+                }
+            });
+        }
+        
+        checkLevelUp();
+        saveGame();
+        
+        // Show Victory Modal
+        document.getElementById('modal-icon').innerText = '🏆';
+        document.getElementById('modal-title').innerText = 'Chiến thắng!';
+        document.getElementById('modal-title').className = 'text-2xl font-black text-blue-500 mb-2';
+        document.getElementById('modal-desc').innerText = `Đã đánh bại ${m.name}`;
+        document.getElementById('modal-rewards').innerHTML = rewardText;
+        document.getElementById('modal-overlay').classList.remove('hidden');
+        document.getElementById('modal-overlay').classList.add('flex');
+        
+        // Custom close behavior for battle end
+        document.querySelector('#modal-overlay button').onclick = () => {
+            closeModal();
+            showScreen('zone'); // Return to map/zone
+            // Restore default modal action
+            document.querySelector('#modal-overlay button').onclick = closeModal;
+        };
+        
+        return;
+    }
+
+    loadCombatTurn();
+}
+
+function checkLevelUp() {
+    let leveledUp = false;
+    let oldTitle = getTitle(gameState.level);
+    
+    while(gameState.exp >= getExpRequired()) {
+        gameState.exp -= getExpRequired();
+        gameState.level++;
+        gameState.hp = getMaxHp();
+        gameState.energy = getMaxEnergy();
+        leveledUp = true;
+    }
+    
+    if(leveledUp) {
+        playSound('levelup');
+        let newTitle = getTitle(gameState.level);
+        let msg = `Máu tối đa tăng lên ${getMaxHp()}<br>Năng lượng tăng lên ${getMaxEnergy()}`;
+        if(oldTitle !== newTitle) {
+            msg += `<br><span class="text-medblue-500 font-bold mt-2 block">Danh hiệu mới: ${newTitle}</span>`;
+        }
+        
+        setTimeout(() => {
+            document.getElementById('modal-icon').innerText = '⭐';
+            document.getElementById('modal-title').innerText = `Lên Cấp ${gameState.level}!`;
+            document.getElementById('modal-title').className = 'text-2xl font-black text-honey-500 mb-2';
+            document.getElementById('modal-desc').innerText = 'Sức mạnh của bạn đã tăng lên!';
+            document.getElementById('modal-rewards').innerHTML = msg;
+            document.getElementById('modal-overlay').classList.remove('hidden');
+            document.getElementById('modal-overlay').classList.add('flex');
+        }, 500); // show slightly after battle win modal if both happen (battle win overwrites modal, so logic handles it)
+    }
+}
+
+function closeModal() {
+    document.getElementById('modal-overlay').classList.add('hidden');
+    document.getElementById('modal-overlay').classList.remove('flex');
+}
+
+// --- UTILS (THEME & AUDIO) ---
+
+function toggleDarkMode() {
+    gameState.settings.darkMode = !gameState.settings.darkMode;
+    applyTheme();
+    saveGame();
+}
+
+function applyTheme() {
+    if(gameState.settings.darkMode) {
+        document.documentElement.classList.add('dark');
+        document.getElementById('theme-icon').classList.replace('fa-moon', 'fa-sun');
+    } else {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('theme-icon').classList.replace('fa-sun', 'fa-moon');
+    }
+}
+
+function toggleSound() {
+    gameState.settings.sound = !gameState.settings.sound;
+    const icon = document.getElementById('sound-icon');
+    if(gameState.settings.sound) {
+        icon.classList.replace('fa-volume-xmark', 'fa-volume-up');
+    } else {
+        icon.classList.replace('fa-volume-up', 'fa-volume-xmark');
+    }
+    saveGame();
+}
+
+// Very simple synth for retro SFX to avoid needing external audio files
+function playSound(type) {
+    if(!gameState.settings.sound) return;
+    
+    if(!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    const now = audioCtx.currentTime;
+    
+    switch(type) {
+        case 'correct':
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
+            gainNode.gain.setValueAtTime(0.1, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+            osc.start(now);
+            osc.stop(now + 0.2);
+            break;
+        case 'wrong':
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.linearRampToValueAtTime(100, now + 0.2);
+            gainNode.gain.setValueAtTime(0.1, now);
+            gainNode.gain.linearRampToValueAtTime(0.01, now + 0.2);
+            osc.start(now);
+            osc.stop(now + 0.2);
+            break;
+        case 'hit':
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(100, now);
+            osc.frequency.exponentialRampToValueAtTime(10, now + 0.1);
+            gainNode.gain.setValueAtTime(0.1, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now);
+            osc.stop(now + 0.1);
+            break;
+        case 'win':
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.setValueAtTime(554, now + 0.1);
+            osc.frequency.setValueAtTime(659, now + 0.2);
+            osc.frequency.setValueAtTime(880, now + 0.3);
+            gainNode.gain.setValueAtTime(0.1, now);
+            gainNode.gain.linearRampToValueAtTime(0.01, now + 0.6);
+            osc.start(now);
+            osc.stop(now + 0.6);
+            break;
+        case 'heal':
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(300, now);
+            osc.frequency.linearRampToValueAtTime(600, now + 0.3);
+            gainNode.gain.setValueAtTime(0.1, now);
+            gainNode.gain.linearRampToValueAtTime(0.01, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+            break;
+    }
+}
+
+// Auto Energy Recovery (1 point every 30 seconds)
+setInterval(() => {
+    if(gameState.energy < getMaxEnergy()) {
+        gameState.energy++;
+        updateHeaderStats();
+        // saveGame(); // Don't save every tick to save IO
+    }
+}, 30000);
+
+// Init
+window.onload = initGame;
+
+</script>
 </body>
 </html>
-
 
 ```
 
